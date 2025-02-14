@@ -22,15 +22,21 @@ export default function Header() {
 
   return (
     <header className="h-16 px-6 flex items-center justify-between border-b border-gray-300 bg-gray-100">
-      <div className="flex items-center justify-end space-x-4 flex-1">
+      <div className="flex items-center gap-4">
+        <span className="text-sm bg-purple-100 text-purple-800 px-3 py-1 rounded-full font-medium">
+          ABC Testnet
+        </span>
+      </div>
+      
+      <div className="flex items-center space-x-4">
         {isConnected && address ? (
-          <div className="flex items-center gap-2">
-            <span className="text-sm text-gray-600">
+          <div className="flex items-center gap-3">
+            <span className="text-sm bg-gray-200 px-3 py-1 rounded-full">
               {formatAddress(address)}
             </span>
             <button 
               onClick={() => disconnect()}
-              className="px-3 py-1 text-sm rounded bg-red-500 text-white hover:bg-red-600"
+              className="px-4 py-2 text-sm font-medium rounded-full bg-red-500 text-white hover:bg-red-600 transition-colors"
             >
               Disconnect
             </button>
@@ -38,7 +44,7 @@ export default function Header() {
         ) : (
           <button 
             onClick={handleConnect}
-            className="px-4 py-2 rounded bg-blue-500 text-white hover:bg-blue-600"
+            className="px-6 py-2 rounded-full bg-blue-500 text-white font-medium hover:bg-blue-600 transition-colors"
           >
             Connect Wallet
           </button>
