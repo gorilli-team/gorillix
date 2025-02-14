@@ -2,8 +2,9 @@
 pragma solidity ^0.8.20;
 
 import { IERC20 } from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import { Ownable } from "@openzeppelin/contracts/access/Ownable.sol";
 
-contract Gorillix {
+contract Gorillix is Ownable {
     IERC20 public immutable i_tokenA;
     IERC20 public immutable i_tokenB;
 
@@ -37,7 +38,7 @@ contract Gorillix {
     //////////////// CONSTRUCTOR ////////////////////
     /////////////////////////////////////////////////
 
-    constructor(address _tokenA, address _tokenB) {
+    constructor(address _tokenA, address _tokenB) Ownable(msg.sender) {
         i_tokenA = IERC20(_tokenA);
         i_tokenB = IERC20(_tokenB);
     }
@@ -76,7 +77,7 @@ contract Gorillix {
 
     // i we call it x and y because user can swap tokenA for tokenB,
     // but also tokenB for tokenA
-    function price(uint256 xInput, uint256 xReserves, uint256 yReserves) public pure returns(uint256) {
+    function price(uint256 xInput, uint256 xReserves, uint256 yReserves) public pure returns(uint256 yOutput) {
         uint256 xInputWithFee = xInput * 997;
         uint256 numerator = xInputWithFee * yReserves;
         uint256 denominator = (xReserves * 1000) + xInputWithFee;
