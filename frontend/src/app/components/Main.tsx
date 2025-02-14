@@ -1,3 +1,5 @@
+import Dashboard from './Dashboard';
+
 interface MainProps {
  selectedPage: string;
  setSelectedPage: React.Dispatch<React.SetStateAction<string>>;
@@ -20,7 +22,7 @@ export default function Main({
        return <div className="p-4"><h1 className="text-2xl font-bold">Pools</h1></div>; 
      case "Dashboard":
      default:
-       return <div className="p-4"><h1 className="text-2xl font-bold">Dashboard Overview</h1></div>;
+       return <Dashboard />;
    }
  };
 

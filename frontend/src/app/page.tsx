@@ -6,7 +6,6 @@ import Main from "./components/Main";
 
 export default function Page() {
   const [selectedPage, setSelectedPage] = useState("Dashboard");
-  const [selectedVault, setSelectedVault] = useState<string | null>(null);
 
   return (
     <div className="flex h-screen bg-gray-100 text-gray-800">
