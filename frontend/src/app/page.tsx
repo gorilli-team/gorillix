@@ -1,7 +1,14 @@
+"use client";
+import Header from "./components/Header";
+
+
 export default function AppLayout() {
+
   return (
-    <div>
-      <p>test</p>
+    <div className="flex h-screen bg-gray-100 text-gray-800">
+      <div className="flex-1 flex flex-col">
+        <Header />
+      </div>
     </div>
   );
 }
