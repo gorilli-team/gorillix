@@ -47,6 +47,11 @@ contract Gorillix {
     /////////////////////////////////////////////////
 
     // q would it be useful to add a modifier to allow call to this function only once?
+
+    // WHAT IF instead of a single function initializing both token, we create two separate functions?
+    // this single init function was thought for initializing ETH and another ERC20 token, BUT NOT BOTH ERC20s
+
+    // q does it need a return value?
     function init(uint256 amountTokenA, uint256 amountTokenB) external {
         // i this check makes sure that whoever calls the init function is obliged to send both token (non-zero amount)
         if (amountTokenA == 0 || amountTokenB == 0) {
@@ -69,8 +74,34 @@ contract Gorillix {
         emit Initialized(msg.sender, amountTokenA, amountTokenB);
     }
 
+    // i we call it x and y because user can swap tokenA for tokenB,
+    // but also tokenB for tokenA
+    function price(uint256 xInput, uint256 xReserves, uint256 yReserves) public pure returns(uint256) {
+        uint256 xInputWithFee = xInput * 997;
+        uint256 numerator = xInputWithFee * yReserves;
+        uint256 denominator = (xReserves * 1000) + xInputWithFee;
+        return (numerator / denominator);
+    }
+
 
     // q what if someone sends token to the contract?
 
-    
+    //////////////////////////////////////////////
+    ////////////// VIEW FUNCTIONS ////////////////
+    //////////////////////////////////////////////
+    function getTotalLiquidityTokenA() public view returns(uint256) {
+        return s_totalLiquidityTokenA;
+    }
+
+    function getTotalLiquidityTokenB() public view returns(uint256) {
+        return s_totalLiquidityTokenB;
+    }
+
+    function getLiquidityTokenAPerUser(address user) public view returns(uint256) {
+        return s_liquidityTokenAPerUser[user];
+    }
+
+    function getLiquidityTokenBPerUser(address user) public view returns(uint256) {
+        return s_liquidityTokenBPerUser[user];
+    }
 }
