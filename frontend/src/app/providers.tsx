@@ -1,36 +1,29 @@
-"use client";
-import { WagmiConfig, createConfig } from 'wagmi';
-import { mainnet } from 'wagmi/chains';
-import { injected } from 'wagmi/connectors';
-import { http } from 'viem';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+'use client';
 
-const config = createConfig({
-  chains: [mainnet],
-  connectors: [
-    injected({
-      shimDisconnect: true
-    })
-  ],
-  transports: {
-    [mainnet.id]: http()
-  },
-  ssr: true
-});
+import { ConnectKitProvider, getDefaultConfig } from "connectkit";
+import { WagmiConfig, createConfig } from "wagmi";
+import { mainnet, sepolia } from 'wagmi/chains';
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      refetchOnWindowFocus: false
-    }
-  }
-});
+const config = createConfig(
+  getDefaultConfig({
+    appName: "Gorillix",
+    
+    chains: [mainnet, sepolia],
+    
+    walletConnectProjectId: process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID || ""
+  }),
+);
+
+const queryClient = new QueryClient();
 
 export function Providers({ children }: { children: React.ReactNode }) {
   return (
     <WagmiConfig config={config}>
       <QueryClientProvider client={queryClient}>
-        {children}
+        <ConnectKitProvider theme="auto" mode="dark">
+          {children}
+        </ConnectKitProvider>
       </QueryClientProvider>
     </WagmiConfig>
   );
