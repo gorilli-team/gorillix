@@ -63,8 +63,8 @@ contract Gorillix is Ownable {
             revert Gorillix__AlreadyInitialized();
         }
 
-        s_totalLiquidityTokenA = i_tokenA.balanceOf(address(this));
-        s_totalLiquidityTokenB = i_tokenB.balanceOf(address(this));
+        s_totalLiquidityTokenA = amountTokenA;
+        s_totalLiquidityTokenB = amountTokenB;
 
         s_liquidityTokenAPerUser[msg.sender] = amountTokenA;
         s_liquidityTokenBPerUser[msg.sender] = amountTokenB;
@@ -77,6 +77,7 @@ contract Gorillix is Ownable {
 
     // i we call it x and y because user can swap tokenA for tokenB,
     // but also tokenB for tokenA
+    // i we account for a 0.3% fee on xInput
     function price(uint256 xInput, uint256 xReserves, uint256 yReserves) public pure returns(uint256 yOutput) {
         uint256 xInputWithFee = xInput * 997;
         uint256 numerator = xInputWithFee * yReserves;
