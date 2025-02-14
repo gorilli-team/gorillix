@@ -18,6 +18,12 @@ export default function Sidebar({
     setMounted(true);
   }, []);
 
+  useEffect(() => {
+    if (mounted) {
+      console.log("connected wallet:", address);
+    }
+  }, [address, mounted]);
+
   const handleGorillixClick = () => {
     window.location.reload();
   };
@@ -39,6 +45,12 @@ export default function Sidebar({
               <button className="w-full text-left px-3 py-2 rounded-lg hover:bg-gray-200">
                 <i className="fa-regular fa-newspaper pr-2"></i>
                 <span>Dashboard</span>
+              </button>
+            </li>
+            <li>
+              <button className="w-full text-left px-3 py-2 rounded-lg hover:bg-gray-200">
+                <i className="fa-regular fa-newspaper pr-2"></i>
+                <span>Pools</span>
               </button>
             </li>
             <li>
@@ -79,6 +91,17 @@ export default function Sidebar({
             >
               <i className="fa-regular fa-newspaper pr-2"></i>
               <span>Dashboard</span>
+            </button>
+          </li>
+          <li>
+            <button
+            className={`w-full text-left px-3 py-2 rounded-lg hover:bg-gray-200 ${
+                selectedPage === "Pools" ? "bg-gray-200" : ""
+            }`}
+            onClick={() => handlePageChange("Pools")}
+            >
+            <i className="fa-solid fa-water pr-2"></i>
+            <span>Pools</span>
             </button>
           </li>
           <li>
