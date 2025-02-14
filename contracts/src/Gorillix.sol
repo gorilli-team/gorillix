@@ -28,8 +28,10 @@ contract Gorillix {
 
     uint256 public s_totalLiquidityTokenA;
     uint256 public s_totalLiquidityTokenB;
-    // q is it more appropriate to call it "s_liquidityPerUser"?
-    mapping (address user => uint256 amount) public s_liquidity;
+
+    mapping (address user => uint256 amountTokenA) public s_liquidityTokenAPerUser;
+    mapping (address user => uint256 amountTokenB) public s_liquidityTokenBPerUser;
+
 
     /////////////////////////////////////////////////
     //////////////// CONSTRUCTOR ////////////////////
@@ -54,9 +56,12 @@ contract Gorillix {
         if (s_totalLiquidityTokenA != 0 && s_totalLiquidityTokenB != 0) {
             revert Gorillix__AlreadyInitialized();
         }
-        
+
         s_totalLiquidityTokenA = i_tokenA.balanceOf(address(this));
         s_totalLiquidityTokenB = i_tokenB.balanceOf(address(this));
+
+        s_liquidityTokenAPerUser[msg.sender] = amountTokenA;
+        s_liquidityTokenBPerUser[msg.sender] = amountTokenB;
 
         i_tokenA.transferFrom(msg.sender, address(this), amountTokenA);
         i_tokenB.transferFrom(msg.sender, address(this), amountTokenB);
