@@ -12,9 +12,9 @@ const mockData = [
 
 export default function DexStats() {
   return (
-    <div className="p-6 max-w-7xl mx-auto">
-      <div className="mb-8">
-        <h1 className="text-2xl font-bold mb-2">Trading Statistics</h1>
+    <div className="p-4 max-w-7xl mx-auto">
+      <div className="mb-4">
+        <h2 className="text-2xl font-bold mb-2">Dex Statistic</h2>
         <p className="text-gray-600">Real-time pool and trading metrics</p>
       </div>
 

@@ -16,15 +16,15 @@ export default function Main({
     const renderContent = () => {
         switch (selectedPage) {
             case "AI Agent":
-                return <div className="p-4"><AiAgentConfiguration /></div>;
+                return <div className="p-4"><h2 className="text-2xl font-bold mb-6">AI Agent Configuration</h2><AiAgentConfiguration /></div>;
             case "Stats":
-                return <div className="p-4"><DexStats/></div>;
+                return <div><DexStats/></div>;
             case "My Account":
-                return <div className="p-4"><h1 className="text-2xl font-bold">My Account Details</h1></div>;
+                return <div className="p-4"><h2 className="text-2xl font-bold">My Account Details</h2></div>;
             case "Pools":
                 return (
-                    <div className="p-6">
-                        <h1 className="text-2xl font-bold mb-8">Your Pools</h1>
+                    <div className="p-4">
+                        <h2 className="text-2xl font-bold mb-8">Your Pools</h2>
                         <div className="mb-8">
                             <PoolItem 
                                 tokenPair="UNI/USDC"

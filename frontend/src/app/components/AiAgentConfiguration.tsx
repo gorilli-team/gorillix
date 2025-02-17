@@ -26,9 +26,7 @@ export default function AiAgentConfiguration() {
 
   return (
     <div className="max-w-4xl mx-auto p-6">
-      <div className="bg-white rounded-xl shadow-lg p-6 mb-6">
-        <h2 className="text-2xl font-bold mb-6">AI Agent Configuration</h2>
-        
+      <div className="bg-white rounded-xl shadow-lg p-6 mb-6">        
         <div className="mb-8">
           <h3 className="text-lg font-semibold mb-4">Trading Strategy</h3>
           <div className="grid gap-4 md:grid-cols-3">
