@@ -24,14 +24,17 @@ contract Gorillix is Ownable {
     event Initialized(address initializer, uint256 indexed amountTokenA, uint256 amountTokenB);
     event TokenAtoTokenBSwap(address indexed user, uint256 indexed amountTokenA, uint256 indexed outputTokenB);
     event TokenBtoTokenASwap(address indexed user, uint256 indexed amountTokenB, uint256 indexed outputTokenA);
+    event AddLiquidity(address indexed liquidityProvider, uint256 indexed amountTokenA, uint256 indexed amountTokenB);
 
     ////////////////////////////////////////////////
     /////////////// STATE VARIABLES ////////////////
     ////////////////////////////////////////////////
 
+    // are they really useful? or it is sufficient to call the balance?
     uint256 public s_totalLiquidityTokenA;
     uint256 public s_totalLiquidityTokenB;
 
+    // do we intend these as the liquidity tokens?
     mapping (address user => uint256 amountTokenA) public s_liquidityTokenAPerUser;
     mapping (address user => uint256 amountTokenB) public s_liquidityTokenBPerUser;
 
@@ -77,7 +80,7 @@ contract Gorillix is Ownable {
         emit Initialized(msg.sender, amountTokenA, amountTokenB);
     }
 
-    function tokenAtoTokenB(uint256 amountTokenA) public returns(uint256 outputTokenB) {
+    function tokenAtoTokenB(uint256 amountTokenA) external returns(uint256 outputTokenB) {
         if (amountTokenA == 0) {
             revert Gorillix__AmountMustBeGreaterThanZero();
         }
@@ -95,7 +98,7 @@ contract Gorillix is Ownable {
         return outputTokenB;
     }
 
-    function tokenBtoTokenA(uint256 amountTokenB) public returns(uint256 outputTokenA) {
+    function tokenBtoTokenA(uint256 amountTokenB) external returns(uint256 outputTokenA) {
         if (amountTokenB == 0) {
             revert Gorillix__AmountMustBeGreaterThanZero();
         }
@@ -113,6 +116,45 @@ contract Gorillix is Ownable {
         return outputTokenA;
     }
 
+    function addLiquidityTokenA(uint256 amountTokenA) external returns(uint256 amountTokenB) {
+        if (amountTokenA == 0) {
+            revert Gorillix__AmountMustBeGreaterThanZero();
+        }
+        uint256 reservesTokenA = s_totalLiquidityTokenA;
+        uint256 reservesTokenB = s_totalLiquidityTokenB;
+
+        amountTokenB = (amountTokenA * reservesTokenB) / reservesTokenA;
+
+        s_totalLiquidityTokenA += amountTokenA;
+        s_totalLiquidityTokenB += amountTokenB;
+        s_liquidityTokenAPerUser[msg.sender] += amountTokenA;
+        s_liquidityTokenBPerUser[msg.sender] += amountTokenB;
+
+        i_tokenA.transferFrom(msg.sender, address(this), amountTokenA);
+        i_tokenB.transferFrom(msg.sender, address(this), amountTokenB);
+
+        emit AddLiquidity(msg.sender, amountTokenA, amountTokenB);
+    }
+
+    function addLiquidityTokenB(uint256 amountTokenB) external returns(uint256 amountTokenA) {
+        if (amountTokenB == 0) {
+            revert Gorillix__AmountMustBeGreaterThanZero();
+        }
+        uint256 reservesTokenA = s_totalLiquidityTokenA;
+        uint256 reservesTokenB = s_totalLiquidityTokenB;
+
+        amountTokenA = (amountTokenB * reservesTokenA) / reservesTokenB;
+
+        s_totalLiquidityTokenA += amountTokenA;
+        s_totalLiquidityTokenB += amountTokenB;
+        s_liquidityTokenAPerUser[msg.sender] += amountTokenA;
+        s_liquidityTokenBPerUser[msg.sender] += amountTokenB;
+
+        i_tokenA.transferFrom(msg.sender, address(this), amountTokenA);
+        i_tokenB.transferFrom(msg.sender, address(this), amountTokenB);
+
+        emit AddLiquidity(msg.sender, amountTokenA, amountTokenB);
+    }
 
     //////////////////////////////////////////////
     ////////////// PURE FUNCTIONS ////////////////

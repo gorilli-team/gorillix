@@ -130,4 +130,50 @@ contract GorillixTest is Test {
 
         assertEq(gorillix.getTotalLiquidityTokenB(), totalLiquidityTokenBBeforeSwap + 10000000000000000000);
     }
+
+    function testAddLiquidityTokenA() public {
+        vm.startPrank(deployer);
+        tokenA.approve(address(gorillix), INIT_AMOUNT);
+        tokenB.approve(address(gorillix), INIT_AMOUNT);
+        gorillix.init(INIT_AMOUNT, INIT_AMOUNT);
+        vm.stopPrank();
+
+        console.log("User1 tokenA balance before adding liquidity: ", tokenA.balanceOf(user1));
+        console.log("User1 tokenB balance before adding liquidity: ", tokenB.balanceOf(user1));
+
+        vm.startPrank(user1);
+        tokenA.approve(address(gorillix), 10000000000000000000);
+        tokenB.approve(address(gorillix), 10000000000000000000);
+        gorillix.addLiquidityTokenA(10000000000000000000);
+        vm.stopPrank();
+
+        console.log("User1 tokenA balance after adding liquidity: ", tokenA.balanceOf(user1));
+        console.log("User1 tokenB balance after adding liquidity: ", tokenB.balanceOf(user1));
+
+        console.log("Gorillix tokenA balance after adding liquidity: ", tokenA.balanceOf(address(gorillix)));
+        console.log("Gorillix tokenB balance after adding liquidity: ", tokenB.balanceOf(address(gorillix)));
+    }
+
+    function testAddLiquidityTokenB() public {
+        vm.startPrank(deployer);
+        tokenA.approve(address(gorillix), INIT_AMOUNT);
+        tokenB.approve(address(gorillix), INIT_AMOUNT);
+        gorillix.init(INIT_AMOUNT, INIT_AMOUNT);
+        vm.stopPrank();
+
+        console.log("User1 tokenA balance before adding liquidity: ", tokenA.balanceOf(user1));
+        console.log("User1 tokenB balance before adding liquidity: ", tokenB.balanceOf(user1));
+
+        vm.startPrank(user1);
+        tokenA.approve(address(gorillix), 10000000000000000000);
+        tokenB.approve(address(gorillix), 10000000000000000000);
+        gorillix.addLiquidityTokenB(10000000000000000000);
+        vm.stopPrank();
+
+        console.log("User1 tokenA balance after adding liquidity: ", tokenA.balanceOf(user1));
+        console.log("User1 tokenB balance after adding liquidity: ", tokenB.balanceOf(user1));
+
+        console.log("Gorillix tokenA balance after adding liquidity: ", tokenA.balanceOf(address(gorillix)));
+        console.log("Gorillix tokenB balance after adding liquidity: ", tokenB.balanceOf(address(gorillix)));
+    }
 }
