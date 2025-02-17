@@ -1,6 +1,7 @@
 import React from 'react';
 import Dashboard from './Dashboard';
 import PoolItem from './PoolItem';
+import AiAgentConfiguration from './AiAgentConfiguration';
 
 interface MainProps {
     selectedPage: string;
@@ -14,7 +15,9 @@ export default function Main({
     const renderContent = () => {
         switch (selectedPage) {
             case "AI Agent":
-                return <div className="p-4"><h1 className="text-2xl font-bold">AI Agent Configuration</h1></div>;
+                return <div className="p-4">
+                    <AiAgentConfiguration />
+                </div>;
             case "Stats":
                 return <div className="p-4"><h1 className="text-2xl font-bold">Trading Statistics</h1></div>;
             case "My Account":
@@ -54,7 +57,7 @@ export default function Main({
     };
 
     return (
-        <main className="flex-1 overflow-y-auto bg-gray-100">
+        <main className="flex-1 overflow-y-auto main-layout bg-gray-100">
             {renderContent()}
         </main>
     );

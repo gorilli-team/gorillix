@@ -5,3 +5,12 @@
 body{
   font-family: "Inter", sans-serif;
 }
+
+.main-layout{
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.main-layout::-webkit-scrollbar {
+  display: none;
+}
