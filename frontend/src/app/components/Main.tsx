@@ -36,16 +36,6 @@ export default function Main({
                                 token1Image="/usd-coin-usdc-logo.png"
                                 token2Image="/uniswap-uni-logo.png"
                             />
-                            <PoolItem 
-                                tokenPair="LINK/DAI"
-                                poolNumber="1"
-                                fee="0.01%"
-                                volume24h="$1,465,282"
-                                liquidity="$1,227,967"
-                                apr="< 0.1% - 2.2%"
-                                token1Image="/chainlink-link-logo.png"
-                                token2Image="/multi-collateral-dai-dai-logo.png"
-                            />
                         </div>
                     </div>
                 );

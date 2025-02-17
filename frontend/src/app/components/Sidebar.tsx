@@ -11,7 +11,7 @@ export default function Sidebar({
   selectedPage,
   setSelectedPage,
 }: SidebarProps) {
-  const { address } = useAccount();
+  const { address, isConnected } = useAccount();
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
@@ -49,7 +49,7 @@ export default function Sidebar({
             </li>
             <li>
               <button className="w-full text-left px-3 py-2 rounded-lg hover:bg-gray-200">
-                <i className="fa-regular fa-newspaper pr-2"></i>
+                <i className="fa-solid fa-water pr-2"></i>
                 <span>Pools</span>
               </button>
             </li>
@@ -95,13 +95,13 @@ export default function Sidebar({
           </li>
           <li>
             <button
-            className={`w-full text-left px-3 py-2 rounded-lg hover:bg-gray-200 ${
+              className={`w-full text-left px-3 py-2 rounded-lg hover:bg-gray-200 ${
                 selectedPage === "Pools" ? "bg-gray-200" : ""
-            }`}
-            onClick={() => handlePageChange("Pools")}
+              }`}
+              onClick={() => handlePageChange("Pools")}
             >
-            <i className="fa-solid fa-water pr-2"></i>
-            <span>Pools</span>
+              <i className="fa-solid fa-water pr-2"></i>
+              <span>Pools</span>
             </button>
           </li>
           <li>
@@ -126,7 +126,7 @@ export default function Sidebar({
               <span>Stats</span>
             </button>
           </li>
-          {address && (
+          {isConnected && (
             <li>
               <button
                 className={`w-full text-left px-3 py-2 rounded-lg hover:bg-gray-200 ${
