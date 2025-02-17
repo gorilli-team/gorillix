@@ -84,4 +84,50 @@ contract GorillixTest is Test {
 
         console.log("If we swap 100 TokenA, we receive: ", yOutput, " TokenB");
     }
+
+    function testTokenAToTokenBSwap() public {
+        vm.startPrank(deployer);
+        tokenA.approve(address(gorillix), INIT_AMOUNT);
+        tokenB.approve(address(gorillix), INIT_AMOUNT);
+        gorillix.init(INIT_AMOUNT, INIT_AMOUNT);
+        vm.stopPrank();
+
+        console.log("User1 tokenA amount before swap: ", tokenA.balanceOf(user1));
+        console.log("User1 tokenB amount before swap: ", tokenB.balanceOf(user1));
+
+        uint256 totalLiquidityTokenABeforeSwap = gorillix.getTotalLiquidityTokenA();
+
+        vm.startPrank(user1);
+        tokenA.approve(address(gorillix), 10000000000000000000);
+        gorillix.tokenAtoTokenB(10000000000000000000);
+        vm.stopPrank();
+
+        console.log("User1 tokenA amount after swap: ", tokenA.balanceOf(user1));
+        console.log("User1 tokenB amount after swap: ", tokenB.balanceOf(user1));
+
+        assertEq(gorillix.getTotalLiquidityTokenA(), totalLiquidityTokenABeforeSwap + 10000000000000000000);
+    }
+
+    function testTokenBToTokenASwap() public {
+        vm.startPrank(deployer);
+        tokenA.approve(address(gorillix), INIT_AMOUNT);
+        tokenB.approve(address(gorillix), INIT_AMOUNT);
+        gorillix.init(INIT_AMOUNT, INIT_AMOUNT);
+        vm.stopPrank();
+
+        console.log("User1 tokenA amount before swap: ", tokenA.balanceOf(user1));
+        console.log("User1 tokenB amount before swap: ", tokenB.balanceOf(user1));
+
+        uint256 totalLiquidityTokenBBeforeSwap = gorillix.getTotalLiquidityTokenB();
+
+        vm.startPrank(user1);
+        tokenB.approve(address(gorillix), 10000000000000000000);
+        gorillix.tokenBtoTokenA(10000000000000000000);
+        vm.stopPrank();
+
+        console.log("User1 tokenA amount after swap: ", tokenA.balanceOf(user1));
+        console.log("User1 tokenB amount after swap: ", tokenB.balanceOf(user1));
+
+        assertEq(gorillix.getTotalLiquidityTokenB(), totalLiquidityTokenBBeforeSwap + 10000000000000000000);
+    }
 }

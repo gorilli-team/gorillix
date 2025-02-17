@@ -22,6 +22,8 @@ contract Gorillix is Ownable {
     ////////////////////////////////////////////////
 
     event Initialized(address initializer, uint256 indexed amountTokenA, uint256 amountTokenB);
+    event TokenAtoTokenBSwap(address indexed user, uint256 indexed amountTokenA, uint256 indexed outputTokenB);
+    event TokenBtoTokenASwap(address indexed user, uint256 indexed amountTokenB, uint256 indexed outputTokenA);
 
     ////////////////////////////////////////////////
     /////////////// STATE VARIABLES ////////////////
@@ -74,6 +76,47 @@ contract Gorillix is Ownable {
 
         emit Initialized(msg.sender, amountTokenA, amountTokenB);
     }
+
+    function tokenAtoTokenB(uint256 amountTokenA) public returns(uint256 outputTokenB) {
+        if (amountTokenA == 0) {
+            revert Gorillix__AmountMustBeGreaterThanZero();
+        }
+        uint256 reservesTokenA = s_totalLiquidityTokenA;
+        uint256 reservesTokenB = s_totalLiquidityTokenB;
+
+        s_totalLiquidityTokenA += amountTokenA;
+
+        outputTokenB = price(amountTokenA, reservesTokenA, reservesTokenB);
+
+        i_tokenA.transferFrom(msg.sender, address(this), amountTokenA);
+        i_tokenB.transfer(msg.sender, outputTokenB);
+
+        emit TokenAtoTokenBSwap(msg.sender, amountTokenA, outputTokenB);
+        return outputTokenB;
+    }
+
+    function tokenBtoTokenA(uint256 amountTokenB) public returns(uint256 outputTokenA) {
+        if (amountTokenB == 0) {
+            revert Gorillix__AmountMustBeGreaterThanZero();
+        }
+        uint256 reservesTokenA = s_totalLiquidityTokenA;
+        uint256 reservesTokenB = s_totalLiquidityTokenB;
+
+        s_totalLiquidityTokenB += amountTokenB;
+
+        outputTokenA = price(amountTokenB, reservesTokenB, reservesTokenA);
+
+        i_tokenB.transferFrom(msg.sender, address(this), amountTokenB);
+        i_tokenA.transfer(msg.sender, outputTokenA);
+
+        emit TokenBtoTokenASwap(msg.sender, amountTokenB, outputTokenA);
+        return outputTokenA;
+    }
+
+
+    //////////////////////////////////////////////
+    ////////////// PURE FUNCTIONS ////////////////
+    //////////////////////////////////////////////
 
     // i we call it x and y because user can swap tokenA for tokenB,
     // but also tokenB for tokenA
