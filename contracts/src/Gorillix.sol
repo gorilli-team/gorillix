@@ -49,7 +49,7 @@ contract Gorillix is Ownable {
     }
 
     /////////////////////////////////////////////////
-    ////////////// PUBLIC FUNCTIONS /////////////////
+    ////////////// EXTERNAL FUNCTIONS ///////////////
     /////////////////////////////////////////////////
 
     // q would it be useful to add a modifier to allow call to this function only once?
@@ -87,9 +87,9 @@ contract Gorillix is Ownable {
         uint256 reservesTokenA = s_totalLiquidityTokenA;
         uint256 reservesTokenB = s_totalLiquidityTokenB;
 
-        s_totalLiquidityTokenA += amountTokenA;
-
         outputTokenB = price(amountTokenA, reservesTokenA, reservesTokenB);
+        s_totalLiquidityTokenA += amountTokenA;
+        s_totalLiquidityTokenB -= outputTokenB;
 
         i_tokenA.transferFrom(msg.sender, address(this), amountTokenA);
         i_tokenB.transfer(msg.sender, outputTokenB);
@@ -105,9 +105,9 @@ contract Gorillix is Ownable {
         uint256 reservesTokenA = s_totalLiquidityTokenA;
         uint256 reservesTokenB = s_totalLiquidityTokenB;
 
-        s_totalLiquidityTokenB += amountTokenB;
-
         outputTokenA = price(amountTokenB, reservesTokenB, reservesTokenA);
+        s_totalLiquidityTokenB += amountTokenB;
+        s_totalLiquidityTokenA -= outputTokenA;
 
         i_tokenB.transferFrom(msg.sender, address(this), amountTokenB);
         i_tokenA.transfer(msg.sender, outputTokenA);
@@ -176,19 +176,19 @@ contract Gorillix is Ownable {
     //////////////////////////////////////////////
     ////////////// VIEW FUNCTIONS ////////////////
     //////////////////////////////////////////////
-    function getTotalLiquidityTokenA() public view returns(uint256) {
+    function getTotalLiquidityTokenA() external view returns(uint256) {
         return s_totalLiquidityTokenA;
     }
 
-    function getTotalLiquidityTokenB() public view returns(uint256) {
+    function getTotalLiquidityTokenB() external view returns(uint256) {
         return s_totalLiquidityTokenB;
     }
 
-    function getLiquidityTokenAPerUser(address user) public view returns(uint256) {
+    function getLiquidityTokenAPerUser(address user) external view returns(uint256) {
         return s_liquidityTokenAPerUser[user];
     }
 
-    function getLiquidityTokenBPerUser(address user) public view returns(uint256) {
+    function getLiquidityTokenBPerUser(address user) external view returns(uint256) {
         return s_liquidityTokenBPerUser[user];
     }
 }

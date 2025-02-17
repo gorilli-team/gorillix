@@ -96,6 +96,9 @@ contract GorillixTest is Test {
         console.log("User1 tokenB amount before swap: ", tokenB.balanceOf(user1));
 
         uint256 totalLiquidityTokenABeforeSwap = gorillix.getTotalLiquidityTokenA();
+        uint256 totalLiquidityTokenBBeforeSwap = gorillix.getTotalLiquidityTokenB();
+        console.log("Total liquidity Token A before swap: ", totalLiquidityTokenABeforeSwap);
+        console.log("Total liquidity Token B before swap: ", totalLiquidityTokenBBeforeSwap);
 
         vm.startPrank(user1);
         tokenA.approve(address(gorillix), 10000000000000000000);
@@ -104,6 +107,9 @@ contract GorillixTest is Test {
 
         console.log("User1 tokenA amount after swap: ", tokenA.balanceOf(user1));
         console.log("User1 tokenB amount after swap: ", tokenB.balanceOf(user1));
+
+        console.log("Total liquidity Token A after swap: ", gorillix.getTotalLiquidityTokenA());
+        console.log("Total liquidity Token B after swap: ", gorillix.getTotalLiquidityTokenB());
 
         assertEq(gorillix.getTotalLiquidityTokenA(), totalLiquidityTokenABeforeSwap + 10000000000000000000);
     }
@@ -131,6 +137,70 @@ contract GorillixTest is Test {
         assertEq(gorillix.getTotalLiquidityTokenB(), totalLiquidityTokenBBeforeSwap + 10000000000000000000);
     }
 
+    function testPriceChangesAfterSwappingTokens() public {
+        vm.startPrank(deployer);
+        tokenA.approve(address(gorillix), INIT_AMOUNT);
+        tokenB.approve(address(gorillix), INIT_AMOUNT);
+        gorillix.init(INIT_AMOUNT, INIT_AMOUNT);
+        vm.stopPrank();
+
+        // PRICE BEFORE SWAP
+        uint256 xReservesBefore = gorillix.getTotalLiquidityTokenA();
+        uint256 yReservesBefore = gorillix.getTotalLiquidityTokenB();
+
+        uint256 yOutputBefore = gorillix.price(100 * 10 ** 18, xReservesBefore, yReservesBefore);
+
+        console.log("yOutput before: ", yOutputBefore);
+
+        // USER1 SWAPS 10 tokenA
+        vm.startPrank(user1);
+        tokenA.approve(address(gorillix), 10000000000000000000);
+        gorillix.tokenAtoTokenB(10000000000000000000);
+        vm.stopPrank();
+
+        uint256 xReservesAfter = gorillix.getTotalLiquidityTokenA();
+        uint256 yReservesAfter = gorillix.getTotalLiquidityTokenB();
+
+        uint256 yOutputAfter = gorillix.price(100 * 10 ** 18, xReservesAfter, yReservesAfter);
+
+        console.log("yOutput after: ", yOutputAfter);
+
+        // The value of Token A has decreased, as there are more Token A in the reserve
+        assert(yOutputAfter < yOutputBefore);
+    }
+
+    function testTokenBValueIncreasesAfterSwappingTokenAToTokenB() public {
+        vm.startPrank(deployer);
+        tokenA.approve(address(gorillix), INIT_AMOUNT);
+        tokenB.approve(address(gorillix), INIT_AMOUNT);
+        gorillix.init(INIT_AMOUNT, INIT_AMOUNT);
+        vm.stopPrank();
+
+        // PRICE BEFORE SWAP
+        uint256 xReservesBefore = gorillix.getTotalLiquidityTokenA();
+        uint256 yReservesBefore = gorillix.getTotalLiquidityTokenB();
+
+        uint256 yOutputBefore = gorillix.price(100 * 10 ** 18, xReservesBefore, yReservesBefore);
+
+        console.log("yOutput before: ", yOutputBefore);
+
+        // USER1 SWAPS 10 tokenA
+        vm.startPrank(user1);
+        tokenA.approve(address(gorillix), 10000000000000000000);
+        gorillix.tokenAtoTokenB(10000000000000000000);
+        vm.stopPrank();
+
+        uint256 xReservesAfter = gorillix.getTotalLiquidityTokenA();
+        uint256 yReservesAfter = gorillix.getTotalLiquidityTokenB();
+
+        uint256 yOutputAfter = gorillix.price(100 * 10 ** 18, yReservesAfter, xReservesAfter);
+
+        console.log("yOutput after: ", yOutputAfter);
+
+        // The value of Token B has increased, as there are less Token B in the reserve
+        assert(yOutputAfter > yOutputBefore);
+    }
+
     function testAddLiquidityTokenA() public {
         vm.startPrank(deployer);
         tokenA.approve(address(gorillix), INIT_AMOUNT);
@@ -140,6 +210,8 @@ contract GorillixTest is Test {
 
         console.log("User1 tokenA balance before adding liquidity: ", tokenA.balanceOf(user1));
         console.log("User1 tokenB balance before adding liquidity: ", tokenB.balanceOf(user1));
+
+        uint256 totalLiquidityTokenABeforeAddingLiquidity = gorillix.getTotalLiquidityTokenA();
 
         vm.startPrank(user1);
         tokenA.approve(address(gorillix), 10000000000000000000);
@@ -152,6 +224,8 @@ contract GorillixTest is Test {
 
         console.log("Gorillix tokenA balance after adding liquidity: ", tokenA.balanceOf(address(gorillix)));
         console.log("Gorillix tokenB balance after adding liquidity: ", tokenB.balanceOf(address(gorillix)));
+
+        assertEq(gorillix.getTotalLiquidityTokenA(), totalLiquidityTokenABeforeAddingLiquidity + 10000000000000000000);
     }
 
     function testAddLiquidityTokenB() public {
@@ -164,6 +238,8 @@ contract GorillixTest is Test {
         console.log("User1 tokenA balance before adding liquidity: ", tokenA.balanceOf(user1));
         console.log("User1 tokenB balance before adding liquidity: ", tokenB.balanceOf(user1));
 
+        uint256 totalLiquidityTokenBBeforeAddingLiquidity = gorillix.getTotalLiquidityTokenA();
+
         vm.startPrank(user1);
         tokenA.approve(address(gorillix), 10000000000000000000);
         tokenB.approve(address(gorillix), 10000000000000000000);
@@ -175,5 +251,7 @@ contract GorillixTest is Test {
 
         console.log("Gorillix tokenA balance after adding liquidity: ", tokenA.balanceOf(address(gorillix)));
         console.log("Gorillix tokenB balance after adding liquidity: ", tokenB.balanceOf(address(gorillix)));
+
+        assertEq(gorillix.getTotalLiquidityTokenB(), totalLiquidityTokenBBeforeAddingLiquidity + 10000000000000000000);
     }
 }
