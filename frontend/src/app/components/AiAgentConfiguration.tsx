@@ -15,13 +15,19 @@ const riskLevels = [
 export default function AiAgentConfiguration() {
   const [selectedStrategy, setSelectedStrategy] = useState('');
   const [riskLevel, setRiskLevel] = useState('');
-  const [allocation, setAllocation] = useState('');
+  const [tokenAAllocation, setTokenAAllocation] = useState('');
+  const [tokenBAllocation, setTokenBAllocation] = useState('');
   const [isAgentActive, setIsAgentActive] = useState(false);
 
   const handleActivation = () => {
-    if (selectedStrategy && riskLevel && allocation) {
+    if (selectedStrategy && riskLevel && isValidAllocation()) {
       setIsAgentActive(!isAgentActive);
     }
+  };
+
+  const isValidAllocation = () => {
+    const totalAllocation = Number(tokenAAllocation) + Number(tokenBAllocation);
+    return totalAllocation === 100;
   };
 
   return (
@@ -69,17 +75,33 @@ export default function AiAgentConfiguration() {
 
         <div className="mb-8">
           <h3 className="text-lg font-semibold mb-4">Fund Allocation</h3>
-          <div className="flex items-center space-x-4">
-            <input
-              type="number"
-              value={allocation}
-              onChange={(e) => setAllocation(e.target.value)}
-              placeholder="Enter allocation percentage"
-              className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-              max={riskLevel ? riskLevels.find(l => l.id === riskLevel)?.maxAllocation : 100}
-            />
-            <span className="text-gray-600">%</span>
+          <div className="grid grid-cols-2 gap-4">
+            <div className="flex items-center space-x-4">
+              <input
+                type="number"
+                value={tokenAAllocation}
+                onChange={(e) => setTokenAAllocation(e.target.value)}
+                placeholder="Token A allocation"
+                className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                max={riskLevel ? riskLevels.find(l => l.id === riskLevel)?.maxAllocation : 100}
+              />
+              <span className="text-gray-600">%</span>
+            </div>
+            <div className="flex items-center space-x-4">
+              <input
+                type="number"
+                value={tokenBAllocation}
+                onChange={(e) => setTokenBAllocation(e.target.value)}
+                placeholder="Token B allocation"
+                className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                max={riskLevel ? riskLevels.find(l => l.id === riskLevel)?.maxAllocation : 100}
+              />
+              <span className="text-gray-600">%</span>
+            </div>
           </div>
+          <p className="text-sm text-gray-600 mt-2">
+            Total Allocation: {Number(tokenAAllocation) + Number(tokenBAllocation)}%
+          </p>
         </div>
 
         <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
@@ -91,7 +113,7 @@ export default function AiAgentConfiguration() {
           </div>
           <button
             onClick={handleActivation}
-            disabled={!selectedStrategy || !riskLevel || !allocation}
+            disabled={!selectedStrategy || !riskLevel || !isValidAllocation()}
             className={`px-6 py-2 rounded-lg font-medium transition-colors ${
               isAgentActive
                 ? 'bg-red-500 text-white hover:bg-red-600'

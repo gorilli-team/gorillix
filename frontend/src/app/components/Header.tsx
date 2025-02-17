@@ -1,10 +1,22 @@
 "use client";
+
 import { ConnectButton } from '@rainbow-me/rainbowkit';
+import BalancePanel from './BalancePanel';
+import { useState, useEffect } from 'react';
 
 export default function Header() {
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   return (
-    <header className="h-16 px-6 flex items-center justify-end border-b border-gray-300 bg-gray-100">      
-      <div className="flex items-center space-x-4">
+    <header className="h-16 px-6 flex items-center justify-between border-b border-gray-300 bg-gray-100">  
+      <div className="flex-1 flex justify-start">
+        {mounted && <BalancePanel />}
+      </div>
+      <div className="flex items-center">
         <ConnectButton.Custom>
           {({
             account,
@@ -12,9 +24,9 @@ export default function Header() {
             openConnectModal,
             openAccountModal,
             openChainModal,
-            mounted,
+            mounted: buttonMounted,
           }) => {
-            const ready = mounted;
+            const ready = buttonMounted && mounted;
             const connected = ready && account && chain;
 
             return (

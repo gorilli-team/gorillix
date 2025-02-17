@@ -115,19 +115,6 @@ export default function Sidebar({
               <span>Stats</span>
             </button>
           </li>
-          {isConnected && (
-            <li>
-              <button
-                className={`w-full text-left px-3 py-2 rounded-lg hover:bg-gray-200 ${
-                  selectedPage === "My Account" ? "bg-gray-200" : ""
-                }`}
-                onClick={() => handlePageChange("My Account")}
-              >
-                <i className="fa-solid fa-circle-user pr-2"></i>
-                <span>My account</span>
-              </button>
-            </li>
-          )}
         </ul>
       </nav>
     </aside>
