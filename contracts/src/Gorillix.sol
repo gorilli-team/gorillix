@@ -123,6 +123,10 @@ contract Gorillix is Ownable {
         uint256 reservesTokenA = s_totalLiquidityTokenA;
         uint256 reservesTokenB = s_totalLiquidityTokenB;
 
+        // info some argue that would be better to add 1 to reduce slippage
+        // for tokens having 18 decimals is negligible, if we were working with USDC, which has 6 decimals
+        // rounding errors would have a more profound impact
+        // in alternative we could use the ceilDiv function from openzeppelin Math library
         amountTokenB = (amountTokenA * reservesTokenB) / reservesTokenA;
 
         s_totalLiquidityTokenA += amountTokenA;
@@ -143,6 +147,7 @@ contract Gorillix is Ownable {
         uint256 reservesTokenA = s_totalLiquidityTokenA;
         uint256 reservesTokenB = s_totalLiquidityTokenB;
 
+        // info same as above
         amountTokenA = (amountTokenB * reservesTokenA) / reservesTokenB;
 
         s_totalLiquidityTokenA += amountTokenA;

@@ -31,6 +31,10 @@ contract GorillixTest is Test {
         vm.stopPrank();
     }
 
+    //////////////////////////////////////////////////
+    /////////// CONTRACTS INIITIALIZATION ////////////
+    //////////////////////////////////////////////////
+
     function testInitializeTokenA() public view {
         assertEq(tokenA.name(), "TokenA");
         assertEq(tokenA.symbol(), "TKA");
@@ -45,6 +49,10 @@ contract GorillixTest is Test {
         assertEq(tokenA.balanceOf(user1), INIT_AMOUNT);
         assertEq(tokenB.balanceOf(user1), INIT_AMOUNT);
     }
+
+    /////////////////////////////////////////////////
+    ////////////// LP INITIALIZATION ////////////////
+    /////////////////////////////////////////////////
 
     function testGorillixInit() public {
         vm.startPrank(user1);
@@ -69,6 +77,43 @@ contract GorillixTest is Test {
         gorillix.init(INIT_AMOUNT / 2, INIT_AMOUNT / 2);
     }
 
+    function testInitRevertsIfAmountTokenAIsZero() public {
+        vm.startPrank(user1);
+        tokenA.approve(address(gorillix), INIT_AMOUNT);
+        tokenB.approve(address(gorillix), INIT_AMOUNT);
+        vm.stopPrank();
+
+        vm.prank(user1);
+        vm.expectRevert(Gorillix.Gorillix__AmountMustBeGreaterThanZero.selector);
+        gorillix.init(0, INIT_AMOUNT / 2);
+    }
+
+    function testInitRevertsIfAmountTokenBIsZero() public {
+        vm.startPrank(user1);
+        tokenA.approve(address(gorillix), INIT_AMOUNT);
+        tokenB.approve(address(gorillix), INIT_AMOUNT);
+        vm.stopPrank();
+
+        vm.prank(user1);
+        vm.expectRevert(Gorillix.Gorillix__AmountMustBeGreaterThanZero.selector);
+        gorillix.init(INIT_AMOUNT / 2, 0);
+    }
+
+    function testInitRevertsIfBothAmountsAreZero() public {
+        vm.startPrank(user1);
+        tokenA.approve(address(gorillix), INIT_AMOUNT);
+        tokenB.approve(address(gorillix), INIT_AMOUNT);
+        vm.stopPrank();
+
+        vm.prank(user1);
+        vm.expectRevert(Gorillix.Gorillix__AmountMustBeGreaterThanZero.selector);
+        gorillix.init(0, 0);
+    }
+
+    //////////////////////////////////////
+    /////////////// PRICE ////////////////
+    //////////////////////////////////////
+
     function testPriceAfterInit() public {
         vm.startPrank(user1);
         tokenA.approve(address(gorillix), INIT_AMOUNT);
@@ -84,6 +129,74 @@ contract GorillixTest is Test {
 
         console.log("If we swap 100 TokenA, we receive: ", yOutput, " TokenB");
     }
+
+    function testPriceChangesAfterSwappingTokens() public {
+        vm.startPrank(deployer);
+        tokenA.approve(address(gorillix), INIT_AMOUNT);
+        tokenB.approve(address(gorillix), INIT_AMOUNT);
+        gorillix.init(INIT_AMOUNT, INIT_AMOUNT);
+        vm.stopPrank();
+
+        // PRICE BEFORE SWAP
+        uint256 xReservesBefore = gorillix.getTotalLiquidityTokenA();
+        uint256 yReservesBefore = gorillix.getTotalLiquidityTokenB();
+
+        uint256 yOutputBefore = gorillix.price(100 * 10 ** 18, xReservesBefore, yReservesBefore);
+
+        console.log("yOutput before: ", yOutputBefore);
+
+        // USER1 SWAPS 10 tokenA
+        vm.startPrank(user1);
+        tokenA.approve(address(gorillix), 10000000000000000000);
+        gorillix.tokenAtoTokenB(10000000000000000000);
+        vm.stopPrank();
+
+        uint256 xReservesAfter = gorillix.getTotalLiquidityTokenA();
+        uint256 yReservesAfter = gorillix.getTotalLiquidityTokenB();
+
+        uint256 yOutputAfter = gorillix.price(100 * 10 ** 18, xReservesAfter, yReservesAfter);
+
+        console.log("yOutput after: ", yOutputAfter);
+
+        // The value of Token A has decreased, as there are more Token A in the reserve
+        assert(yOutputAfter < yOutputBefore);
+    }
+
+    function testTokenBPriceIncreasesAfterSwappingTokenAToTokenB() public {
+        vm.startPrank(deployer);
+        tokenA.approve(address(gorillix), INIT_AMOUNT);
+        tokenB.approve(address(gorillix), INIT_AMOUNT);
+        gorillix.init(INIT_AMOUNT, INIT_AMOUNT);
+        vm.stopPrank();
+
+        // PRICE BEFORE SWAP
+        uint256 xReservesBefore = gorillix.getTotalLiquidityTokenA();
+        uint256 yReservesBefore = gorillix.getTotalLiquidityTokenB();
+
+        uint256 yOutputBefore = gorillix.price(100 * 10 ** 18, xReservesBefore, yReservesBefore);
+
+        console.log("yOutput before: ", yOutputBefore);
+
+        // USER1 SWAPS 10 tokenA
+        vm.startPrank(user1);
+        tokenA.approve(address(gorillix), 10000000000000000000);
+        gorillix.tokenAtoTokenB(10000000000000000000);
+        vm.stopPrank();
+
+        uint256 xReservesAfter = gorillix.getTotalLiquidityTokenA();
+        uint256 yReservesAfter = gorillix.getTotalLiquidityTokenB();
+
+        uint256 yOutputAfter = gorillix.price(100 * 10 ** 18, yReservesAfter, xReservesAfter);
+
+        console.log("yOutput after: ", yOutputAfter);
+
+        // The value of Token B has increased, as there are less Token B in the reserve
+        assert(yOutputAfter > yOutputBefore);
+    }
+
+    ////////////////////////////////////////
+    //////////////// SWAP //////////////////
+    ////////////////////////////////////////
 
     function testTokenAToTokenBSwap() public {
         vm.startPrank(deployer);
@@ -137,69 +250,37 @@ contract GorillixTest is Test {
         assertEq(gorillix.getTotalLiquidityTokenB(), totalLiquidityTokenBBeforeSwap + 10000000000000000000);
     }
 
-    function testPriceChangesAfterSwappingTokens() public {
+    function testSwapRevertsWhenAmountTokenAIsZero() public {
         vm.startPrank(deployer);
         tokenA.approve(address(gorillix), INIT_AMOUNT);
         tokenB.approve(address(gorillix), INIT_AMOUNT);
         gorillix.init(INIT_AMOUNT, INIT_AMOUNT);
         vm.stopPrank();
 
-        // PRICE BEFORE SWAP
-        uint256 xReservesBefore = gorillix.getTotalLiquidityTokenA();
-        uint256 yReservesBefore = gorillix.getTotalLiquidityTokenB();
-
-        uint256 yOutputBefore = gorillix.price(100 * 10 ** 18, xReservesBefore, yReservesBefore);
-
-        console.log("yOutput before: ", yOutputBefore);
-
-        // USER1 SWAPS 10 tokenA
         vm.startPrank(user1);
         tokenA.approve(address(gorillix), 10000000000000000000);
-        gorillix.tokenAtoTokenB(10000000000000000000);
+        vm.expectRevert(Gorillix.Gorillix__AmountMustBeGreaterThanZero.selector);
+        gorillix.tokenAtoTokenB(0);
         vm.stopPrank();
-
-        uint256 xReservesAfter = gorillix.getTotalLiquidityTokenA();
-        uint256 yReservesAfter = gorillix.getTotalLiquidityTokenB();
-
-        uint256 yOutputAfter = gorillix.price(100 * 10 ** 18, xReservesAfter, yReservesAfter);
-
-        console.log("yOutput after: ", yOutputAfter);
-
-        // The value of Token A has decreased, as there are more Token A in the reserve
-        assert(yOutputAfter < yOutputBefore);
     }
 
-    function testTokenBValueIncreasesAfterSwappingTokenAToTokenB() public {
+    function testSwapRevertsWhenAmountTokenBIsZero() public {
         vm.startPrank(deployer);
         tokenA.approve(address(gorillix), INIT_AMOUNT);
         tokenB.approve(address(gorillix), INIT_AMOUNT);
         gorillix.init(INIT_AMOUNT, INIT_AMOUNT);
         vm.stopPrank();
 
-        // PRICE BEFORE SWAP
-        uint256 xReservesBefore = gorillix.getTotalLiquidityTokenA();
-        uint256 yReservesBefore = gorillix.getTotalLiquidityTokenB();
-
-        uint256 yOutputBefore = gorillix.price(100 * 10 ** 18, xReservesBefore, yReservesBefore);
-
-        console.log("yOutput before: ", yOutputBefore);
-
-        // USER1 SWAPS 10 tokenA
         vm.startPrank(user1);
-        tokenA.approve(address(gorillix), 10000000000000000000);
-        gorillix.tokenAtoTokenB(10000000000000000000);
+        tokenB.approve(address(gorillix), 10000000000000000000);
+        vm.expectRevert(Gorillix.Gorillix__AmountMustBeGreaterThanZero.selector);
+        gorillix.tokenBtoTokenA(0);
         vm.stopPrank();
-
-        uint256 xReservesAfter = gorillix.getTotalLiquidityTokenA();
-        uint256 yReservesAfter = gorillix.getTotalLiquidityTokenB();
-
-        uint256 yOutputAfter = gorillix.price(100 * 10 ** 18, yReservesAfter, xReservesAfter);
-
-        console.log("yOutput after: ", yOutputAfter);
-
-        // The value of Token B has increased, as there are less Token B in the reserve
-        assert(yOutputAfter > yOutputBefore);
     }
+
+    /////////////////////////////////////////////
+    /////////////// ADD LIQUIDITY ///////////////
+    /////////////////////////////////////////////
 
     function testAddLiquidityTokenA() public {
         vm.startPrank(deployer);
@@ -253,5 +334,35 @@ contract GorillixTest is Test {
         console.log("Gorillix tokenB balance after adding liquidity: ", tokenB.balanceOf(address(gorillix)));
 
         assertEq(gorillix.getTotalLiquidityTokenB(), totalLiquidityTokenBBeforeAddingLiquidity + 10000000000000000000);
+    }
+
+    function testAddLiquidityRevertsIfAmountTokenAIsZero() public {
+        vm.startPrank(deployer);
+        tokenA.approve(address(gorillix), INIT_AMOUNT);
+        tokenB.approve(address(gorillix), INIT_AMOUNT);
+        gorillix.init(INIT_AMOUNT, INIT_AMOUNT);
+        vm.stopPrank();
+
+        vm.startPrank(user1);
+        tokenA.approve(address(gorillix), 10000000000000000000);
+        tokenB.approve(address(gorillix), 10000000000000000000);
+        vm.expectRevert(Gorillix.Gorillix__AmountMustBeGreaterThanZero.selector);
+        gorillix.addLiquidityTokenA(0);
+        vm.stopPrank();
+    }
+
+    function testAddLiquidityRevertsIfAmountTokenBIsZero() public {
+        vm.startPrank(deployer);
+        tokenA.approve(address(gorillix), INIT_AMOUNT);
+        tokenB.approve(address(gorillix), INIT_AMOUNT);
+        gorillix.init(INIT_AMOUNT, INIT_AMOUNT);
+        vm.stopPrank();
+
+        vm.startPrank(user1);
+        tokenA.approve(address(gorillix), 10000000000000000000);
+        tokenB.approve(address(gorillix), 10000000000000000000);
+        vm.expectRevert(Gorillix.Gorillix__AmountMustBeGreaterThanZero.selector);
+        gorillix.addLiquidityTokenB(0);
+        vm.stopPrank();
     }
 }
