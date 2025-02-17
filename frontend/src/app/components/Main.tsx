@@ -1,6 +1,5 @@
 import React from 'react';
 import Dashboard from './Dashboard';
-import PoolItem from './PoolItem';
 import AiAgentConfiguration from './AiAgentConfiguration';
 import DexStats from './DexStats';
 
@@ -21,24 +20,6 @@ export default function Main({
                 return <div><DexStats/></div>;
             case "My Account":
                 return <div className="p-4"><h2 className="text-2xl font-bold">My Account Details</h2></div>;
-            case "Pools":
-                return (
-                    <div className="p-4">
-                        <h2 className="text-2xl font-bold mb-8">Your Pools</h2>
-                        <div className="mb-8">
-                            <PoolItem 
-                                tokenPair="UNI/USDC"
-                                poolNumber="0"
-                                fee="0.05%"
-                                volume24h="$1,708,112"
-                                liquidity="$231,643"
-                                apr="0.3% - 42.9%"
-                                token1Image="/usd-coin-usdc-logo.png"
-                                token2Image="/uniswap-uni-logo.png"
-                            />
-                        </div>
-                    </div>
-                );
             case "Dashboard":
             default:
                 return <Dashboard />;

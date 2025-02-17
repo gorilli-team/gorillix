@@ -3,6 +3,7 @@ import { useState } from 'react';
 import AiTradingView from './AiTradingView';
 import ManualSwapView from './ManualSwapView';
 
+
 export default function Dashboard() {
     const [isAiEnabled, setIsAiEnabled] = useState(true);
   

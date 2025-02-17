@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { ConnectKitButton } from "connectkit";
 import { useAccount } from 'wagmi';
+import PoolItem from './PoolItem';
 
 const tokens = [
   { id: 'tokenA', name: 'Token A', symbol: 'TKNA' },
@@ -39,7 +40,7 @@ export default function SwapInterface() {
   };
 
   return (
-    <div className="p-6 w-full max-w-md mx-auto">
+    <div className="p-6 w-full flex">
       <div className="bg-gray-900 rounded-xl p-6 shadow-lg">
         <div className="mb-4">
           <label className="text-gray-400 text-sm mb-2 block">From</label>
@@ -129,6 +130,22 @@ export default function SwapInterface() {
             )}
           </ConnectKitButton.Custom>
         )}
+      </div>
+      <div>
+        <div className="p-4">
+            <div className="mb-8">
+                <PoolItem 
+                    tokenPair="UNI/USDC"
+                    poolNumber="0"
+                    fee="0.05%"
+                    volume24h="$1,708,112"
+                    liquidity="$231,643"
+                    apr="0.3% - 42.9%"
+                    token1Image="/usd-coin-usdc-logo.png"
+                    token2Image="/uniswap-uni-logo.png"
+                />
+            </div>
+        </div>
       </div>
     </div>
   );
