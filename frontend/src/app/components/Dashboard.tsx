@@ -12,7 +12,7 @@ export default function Dashboard() {
           <h1 className="text-2xl font-bold">Dashboard Overview</h1>
           <div className="flex items-center gap-3">
             <span className="text-sm font-medium">
-              {isAiEnabled ? 'AI Trading Active' : 'Manual Trading'}
+              {isAiEnabled ? 'AI Agent Mode' : 'Manual Mode'}
             </span>
             <button
               onClick={() => setIsAiEnabled(!isAiEnabled)}
