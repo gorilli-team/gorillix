@@ -2,6 +2,7 @@ import React from 'react';
 import Dashboard from './Dashboard';
 import PoolItem from './PoolItem';
 import AiAgentConfiguration from './AiAgentConfiguration';
+import DexStats from './DexStats';
 
 interface MainProps {
     selectedPage: string;
@@ -15,11 +16,9 @@ export default function Main({
     const renderContent = () => {
         switch (selectedPage) {
             case "AI Agent":
-                return <div className="p-4">
-                    <AiAgentConfiguration />
-                </div>;
+                return <div className="p-4"><AiAgentConfiguration /></div>;
             case "Stats":
-                return <div className="p-4"><h1 className="text-2xl font-bold">Trading Statistics</h1></div>;
+                return <div className="p-4"><DexStats/></div>;
             case "My Account":
                 return <div className="p-4"><h1 className="text-2xl font-bold">My Account Details</h1></div>;
             case "Pools":

@@ -22,7 +22,7 @@ export default function PoolItem({
     token2Image
 }: PoolItemProps) {
     return (
-        <div className="bg-gray-800 cursor-pointer rounded-xl p-5 mb-4 text-white shadow-lg hover:shadow-xl transition-all duration-300 ease-in-out transform hover:-translate-y-1">
+        <div className="bg-white cursor-pointer rounded-xl p-5 mb-4 shadow-lg hover:shadow-xl transition-all duration-300 ease-in-out transform hover:-translate-y-1">
             <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-4">
                     <div className="flex -space-x-3">
@@ -49,11 +49,11 @@ export default function PoolItem({
                 </div>
                 <div className="flex items-center space-x-8">
                     <div className="text-right">
-                        <div className="font-semibold text-gray-100">{volume24h}</div>
+                        <div className="font-semibold text-gray-800">{volume24h}</div>
                         <div className="text-xs text-gray-400 uppercase tracking-wider">Volume (24H)</div>
                     </div>
                     <div className="text-right">
-                        <div className="font-semibold text-gray-100">{liquidity}</div>
+                        <div className="font-semibold text-gray-800">{liquidity}</div>
                         <div className="text-xs text-gray-400 uppercase tracking-wider">Liquidity</div>
                     </div>
                     <div className="text-right">
