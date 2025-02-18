@@ -16,6 +16,7 @@ contract GorillixTest is Test {
     address deployer = makeAddr("deployer");
     address user1 = makeAddr("user1");
     address user2 = makeAddr("user2");
+    address trustedForwarder = makeAddr("trustedForwarder");
 
     uint256 constant INIT_AMOUNT = 500_000 * 10 ** 18;
 
@@ -23,7 +24,7 @@ contract GorillixTest is Test {
         vm.startPrank(deployer);
         tokenA = new TokenA();
         tokenB = new TokenB();
-        gorillix = new Gorillix(address(tokenA), address(tokenB));
+        gorillix = new Gorillix(address(tokenA), address(tokenB), trustedForwarder);
 
         tokenA.transfer(user1, INIT_AMOUNT);
         tokenB.transfer(user1, INIT_AMOUNT);

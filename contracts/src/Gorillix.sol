@@ -3,8 +3,10 @@ pragma solidity ^0.8.20;
 
 import { IERC20 } from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import { Ownable } from "@openzeppelin/contracts/access/Ownable.sol";
+import { Context } from "@openzeppelin/contracts/utils/Context.sol";
+import { ERC2771Context } from "@gelatonetwork/relay-context/contracts/vendor/ERC2771Context.sol";
 
-contract Gorillix is Ownable {
+contract Gorillix is Ownable, ERC2771Context {
     IERC20 public immutable i_tokenA;
     IERC20 public immutable i_tokenB;
 
@@ -43,7 +45,7 @@ contract Gorillix is Ownable {
     //////////////// CONSTRUCTOR ////////////////////
     /////////////////////////////////////////////////
 
-    constructor(address _tokenA, address _tokenB) Ownable(msg.sender) {
+    constructor(address _tokenA, address _tokenB, address trustedForwarder) Ownable(msg.sender) ERC2771Context(trustedForwarder) {
         i_tokenA = IERC20(_tokenA);
         i_tokenB = IERC20(_tokenB);
     }
@@ -58,6 +60,7 @@ contract Gorillix is Ownable {
     // this single init function was thought for initializing ETH and another ERC20 token, BUT NOT BOTH ERC20s
 
     // q does it need a return value?
+    // info add onlyOwner modifier
     function init(uint256 amountTokenA, uint256 amountTokenB) external {
         // i this check makes sure that whoever calls the init function is obliged to send both token (non-zero amount)
         if (amountTokenA == 0 || amountTokenB == 0) {
@@ -177,6 +180,18 @@ contract Gorillix is Ownable {
 
 
     // q what if someone sends token to the contract?
+
+    //////////////////////////////////////////////
+    //////////// INTERNAL FUNCTIONS //////////////
+    //////////////////////////////////////////////
+
+    function _msgSender() internal view override(ERC2771Context, Context) returns (address sender) {
+        return ERC2771Context._msgSender();
+    }
+
+    function _msgData() internal view override(ERC2771Context, Context) returns (bytes calldata) {
+        return ERC2771Context._msgData();
+    }
 
     //////////////////////////////////////////////
     ////////////// VIEW FUNCTIONS ////////////////
