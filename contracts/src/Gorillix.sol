@@ -120,6 +120,7 @@ contract Gorillix is Ownable, ERC2771Context, ERC20 {
         }
         uint256 reservesTokenA = s_totalLiquidityTokenA;
         uint256 reservesTokenB = s_totalLiquidityTokenB;
+        uint256 lpTokensToMint = _calculateLPTokensAddLiquidity(amountTokenA, reservesTokenA);
 
         // info some argue that would be better to add 1 to reduce slippage
         // for tokens having 18 decimals is negligible, if we were working with USDC, which has 6 decimals
@@ -134,6 +135,7 @@ contract Gorillix is Ownable, ERC2771Context, ERC20 {
 
         i_tokenA.transferFrom(msg.sender, address(this), amountTokenA);
         i_tokenB.transferFrom(msg.sender, address(this), amountTokenB);
+        _mint(msg.sender, lpTokensToMint);
 
         emit AddLiquidity(msg.sender, amountTokenA, amountTokenB);
     }
@@ -144,6 +146,7 @@ contract Gorillix is Ownable, ERC2771Context, ERC20 {
         }
         uint256 reservesTokenA = s_totalLiquidityTokenA;
         uint256 reservesTokenB = s_totalLiquidityTokenB;
+        uint256 lpTokensToMint = _calculateLPTokensAddLiquidity(amountTokenB, reservesTokenB);
 
         // info same as above
         amountTokenA = (amountTokenB * reservesTokenA) / reservesTokenB;
@@ -155,6 +158,7 @@ contract Gorillix is Ownable, ERC2771Context, ERC20 {
 
         i_tokenA.transferFrom(msg.sender, address(this), amountTokenA);
         i_tokenB.transferFrom(msg.sender, address(this), amountTokenB);
+        _mint(msg.sender, lpTokensToMint);
 
         emit AddLiquidity(msg.sender, amountTokenA, amountTokenB);
     }
@@ -180,16 +184,23 @@ contract Gorillix is Ownable, ERC2771Context, ERC20 {
     //////////// INTERNAL FUNCTIONS //////////////
     //////////////////////////////////////////////
 
-    function _msgSender() internal view override(ERC2771Context, Context) returns (address sender) {
+    function _msgSender() internal view override(ERC2771Context, Context) returns(address sender) {
         return ERC2771Context._msgSender();
     }
 
-    function _msgData() internal view override(ERC2771Context, Context) returns (bytes calldata) {
+    function _msgData() internal view override(ERC2771Context, Context) returns(bytes calldata) {
         return ERC2771Context._msgData();
     }
 
-    function _calculateLPTokensInit(uint256 amountTokenA, uint256 amountTokenB) internal pure returns (uint256 amountLPTokens) {
+    function _calculateLPTokensInit(uint256 amountTokenA, uint256 amountTokenB) internal pure returns(uint256 amountLPTokens) {
         return Math.sqrt(amountTokenA) * Math.sqrt(amountTokenB);
+    }
+
+    function _calculateLPTokensAddLiquidity(uint256 amountInputToken, uint256 reservesInputToken) internal view returns(uint256 amountLPTokens) {
+        // ATTENTION: if the first division has an output smaller than 1
+        // Solidity rounds down to zero
+        // the return value will then be zero
+        return (amountInputToken / reservesInputToken) * totalSupply();
     }
 
     //////////////////////////////////////////////
@@ -213,5 +224,9 @@ contract Gorillix is Ownable, ERC2771Context, ERC20 {
 
     function getLPTokensInit(uint256 amountTokenA, uint256 amountTokenB) external pure returns(uint256) {
         return _calculateLPTokensInit(amountTokenA, amountTokenB);
+    }
+
+    function getLPTokensAddLiquidity(uint256 amountTokenA, uint256 reservesTokenA) external view returns(uint256) {
+        return _calculateLPTokensAddLiquidity(amountTokenA, reservesTokenA);
     }
 }

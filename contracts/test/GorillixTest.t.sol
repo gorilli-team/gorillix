@@ -139,6 +139,29 @@ contract GorillixTest is Test {
         assertEq(expectedLPTokens, gorillix.totalSupply());
     }
 
+    // info there maybe is an issue with numbers 
+    function testMintCorrectAmountLPTokensToLP() public {
+        vm.startPrank(deployer);
+        tokenA.approve(address(gorillix), 10000000000000000000);
+        tokenB.approve(address(gorillix), 100000000000000000000);
+        gorillix.init(10000000000000000000, 100000000000000000000);
+        vm.stopPrank();
+
+        uint256 reservesTokenA = gorillix.getTotalLiquidityTokenA();
+        uint256 expectedLPTokens = gorillix.getLPTokensAddLiquidity(50000000000000000000, reservesTokenA);
+
+        vm.startPrank(user1);
+        tokenA.approve(address(gorillix), 1000000000000000000000);
+        tokenB.approve(address(gorillix), 1000000000000000000000);
+        gorillix.addLiquidityTokenA(50000000000000000000);
+        vm.stopPrank();
+
+        console.log("Expected LP tokens user1: ", expectedLPTokens);
+        console.log("User1 LP tokens: ", gorillix.balanceOf(user1));
+        console.log("Deployer LP tokens: ", gorillix.balanceOf(deployer));
+        console.log("Total supply LP tokens: ", gorillix.totalSupply());
+    }
+
     //////////////////////////////////////
     /////////////// PRICE ////////////////
     //////////////////////////////////////
