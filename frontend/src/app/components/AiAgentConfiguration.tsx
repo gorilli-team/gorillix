@@ -1,10 +1,10 @@
 import { useState } from 'react';
 
 const tradingStrategies = [
-  { id: 'arbitrage', name: 'Arbitrage', description: 'Identify and exploit price differences between markets' },
-  { id: 'momentum', name: 'Momentum', description: 'Follow market trends and capitalize on price movements' },
-  { id: 'liquidity', name: 'Liquidity Provision', description: 'Optimize liquidity provision based on market conditions' }
-];
+    { id: 'hodl', name: 'HODL', description: 'Hold your position regardless of market conditions' },
+    { id: 'buy', name: 'BUY', description: 'Automatically buy when market conditions are favorable' },
+    { id: 'sell', name: 'SELL', description: 'Automatically sell when profit targets are reached' }
+  ];
 
 const riskLevels = [
   { id: 'conservative', name: 'Conservative' },
@@ -55,7 +55,7 @@ export default function AiAgentConfiguration() {
           }
         `}
       </style>
-      <div className="bg-white rounded-xl shadow-lg p-6 mb-6">        
+      <div className="bg-gray-800 rounded-xl shadow-lg p-6 mb-6">        
         <div className="mb-8">
           <h3 className="text-lg font-semibold mb-4">Trading Strategy</h3>
           <div className="grid gap-4 md:grid-cols-3">
@@ -133,7 +133,7 @@ export default function AiAgentConfiguration() {
           </div>
         </div>
 
-        <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+        <div className="flex items-center justify-between p-4 bg-gray-700 rounded-lg">
           <div>
             <h3 className="font-semibold">AI Agent Status</h3>
             <p className="text-sm text-gray-600">
@@ -155,7 +155,7 @@ export default function AiAgentConfiguration() {
       </div>
 
       {isAgentActive && (
-        <div className="bg-white rounded-xl shadow-lg p-6">
+        <div className="bg-gray-800 rounded-xl shadow-lg p-6">
           <div className="mb-6 grid grid-cols-2 gap-4">
             <div>
               <h3 className="font-semibold mb-2">Configuration</h3>

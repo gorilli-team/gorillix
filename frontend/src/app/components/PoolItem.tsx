@@ -38,7 +38,7 @@ export default function PoolItem({
                         />
                     </div>
                     <div>
-                        <div className="font-bold text-lg">{tokenPair}</div>
+                        <div className="font-bold text-lg text-black">{tokenPair}</div>
                         <div className="text-sm text-gray-400 flex items-center">
                             <span className="bg-blue-500/20 text-blue-300 px-2 py-0.5 rounded-full mr-2">
                                 Pool #{poolNumber}

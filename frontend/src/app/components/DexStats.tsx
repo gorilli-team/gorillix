@@ -19,17 +19,17 @@ export default function DexStats() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-        <div className="bg-white p-6 rounded-xl shadow-lg">
+        <div className="bg-gray-800 p-6 rounded-xl shadow-lg">
           <h3 className="text-sm font-medium text-gray-500">TokenA Reserve</h3>
           <p className="text-2xl font-bold mt-2">104,000</p>
           <span className="text-green-500 text-sm">+4,000 (24h)</span>
         </div>
-        <div className="bg-white p-6 rounded-xl shadow-lg">
+        <div className="bg-gray-800 p-6 rounded-xl shadow-lg">
           <h3 className="text-sm font-medium text-gray-500">TokenB Reserve</h3>
           <p className="text-2xl font-bold mt-2">520,000</p>
           <span className="text-green-500 text-sm">+20,000 (24h)</span>
         </div>
-        <div className="bg-white p-6 rounded-xl shadow-lg">
+        <div className="bg-gray-800 p-6 rounded-xl shadow-lg">
           <h3 className="text-sm font-medium text-gray-500">Token Prices</h3>
           <div>
             <p className="text-lg font-bold mt-2">1 TokenA = 5.3 TokenB</p>
@@ -40,7 +40,7 @@ export default function DexStats() {
             <span className="text-red-500 text-sm">-2.4% (24h)</span>
           </div>
         </div>
-        <div className="bg-white p-6 rounded-xl shadow-lg">
+        <div className="bg-gray-800 p-6 rounded-xl shadow-lg">
           <h3 className="text-sm font-medium text-gray-500">Pool Ratio</h3>
           <p className="text-2xl font-bold mt-2">1:5</p>
           <span className="text-gray-500 text-sm">TokenA:TokenB</span>
@@ -48,7 +48,7 @@ export default function DexStats() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-        <div className="bg-white p-6 rounded-xl shadow-lg">
+        <div className="bg-gray-800 p-6 rounded-xl shadow-lg">
           <h3 className="text-lg font-semibold mb-4">Pool Reserves History</h3>
           <div className="h-64">
             <ResponsiveContainer width="100%" height="100%">
@@ -64,7 +64,7 @@ export default function DexStats() {
           </div>
         </div>
 
-        <div className="bg-white p-6 rounded-xl shadow-lg">
+        <div className="bg-gray-800 p-6 rounded-xl shadow-lg text-white">
           <h3 className="text-lg font-semibold mb-4">Price History</h3>
           <div className="h-64">
             <ResponsiveContainer width="100%" height="100%">
@@ -81,7 +81,7 @@ export default function DexStats() {
         </div>
       </div>
 
-      <div className="bg-white p-6 rounded-xl shadow-lg">
+      <div className="bg-gray-800 p-6 rounded-xl shadow-lg">
         <h3 className="text-lg font-semibold mb-4">Trade History</h3>
         <div className="overflow-x-auto">
           <table className="min-w-full">

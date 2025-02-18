@@ -26,12 +26,12 @@ const BalancePanel = () => {
     <div className="flex items-center space-x-4 px-4 py-2 bg-white rounded-lg shadow-sm">
       <div className="flex items-center space-x-2">
         <span className="text-sm text-gray-500">TokenA:</span>
-        <span className="text-sm font-medium">{balances.tokenA}</span>
+        <span className="text-sm font-medium text-black">{balances.tokenA}</span>
       </div>
       <div className="h-4 w-px bg-gray-300" />
       <div className="flex items-center space-x-2">
         <span className="text-sm text-gray-500">TokenB:</span>
-        <span className="text-sm font-medium">{balances.tokenB}</span>
+        <span className="text-sm font-medium text-black">{balances.tokenB}</span>
       </div>
     </div>
   );

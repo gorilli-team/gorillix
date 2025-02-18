@@ -5,7 +5,7 @@ import BalancePanel from './BalancePanel';
 
 export default function Header() {
   return (
-    <header className="h-16 px-6 flex items-center justify-between border-b border-gray-300 bg-gray-100">  
+    <header className="h-16 px-6 flex items-center justify-between bg-gray-800">  
       <div className="flex-1 flex justify-start">
         <BalancePanel />
       </div>
@@ -27,8 +27,8 @@ export default function Header() {
                 onClick={connected ? openAccountModal : openConnectModal}
                 className={`px-6 py-2 rounded-full font-medium transition-colors ${
                   connected 
-                    ? "bg-green-500 text-white hover:bg-green-600"
-                    : "bg-blue-500 text-white hover:bg-blue-600"
+                    ? "bg-gray-500 text-white hover:bg-gray-600"
+                    : "bg-gray-500 text-white hover:bg-gray-600"
                 }`}
               >
                 {connected ? account.displayName : "Connect Wallet"}

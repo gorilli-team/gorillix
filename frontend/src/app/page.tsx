@@ -8,7 +8,7 @@ export default function Page() {
   const [selectedPage, setSelectedPage] = useState("Dashboard");
 
   return (
-    <div className="flex h-screen bg-gray-100 text-gray-800">
+    <div className="flex h-screen text-white">
       <Sidebar 
         selectedPage={selectedPage} 
         setSelectedPage={setSelectedPage}

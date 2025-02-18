@@ -25,7 +25,7 @@ export default function Main({
     };
 
     return (
-        <main className="flex-1 overflow-y-auto main-layout bg-gray-100">
+        <main className="flex-1 overflow-y-auto main-layout bg-gray-900">
             {renderContent()}
         </main>
     );

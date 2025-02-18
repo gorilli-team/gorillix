@@ -34,7 +34,7 @@ export default function Sidebar({
 
   if (!mounted) {
     return (
-      <aside className="w-64 text-gray-800 flex flex-col border border-gray-300">
+      <aside className="w-64 bg-gray-800 flex text-white flex-col border border-gray-300">
         <div className="h-16 text-xl font-bold flex items-center ps-4">
           <img className="w-12 h-12 rounded-full" src="/avatar_3.png" alt="logo-gorillix" />
           <span className="ps-2">Gorillix</span>
@@ -42,21 +42,21 @@ export default function Sidebar({
         <nav className="flex-1 p-4">
           <ul className="space-y-2">
             <li>
-              <button className="w-full text-left px-3 py-2 rounded-lg hover:bg-gray-200">
+              <button className="w-full text-left px-3 py-2 rounded-lg hover:bg-gray-700">
                 <i className="fa-regular fa-newspaper pr-2"></i>
-                <span>Dashboard</span>
+                <span>DASHBOARD</span>
               </button>
             </li>
             <li>
               <button className="w-full text-left px-3 py-2 rounded-lg hover:bg-gray-200">
                 <i className="fa-solid fa-shield pr-2"></i>
-                <span>AI Agent</span>
+                <span>AI AGENT</span>
               </button>
             </li>
             <li>
               <button className="w-full text-left px-3 py-2 rounded-lg hover:bg-gray-200">
                 <i className="fa-solid fa-shield pr-2"></i>
-                <span>Stats</span>
+                <span>STATS</span>
               </button>
             </li>
           </ul>
@@ -66,7 +66,7 @@ export default function Sidebar({
   }
 
   return (
-    <aside className="w-64 text-gray-800 flex flex-col border border-gray-300">
+    <aside className="w-64 bg-gray-800 flex text-white flex-col">
       <div
         className="h-16 text-xl font-bold flex items-center ps-4 cursor-pointer"
         onClick={handleGorillixClick}
@@ -78,35 +78,35 @@ export default function Sidebar({
         <ul className="space-y-2">
           <li>
             <button
-              className={`w-full text-left px-3 py-2 rounded-lg hover:bg-gray-200 ${
-                selectedPage === "Dashboard" ? "bg-gray-200" : ""
+              className={`w-full text-left px-3 py-2 rounded-lg hover:bg-gray-600 ${
+                selectedPage === "Dashboard" ? "bg-gray-700" : ""
               }`}
               onClick={() => handlePageChange("Dashboard")}
             >
               <i className="fa-regular fa-newspaper pr-2"></i>
-              <span>Dashboard</span>
+              <span>DASHBOARD</span>
             </button>
           </li>
           <li>
             <button
-              className={`w-full text-left px-3 py-2 rounded-lg hover:bg-gray-200 ${
-                selectedPage === "AI Agent" ? "bg-gray-200" : ""
+              className={`w-full text-left px-3 py-2 rounded-lg hover:bg-gray-700 ${
+                selectedPage === "AI Agent" ? "bg-gray-700" : ""
               }`}
               onClick={() => handlePageChange("AI Agent")}
             >
               <i className="fa-solid fa-shield pr-2"></i>
-              <span>AI Agent</span>
+              <span>AI AGENT</span>
             </button>
           </li>
           <li>
             <button
-              className={`w-full text-left px-3 py-2 rounded-lg hover:bg-gray-200 ${
-                selectedPage === "Stats" ? "bg-gray-200" : ""
+              className={`w-full text-left px-3 py-2 rounded-lg hover:bg-gray-900 ${
+                selectedPage === "Stats" ? "bg-gray-900" : ""
               }`}
               onClick={() => handlePageChange("Stats")}
             >
               <i className="fa-solid fa-shield pr-2"></i>
-              <span>Stats</span>
+              <span>STATS</span>
             </button>
           </li>
         </ul>
