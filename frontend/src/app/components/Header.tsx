@@ -2,19 +2,12 @@
 
 import { ConnectButton } from '@rainbow-me/rainbowkit';
 import BalancePanel from './BalancePanel';
-import { useState, useEffect } from 'react';
 
 export default function Header() {
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
   return (
     <header className="h-16 px-6 flex items-center justify-between border-b border-gray-300 bg-gray-100">  
       <div className="flex-1 flex justify-start">
-        {mounted && <BalancePanel />}
+        <BalancePanel />
       </div>
       <div className="flex items-center">
         <ConnectButton.Custom>
@@ -26,8 +19,7 @@ export default function Header() {
             openChainModal,
             mounted: buttonMounted,
           }) => {
-            const ready = buttonMounted && mounted;
-            const connected = ready && account && chain;
+            const connected = buttonMounted && account && chain;
 
             return (
               <button

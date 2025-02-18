@@ -49,12 +49,6 @@ export default function Sidebar({
             </li>
             <li>
               <button className="w-full text-left px-3 py-2 rounded-lg hover:bg-gray-200">
-                <i className="fa-solid fa-water pr-2"></i>
-                <span>Pools</span>
-              </button>
-            </li>
-            <li>
-              <button className="w-full text-left px-3 py-2 rounded-lg hover:bg-gray-200">
                 <i className="fa-solid fa-shield pr-2"></i>
                 <span>AI Agent</span>
               </button>
