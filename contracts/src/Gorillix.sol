@@ -54,15 +54,7 @@ contract Gorillix is Ownable, ERC2771Context {
     ////////////// EXTERNAL FUNCTIONS ///////////////
     /////////////////////////////////////////////////
 
-    // q would it be useful to add a modifier to allow call to this function only once?
-
-    // WHAT IF instead of a single function initializing both token, we create two separate functions?
-    // this single init function was thought for initializing ETH and another ERC20 token, BUT NOT BOTH ERC20s
-
-    // q does it need a return value?
-    // info add onlyOwner modifier
-    function init(uint256 amountTokenA, uint256 amountTokenB) external {
-        // i this check makes sure that whoever calls the init function is obliged to send both token (non-zero amount)
+    function init(uint256 amountTokenA, uint256 amountTokenB) external onlyOwner {
         if (amountTokenA == 0 || amountTokenB == 0) {
             revert Gorillix__AmountMustBeGreaterThanZero();
         }

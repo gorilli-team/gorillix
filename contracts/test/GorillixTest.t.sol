@@ -56,7 +56,7 @@ contract GorillixTest is Test {
     /////////////////////////////////////////////////
 
     function testGorillixInit() public {
-        vm.startPrank(user1);
+        vm.startPrank(deployer);
         tokenA.approve(address(gorillix), INIT_AMOUNT);
         tokenB.approve(address(gorillix), INIT_AMOUNT);
         gorillix.init(INIT_AMOUNT, INIT_AMOUNT);
@@ -66,47 +66,58 @@ contract GorillixTest is Test {
         assertEq(tokenB.balanceOf(address(gorillix)), INIT_AMOUNT);
     }
 
-    function testInitRevertsIfCalledTwice() public {
+    function testInitRevertsIfNotCalledByOwner() public {
         vm.startPrank(user1);
+        tokenA.approve(address(gorillix), INIT_AMOUNT);
+        tokenB.approve(address(gorillix), INIT_AMOUNT);
+        vm.stopPrank();
+
+        vm.prank(user1);
+        vm.expectRevert();
+        gorillix.init(INIT_AMOUNT, INIT_AMOUNT);
+    }
+
+    function testInitRevertsIfCalledTwice() public {
+        vm.startPrank(deployer);
         tokenA.approve(address(gorillix), INIT_AMOUNT);
         tokenB.approve(address(gorillix), INIT_AMOUNT);
         gorillix.init(INIT_AMOUNT / 2, INIT_AMOUNT / 2);
         vm.stopPrank();
 
-        vm.prank(user1);
+        vm.prank(deployer);
         vm.expectRevert(Gorillix.Gorillix__AlreadyInitialized.selector);
         gorillix.init(INIT_AMOUNT / 2, INIT_AMOUNT / 2);
     }
 
     function testInitRevertsIfAmountTokenAIsZero() public {
-        vm.startPrank(user1);
+        vm.startPrank(deployer);
         tokenA.approve(address(gorillix), INIT_AMOUNT);
         tokenB.approve(address(gorillix), INIT_AMOUNT);
         vm.stopPrank();
 
-        vm.prank(user1);
+        vm.prank(deployer);
         vm.expectRevert(Gorillix.Gorillix__AmountMustBeGreaterThanZero.selector);
         gorillix.init(0, INIT_AMOUNT / 2);
     }
 
     function testInitRevertsIfAmountTokenBIsZero() public {
-        vm.startPrank(user1);
+        vm.startPrank(deployer);
         tokenA.approve(address(gorillix), INIT_AMOUNT);
         tokenB.approve(address(gorillix), INIT_AMOUNT);
         vm.stopPrank();
 
-        vm.prank(user1);
+        vm.prank(deployer);
         vm.expectRevert(Gorillix.Gorillix__AmountMustBeGreaterThanZero.selector);
         gorillix.init(INIT_AMOUNT / 2, 0);
     }
 
     function testInitRevertsIfBothAmountsAreZero() public {
-        vm.startPrank(user1);
+        vm.startPrank(deployer);
         tokenA.approve(address(gorillix), INIT_AMOUNT);
         tokenB.approve(address(gorillix), INIT_AMOUNT);
         vm.stopPrank();
 
-        vm.prank(user1);
+        vm.prank(deployer);
         vm.expectRevert(Gorillix.Gorillix__AmountMustBeGreaterThanZero.selector);
         gorillix.init(0, 0);
     }
@@ -116,7 +127,7 @@ contract GorillixTest is Test {
     //////////////////////////////////////
 
     function testPriceAfterInit() public {
-        vm.startPrank(user1);
+        vm.startPrank(deployer);
         tokenA.approve(address(gorillix), INIT_AMOUNT);
         tokenB.approve(address(gorillix), INIT_AMOUNT);
         gorillix.init(INIT_AMOUNT, INIT_AMOUNT);
