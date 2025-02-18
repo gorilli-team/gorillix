@@ -24,7 +24,7 @@ contract GorillixTest is Test {
         vm.startPrank(deployer);
         tokenA = new TokenA();
         tokenB = new TokenB();
-        gorillix = new Gorillix(address(tokenA), address(tokenB), trustedForwarder);
+        gorillix = new Gorillix(address(tokenA), address(tokenB), trustedForwarder, "Gorillix TokenA/TokenB", "GOR-LP");
 
         tokenA.transfer(user1, INIT_AMOUNT);
         tokenB.transfer(user1, INIT_AMOUNT);

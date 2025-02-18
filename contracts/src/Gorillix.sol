@@ -1,12 +1,13 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.20;
 
+import { ERC20 } from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import { IERC20 } from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import { Ownable } from "@openzeppelin/contracts/access/Ownable.sol";
 import { Context } from "@openzeppelin/contracts/utils/Context.sol";
 import { ERC2771Context } from "@gelatonetwork/relay-context/contracts/vendor/ERC2771Context.sol";
 
-contract Gorillix is Ownable, ERC2771Context {
+contract Gorillix is Ownable, ERC2771Context, ERC20 {
     IERC20 public immutable i_tokenA;
     IERC20 public immutable i_tokenB;
 
@@ -45,7 +46,7 @@ contract Gorillix is Ownable, ERC2771Context {
     //////////////// CONSTRUCTOR ////////////////////
     /////////////////////////////////////////////////
 
-    constructor(address _tokenA, address _tokenB, address trustedForwarder) Ownable(msg.sender) ERC2771Context(trustedForwarder) {
+    constructor(address _tokenA, address _tokenB, address trustedForwarder, string memory lpTokenName, string memory lpTokenSymbol) Ownable(msg.sender) ERC2771Context(trustedForwarder) ERC20(lpTokenName, lpTokenSymbol) {
         i_tokenA = IERC20(_tokenA);
         i_tokenB = IERC20(_tokenB);
     }
