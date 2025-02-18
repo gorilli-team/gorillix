@@ -122,6 +122,23 @@ contract GorillixTest is Test {
         gorillix.init(0, 0);
     }
 
+    ///////////////////////////////////////////
+    /////////////// LP TOKENS /////////////////
+    ///////////////////////////////////////////
+
+    function testMintCorrectAmountLPTokensToOwnerAfterInit() public {
+        vm.startPrank(deployer);
+        tokenA.approve(address(gorillix), INIT_AMOUNT);
+        tokenB.approve(address(gorillix), INIT_AMOUNT);
+        gorillix.init(INIT_AMOUNT, INIT_AMOUNT);
+        vm.stopPrank();
+
+        uint256 expectedLPTokens = gorillix.getLPTokensInit(INIT_AMOUNT, INIT_AMOUNT);
+
+        assertEq(expectedLPTokens, gorillix.balanceOf(deployer));
+        assertEq(expectedLPTokens, gorillix.totalSupply());
+    }
+
     //////////////////////////////////////
     /////////////// PRICE ////////////////
     //////////////////////////////////////

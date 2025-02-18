@@ -6,6 +6,7 @@ import { IERC20 } from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import { Ownable } from "@openzeppelin/contracts/access/Ownable.sol";
 import { Context } from "@openzeppelin/contracts/utils/Context.sol";
 import { ERC2771Context } from "@gelatonetwork/relay-context/contracts/vendor/ERC2771Context.sol";
+import { Math } from "@openzeppelin/contracts/utils/math/Math.sol";
 
 contract Gorillix is Ownable, ERC2771Context, ERC20 {
     IERC20 public immutable i_tokenA;
@@ -72,6 +73,7 @@ contract Gorillix is Ownable, ERC2771Context, ERC20 {
 
         i_tokenA.transferFrom(msg.sender, address(this), amountTokenA);
         i_tokenB.transferFrom(msg.sender, address(this), amountTokenB);
+        _mint(msg.sender, _calculateLPTokensInit(amountTokenA, amountTokenB));
 
         emit Initialized(msg.sender, amountTokenA, amountTokenB);
     }
@@ -186,6 +188,10 @@ contract Gorillix is Ownable, ERC2771Context, ERC20 {
         return ERC2771Context._msgData();
     }
 
+    function _calculateLPTokensInit(uint256 amountTokenA, uint256 amountTokenB) internal pure returns (uint256 amountLPTokens) {
+        return Math.sqrt(amountTokenA) * Math.sqrt(amountTokenB);
+    }
+
     //////////////////////////////////////////////
     ////////////// VIEW FUNCTIONS ////////////////
     //////////////////////////////////////////////
@@ -203,5 +209,9 @@ contract Gorillix is Ownable, ERC2771Context, ERC20 {
 
     function getLiquidityTokenBPerUser(address user) external view returns(uint256) {
         return s_liquidityTokenBPerUser[user];
+    }
+
+    function getLPTokensInit(uint256 amountTokenA, uint256 amountTokenB) external pure returns(uint256) {
+        return _calculateLPTokensInit(amountTokenA, amountTokenB);
     }
 }
