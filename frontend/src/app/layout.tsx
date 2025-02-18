@@ -24,6 +24,11 @@ export default function RootLayout({
               integrity="sha512-5Hs3dF2AEPkpNAR7UiOHba+lRSJNeM2ECkwxUIxC1Q/FLycGTbNapWXB4tP889k5T5Ju8fs4b1P5z/iB4nMfSQ==" 
               crossOrigin="anonymous" 
         />
+         <link
+          rel="preconnect" 
+          href="https://fonts.googleapis.com" 
+          crossOrigin="anonymous" 
+        />
       </head>
       <body>
         <Providers>{children}</Providers>
