@@ -9,10 +9,18 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@rainbow-me/rainbowkit": "^2.2.3",
+    "@tanstack/react-query": "^5.66.0",
+    "@wagmi/core": "^2.16.4",
     "axios": "^1.7.9",
+    "connectkit": "^1.8.2",
+    "frontend": "file:",
     "next": "15.1.7",
-    "react": "^19.0.0",
-    "react-dom": "^19.0.0"
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "recharts": "^2.15.1",
+    "viem": "^2.23.2",
+    "wagmi": "^2.14.11"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
