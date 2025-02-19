@@ -243,7 +243,7 @@ contract GorillixTest is Test {
         uint256 xReserves = gorillix.getTotalLiquidityTokenA();
         uint256 yReserves = gorillix.getTotalLiquidityTokenB();
 
-        // We want to see of many TokenB we receive if we swap 100 TokenA
+        // We want to see how many TokenB we receive if we swap 100 TokenA
         uint256 yOutput = gorillix.price(100 * 10 ** 18, xReserves, yReserves);
 
         console.log("If we swap 100 TokenA, we receive: ", yOutput, " TokenB");
@@ -489,8 +489,6 @@ contract GorillixTest is Test {
     //////////// REMOVE LIQUIDITY /////////////
     ///////////////////////////////////////////
 
-    // info if the liquidity provided is too small, the lp tokens calculated are 0.93422
-    // which is rounded down to 0, hence the user has donated to the pool without receiving any token
     function testRemoveLiquidity() public {
         vm.startPrank(deployer);
         tokenA.approve(address(gorillix), 10000000000000000000);

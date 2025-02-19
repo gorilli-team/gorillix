@@ -9,15 +9,11 @@ import { ERC2771Context } from "@gelatonetwork/relay-context/contracts/vendor/ER
 import { Math } from "@openzeppelin/contracts/utils/math/Math.sol";
 
 contract Gorillix is Ownable, ERC2771Context, ERC20 {
-    IERC20 public immutable i_tokenA;
-    IERC20 public immutable i_tokenB;
-
+    
     ////////////////////////////////////////////////
     //////////////// CUSTOM ERRORS /////////////////
     ////////////////////////////////////////////////
 
-    // q is it better to specify that it is the liquidity to be initialized?
-    // e.g. Gorillix__LiquidityAlreadyInitialized()?
     error Gorillix__AlreadyInitialized();
     error Gorillix__AmountMustBeGreaterThanZero();
 
@@ -35,16 +31,16 @@ contract Gorillix is Ownable, ERC2771Context, ERC20 {
     /////////////// STATE VARIABLES ////////////////
     ////////////////////////////////////////////////
 
+    IERC20 public immutable i_tokenA;
+    IERC20 public immutable i_tokenB;
+
     uint256 public constant BASIS_POINTS = 1e4;
 
-    // are they really useful? or it is sufficient to call the balance?
     uint256 public s_totalLiquidityTokenA;
     uint256 public s_totalLiquidityTokenB;
 
-    // do we intend these as the liquidity tokens?
     mapping (address user => uint256 amountTokenA) public s_liquidityTokenAPerUser;
     mapping (address user => uint256 amountTokenB) public s_liquidityTokenBPerUser;
-
 
     /////////////////////////////////////////////////
     //////////////// CONSTRUCTOR ////////////////////
@@ -125,10 +121,6 @@ contract Gorillix is Ownable, ERC2771Context, ERC20 {
         uint256 reservesTokenB = s_totalLiquidityTokenB;
         uint256 lpTokensToMint = _calculateLPTokensAddLiquidity(amountTokenA, reservesTokenA);
 
-        // info some argue that would be better to add 1 to reduce slippage
-        // for tokens having 18 decimals is negligible, if we were working with USDC, which has 6 decimals
-        // rounding errors would have a more profound impact
-        // in alternative we could use the ceilDiv function from openzeppelin Math library
         amountTokenB = (amountTokenA * reservesTokenB) / reservesTokenA;
 
         s_totalLiquidityTokenA += amountTokenA;
@@ -151,7 +143,6 @@ contract Gorillix is Ownable, ERC2771Context, ERC20 {
         uint256 reservesTokenB = s_totalLiquidityTokenB;
         uint256 lpTokensToMint = _calculateLPTokensAddLiquidity(amountTokenB, reservesTokenB);
 
-        // info same as above
         amountTokenA = (amountTokenB * reservesTokenA) / reservesTokenB;
 
         s_totalLiquidityTokenA += amountTokenA;
@@ -190,18 +181,12 @@ contract Gorillix is Ownable, ERC2771Context, ERC20 {
     ////////////// PURE FUNCTIONS ////////////////
     //////////////////////////////////////////////
 
-    // i we call it x and y because user can swap tokenA for tokenB,
-    // but also tokenB for tokenA
-    // i we account for a 0.3% fee on xInput
     function price(uint256 xInput, uint256 xReserves, uint256 yReserves) public pure returns(uint256 yOutput) {
         uint256 xInputWithFee = xInput * 997;
         uint256 numerator = xInputWithFee * yReserves;
         uint256 denominator = (xReserves * 1000) + xInputWithFee;
         return (numerator / denominator);
     }
-
-
-    // q what if someone sends token to the contract?
 
     //////////////////////////////////////////////
     //////////// INTERNAL FUNCTIONS //////////////
@@ -220,9 +205,6 @@ contract Gorillix is Ownable, ERC2771Context, ERC20 {
     }
 
     function _calculateLPTokensAddLiquidity(uint256 amountInputToken, uint256 reservesInputToken) internal view returns(uint256 amountLPTokens) {
-        // ATTENTION: if the first division has an output smaller than 1
-        // Solidity rounds down to zero
-        // the return value will then be zero
         return (((amountInputToken * BASIS_POINTS) / reservesInputToken) * totalSupply()) / BASIS_POINTS;
     }
 
