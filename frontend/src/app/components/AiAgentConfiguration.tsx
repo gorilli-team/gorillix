@@ -142,7 +142,7 @@ export default function AiAgentConfiguration() {
           <button
             onClick={handleActivation}
             disabled={!selectedStrategy || !riskLevel || !isValidAllocation()}
-            className={`px-6 py-2 rounded-full font-medium transition-colors ${
+            className={`px-6 py-2 rounded-lg font-medium transition-colors ${
               isAgentActive
                 ? 'bg-gray-800 text-white hover:bg-gray-900'
                 : 'bg-purple-600 text-white hover:bg-purple-700'

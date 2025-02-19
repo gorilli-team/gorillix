@@ -60,12 +60,11 @@ export default function Dashboard() {
          </div>
        )}
 
-       <div className="flex justify-between items-center mb-6">
-         <h1 className="text-2xl font-bold">Dashboard Overview</h1>
+       <div className="flex justify-end items-center mb-2">
          <div className="flex items-center gap-3">
            <button
              onClick={handleModeSwitch}
-             className="px-6 py-2 rounded-full font-medium transition-colors bg-purple-600 text-white hover:bg-purple-700 transition-colors focus:outline-none"
+             className="px-4 py-2 rounded-lg text-sm transition-colors bg-purple-600 text-white hover:bg-purple-700 transition-colors focus:outline-none"
            >
              {isAiEnabled ? 'Switch to Manual Mode' : 'Switch to AI Mode'}
            </button>

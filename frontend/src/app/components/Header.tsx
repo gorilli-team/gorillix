@@ -25,7 +25,7 @@ export default function Header() {
               <button
                 type="button"
                 onClick={connected ? openAccountModal : openConnectModal}
-                className={`px-6 py-2 rounded-full font-medium transition-colors ${
+                className={`px-6 py-2 rounded-lg font-medium transition-colors ${
                   connected 
                     ? "bg-purple-600 text-white hover:bg-purple-700"
                     : "bg-purple-600 text-white hover:bg-purple-700"
