@@ -29,8 +29,8 @@ export default function Dashboard() {
    return (
      <div className="p-4 relative">
        {showAlert && (
-         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-           <div className="bg-gray-800 rounded-lg p-4 max-w-md w-full">
+         <div className="fixed inset-0 bg-black bg-opacity-95 flex items-center justify-center z-50">
+           <div className="bg-gray-700 border border-purple-600 rounded-lg p-4 max-w-md w-full">
              <div className="font-medium mb-2">Mode Switch Confirmation</div>
              <div className="mt-2">
                <div className="mb-4 text-sm">
@@ -43,14 +43,14 @@ export default function Dashboard() {
                  <button
                    type="button"
                    onClick={handleConfirm}
-                   className="mr-2 inline-flex items-center rounded-lg bg-gray-500 px-3 py-1.5 text-center text-xs font-medium text-white hover:bg-gray-600 focus:outline-none"
+                   className="mr-2 inline-flex items-center rounded-lg bg-purple-600 hover:bg-purple-700 px-3 py-1.5 text-center text-xs focus:outline-none"
                  >
                    Yes
                  </button>
                  <button
                    type="button"
                    onClick={handleDismiss}
-                   className="rounded-lg border border-gray-500 bg-transparent px-3 py-1.5 text-center text-xs font-medium hover:bg-gray-500 hover:text-white focus:outline-none"
+                   className="rounded-lg border border-purple-600 bg-transparent hover:bg-purple-600 px-3 py-1.5 text-center text-xs focus:outline-none"
                  >
                    No
                  </button>
@@ -65,7 +65,7 @@ export default function Dashboard() {
          <div className="flex items-center gap-3">
            <button
              onClick={handleModeSwitch}
-             className="px-6 py-2 rounded-full font-medium transition-colors bg-gray-500 hover:bg-gray-600 text-white transition-colors focus:outline-none"
+             className="px-6 py-2 rounded-full font-medium transition-colors bg-purple-600 text-white hover:bg-purple-700 transition-colors focus:outline-none"
            >
              {isAiEnabled ? 'Switch to Manual Mode' : 'Switch to AI Mode'}
            </button>

@@ -15,7 +15,7 @@ export default function Main({
     const renderContent = () => {
         switch (selectedPage) {
             case "AI Agent":
-                return <div className="p-4"><h2 className="text-2xl font-bold mb-6">AI Agent Configuration</h2><AiAgentConfiguration /></div>;
+                return <div className="p-4"><AiAgentConfiguration /></div>;
             case "Stats":
                 return <div><DexStats/></div>;
             case "Dashboard":

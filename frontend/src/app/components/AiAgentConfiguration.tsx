@@ -1,9 +1,9 @@
 import { useState } from 'react';
 
 const tradingStrategies = [
-    { id: 'hodl', name: 'HODL', description: 'Hold your position regardless of market conditions' },
-    { id: 'buy', name: 'BUY', description: 'Automatically buy when market conditions are favorable' },
-    { id: 'sell', name: 'SELL', description: 'Automatically sell when profit targets are reached' }
+    { id: 'hodl', name: 'HODL'},
+    { id: 'buy', name: 'BUY'},
+    { id: 'sell', name: 'SELL'}
   ];
 
 const riskLevels = [
@@ -55,22 +55,21 @@ export default function AiAgentConfiguration() {
           }
         `}
       </style>
-      <div className="bg-gray-800 rounded-xl shadow-lg p-6 mb-6">        
+      <div className="bg-gray-800 rounded-xl shadow-lg p-6 mb-6 border border-purple-600">        
         <div className="mb-8">
           <h3 className="text-lg font-semibold mb-4">Trading Strategy</h3>
           <div className="grid gap-4 md:grid-cols-3">
             {tradingStrategies.map((strategy) => (
               <div
                 key={strategy.id}
-                className={`p-4 rounded-lg border-2 cursor-pointer transition-colors ${
+                className={`p-2 px-4 rounded-lg border-2 cursor-pointer transition-colors ${
                   selectedStrategy === strategy.id
-                    ? 'border-blue-500 bg-blue-50'
-                    : 'border-gray-200 hover:border-blue-300'
+                    ? 'border-purple-600 bg-gray-600'
+                    : 'border-purple-600 hover:bg-gray-600'
                 }`}
                 onClick={() => setSelectedStrategy(strategy.id)}
               >
-                <h4 className="font-medium mb-2">{strategy.name}</h4>
-                <p className="text-sm text-gray-600">{strategy.description}</p>
+                <h4 className="font-medium">{strategy.name}</h4>
               </div>
             ))}
           </div>
@@ -82,10 +81,10 @@ export default function AiAgentConfiguration() {
             {riskLevels.map((level) => (
               <div
                 key={level.id}
-                className={`p-4 rounded-lg border-2 cursor-pointer transition-colors ${
+                className={`p-2 px-4 rounded-lg border-2 cursor-pointer transition-colors ${
                   riskLevel === level.id
-                    ? 'border-blue-500 bg-blue-50'
-                    : 'border-gray-200 hover:border-blue-300'
+                    ? 'border-purple-600 bg-gray-600'
+                    : 'border-purple-600 hover:bg-gray-600'
                 }`}
                 onClick={() => setRiskLevel(level.id)}
               >
@@ -105,14 +104,14 @@ export default function AiAgentConfiguration() {
                   value={tokenAAllocation}
                   onChange={(e) => handleAllocationChange(e.target.value, setTokenAAllocation)}
                   placeholder="Token A allocation"
-                  className={`w-full p-3 border-2 rounded-lg focus:outline-none ${
-                    Number(tokenAAllocation) > 0 ? 'border-blue-500' : 'border-gray-200'
+                  className={`bg-gray-800 border-purple-600 w-full p-2 px-4 border-2 rounded-lg focus:outline-none ${
+                    Number(tokenAAllocation) > 0 ? 'bg-gray-600' : ''
                   }`}
                   min="0"
                 />
-                <span className="text-gray-600">%</span>
+                <span className="text-purple-600">%</span>
               </div>
-              <p className="text-sm text-gray-600">Token A Allocation: {Number(tokenAAllocation)}%</p>
+              <p className="text-sm text-purple-600">Token A Allocation: {Number(tokenAAllocation)}%</p>
             </div>
             <div className="space-y-2">
               <div className="flex items-center space-x-4">
@@ -121,32 +120,32 @@ export default function AiAgentConfiguration() {
                   value={tokenBAllocation}
                   onChange={(e) => handleAllocationChange(e.target.value, setTokenBAllocation)}
                   placeholder="Token B allocation"
-                  className={`w-full p-3 border-2 rounded-lg focus:outline-none ${
-                    Number(tokenBAllocation) > 0 ? 'border-blue-500' : 'border-gray-200'
+                  className={`bg-gray-800 w-full p-2 px-4 border-purple-600 border-2 rounded-lg focus:outline-none ${
+                    Number(tokenBAllocation) > 0 ? 'bg-gray-600' : ''
                   }`}
                   min="0"
                 />
-                <span className="text-gray-600">%</span>
+                <span className="">%</span>
               </div>
-              <p className="text-sm text-gray-600">Token B Allocation: {Number(tokenBAllocation)}%</p>
+              <p className="text-sm">Token B Allocation: {Number(tokenBAllocation)}%</p>
             </div>
           </div>
         </div>
 
-        <div className="flex items-center justify-between p-4 bg-gray-700 rounded-lg">
+        <div className="flex items-center justify-between p-4 bg-gray-600 rounded-lg">
           <div>
             <h3 className="font-semibold">AI Agent Status</h3>
-            <p className="text-sm text-gray-600">
+            <p className="text-sm text-gray-800">
               {isAgentActive ? 'Agent is actively trading' : 'Agent is paused'}
             </p>
           </div>
           <button
             onClick={handleActivation}
             disabled={!selectedStrategy || !riskLevel || !isValidAllocation()}
-            className={`px-6 py-2 rounded-lg font-medium transition-colors ${
+            className={`px-6 py-2 rounded-full font-medium transition-colors ${
               isAgentActive
-                ? 'bg-red-500 text-white hover:bg-red-600'
-                : 'bg-green-500 text-white hover:bg-green-600'
+                ? 'bg-gray-800 text-white hover:bg-gray-900'
+                : 'bg-purple-600 text-white hover:bg-purple-700'
             } disabled:opacity-50 disabled:cursor-not-allowed`}
           >
             {isAgentActive ? 'Pause Agent' : 'Activate Agent'}

@@ -48,13 +48,13 @@ export default function Sidebar({
               </button>
             </li>
             <li>
-              <button className="w-full text-left px-3 py-2 rounded-lg hover:bg-gray-200">
+              <button className="w-full text-left px-3 py-2 rounded-lg hover:bg-gray-700">
                 <i className="fa-solid fa-shield pr-2"></i>
                 <span>AI AGENT</span>
               </button>
             </li>
             <li>
-              <button className="w-full text-left px-3 py-2 rounded-lg hover:bg-gray-200">
+              <button className="w-full text-left px-3 py-2 rounded-lg hover:bg-gray-700">
                 <i className="fa-solid fa-shield pr-2"></i>
                 <span>STATS</span>
               </button>
@@ -66,7 +66,7 @@ export default function Sidebar({
   }
 
   return (
-    <aside className="w-64 bg-gray-800 border-r border-gray-900 flex text-white flex-col">
+    <aside className="w-64 bg-gray-800 border-r border-purple-600 flex text-white flex-col">
       <div
         className="h-16 text-xl font-bold flex items-center ps-4 cursor-pointer"
         onClick={handleGorillixClick}
@@ -78,7 +78,7 @@ export default function Sidebar({
         <ul className="space-y-2">
           <li>
             <button
-              className={`w-full text-left px-3 py-2 rounded-lg hover:bg-gray-600 ${
+              className={`w-full text-left px-3 py-2 rounded-lg hover:bg-gray-700 ${
                 selectedPage === "Dashboard" ? "bg-gray-700" : ""
               }`}
               onClick={() => handlePageChange("Dashboard")}
@@ -100,8 +100,8 @@ export default function Sidebar({
           </li>
           <li>
             <button
-              className={`w-full text-left px-3 py-2 rounded-lg hover:bg-gray-900 ${
-                selectedPage === "Stats" ? "bg-gray-900" : ""
+              className={`w-full text-left px-3 py-2 rounded-lg hover:bg-gray-700 ${
+                selectedPage === "Stats" ? "bg-gray-700" : ""
               }`}
               onClick={() => handlePageChange("Stats")}
             >
