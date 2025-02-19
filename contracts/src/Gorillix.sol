@@ -34,6 +34,8 @@ contract Gorillix is Ownable, ERC2771Context, ERC20 {
     /////////////// STATE VARIABLES ////////////////
     ////////////////////////////////////////////////
 
+    uint256 public constant BASIS_POINTS = 1e4;
+
     // are they really useful? or it is sufficient to call the balance?
     uint256 public s_totalLiquidityTokenA;
     uint256 public s_totalLiquidityTokenB;
@@ -200,7 +202,7 @@ contract Gorillix is Ownable, ERC2771Context, ERC20 {
         // ATTENTION: if the first division has an output smaller than 1
         // Solidity rounds down to zero
         // the return value will then be zero
-        return (amountInputToken / reservesInputToken) * totalSupply();
+        return (((amountInputToken * BASIS_POINTS) / reservesInputToken) * totalSupply()) / BASIS_POINTS;
     }
 
     //////////////////////////////////////////////

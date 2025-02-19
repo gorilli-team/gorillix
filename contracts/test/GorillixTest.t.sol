@@ -139,27 +139,94 @@ contract GorillixTest is Test {
         assertEq(expectedLPTokens, gorillix.totalSupply());
     }
 
-    // info there maybe is an issue with numbers 
-    function testMintCorrectAmountLPTokensToLP() public {
+    function testMintCorrectAmountLPTokensAddLiquidityTokenA() public {
         vm.startPrank(deployer);
-        tokenA.approve(address(gorillix), 10000000000000000000);
-        tokenB.approve(address(gorillix), 100000000000000000000);
-        gorillix.init(10000000000000000000, 100000000000000000000);
+        tokenA.approve(address(gorillix), 100000000000000000000);
+        tokenB.approve(address(gorillix), 1000000000000000000000);
+        // deployer init the pool with 100 tokenA and 1000 tokenB
+        gorillix.init(100000000000000000000, 1000000000000000000000);
         vm.stopPrank();
 
         uint256 reservesTokenA = gorillix.getTotalLiquidityTokenA();
-        uint256 expectedLPTokens = gorillix.getLPTokensAddLiquidity(50000000000000000000, reservesTokenA);
+        uint256 expectedLPTokensUser1 = gorillix.getLPTokensAddLiquidity(50000000000000000000, reservesTokenA);
 
         vm.startPrank(user1);
-        tokenA.approve(address(gorillix), 1000000000000000000000);
-        tokenB.approve(address(gorillix), 1000000000000000000000);
+        tokenA.approve(address(gorillix), 50000000000000000000);
+        tokenB.approve(address(gorillix), 500000000000000000000);
+        // user1 provides 50 tokenA of liquidity to the pool
+        // addLiquidityTokenA calculates of much of tokenB needs to be sent
         gorillix.addLiquidityTokenA(50000000000000000000);
         vm.stopPrank();
 
-        console.log("Expected LP tokens user1: ", expectedLPTokens);
-        console.log("User1 LP tokens: ", gorillix.balanceOf(user1));
-        console.log("Deployer LP tokens: ", gorillix.balanceOf(deployer));
-        console.log("Total supply LP tokens: ", gorillix.totalSupply());
+        assertEq(expectedLPTokensUser1, gorillix.balanceOf(user1));
+    }
+
+    function testMintCorrectAmountLPTokensAddLiquidityTokenB() public {
+        vm.startPrank(deployer);
+        tokenA.approve(address(gorillix), 100000000000000000000);
+        tokenB.approve(address(gorillix), 1000000000000000000000);
+        // deployer init the pool with 100 tokenA and 1000 tokenB
+        gorillix.init(100000000000000000000, 1000000000000000000000);
+        vm.stopPrank();
+
+        uint256 reservesTokenB = gorillix.getTotalLiquidityTokenB();
+        uint256 expectedLPTokensUser1 = gorillix.getLPTokensAddLiquidity(50000000000000000000, reservesTokenB);
+
+        vm.startPrank(user1);
+        tokenA.approve(address(gorillix), 50000000000000000000);
+        tokenB.approve(address(gorillix), 50000000000000000000);
+        // user1 provides 50 tokenB of liquidity to the pool
+        // addLiquidityTokenB calculates of much of tokenB needs to be sent
+        gorillix.addLiquidityTokenB(50000000000000000000);
+        vm.stopPrank();
+
+        assertEq(expectedLPTokensUser1, gorillix.balanceOf(user1));
+    }
+
+    function testFuzzMintCorrectAmountLPTokensAddLiquidityTokenA(uint32 initTokenA, uint32 initTokenB, uint32 depositTokenA) public {
+        vm.assume(initTokenA > 0);
+        vm.assume(initTokenB > 0);
+        vm.assume(depositTokenA > 0);
+
+        vm.startPrank(deployer);
+        tokenA.approve(address(gorillix), initTokenA);
+        tokenB.approve(address(gorillix), initTokenB);
+        gorillix.init(initTokenA, initTokenB);
+        vm.stopPrank();
+
+        uint256 reservesTokenA = gorillix.getTotalLiquidityTokenA();
+        uint256 expectedLPTokensUser1 = gorillix.getLPTokensAddLiquidity(depositTokenA, reservesTokenA);
+
+        vm.startPrank(user1);
+        tokenA.approve(address(gorillix), 500000000000000000000000);
+        tokenB.approve(address(gorillix), 500000000000000000000000);
+        gorillix.addLiquidityTokenA(depositTokenA);
+        vm.stopPrank();
+
+        assertEq(expectedLPTokensUser1, gorillix.balanceOf(user1));
+    }
+
+    function testFuzzMintCorrectAmountLPTokensAddLiquidityTokenB(uint32 initTokenA, uint32 initTokenB, uint32 depositTokenB) public {
+        vm.assume(initTokenA > 0);
+        vm.assume(initTokenB > 0);
+        vm.assume(depositTokenB > 0);
+
+        vm.startPrank(deployer);
+        tokenA.approve(address(gorillix), initTokenA);
+        tokenB.approve(address(gorillix), initTokenB);
+        gorillix.init(initTokenA, initTokenB);
+        vm.stopPrank();
+
+        uint256 reservesTokenB = gorillix.getTotalLiquidityTokenB();
+        uint256 expectedLPTokensUser1 = gorillix.getLPTokensAddLiquidity(depositTokenB, reservesTokenB);
+
+        vm.startPrank(user1);
+        tokenA.approve(address(gorillix), 50000000000000000000);
+        tokenB.approve(address(gorillix), 50000000000000000000);
+        gorillix.addLiquidityTokenB(depositTokenB);
+        vm.stopPrank();
+
+        assertEq(expectedLPTokensUser1, gorillix.balanceOf(user1));
     }
 
     //////////////////////////////////////
