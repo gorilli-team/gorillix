@@ -16,7 +16,6 @@ export default function Header() {
             chain,
             openConnectModal,
             openAccountModal,
-            openChainModal,
             mounted: buttonMounted,
           }) => {
             const connected = buttonMounted && account && chain;

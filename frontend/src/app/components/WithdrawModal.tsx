@@ -77,7 +77,7 @@ export function WithdrawModal({
   if (!isVisible) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div className="fixed inset-0 bg-black bg-opacity-95 flex items-center justify-center z-50">
       <div className="bg-gray-900 rounded-xl p-6 w-full max-w-lg">
         <div className="flex justify-between items-center mb-4">
           <div>
@@ -121,7 +121,7 @@ export function WithdrawModal({
           </div>
 
           <div className="text-center">
-            <span className="text-gray-400">You'll receive</span>
+            <span className="text-gray-400">You&apos;ll receive</span>
           </div>
 
           <div className="bg-gray-800 rounded-lg p-4">

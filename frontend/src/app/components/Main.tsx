@@ -5,12 +5,10 @@ import DexStats from './DexStats';
 
 interface MainProps {
     selectedPage: string;
-    setSelectedPage: React.Dispatch<React.SetStateAction<string>>;
 }
 
 export default function Main({
-    selectedPage,
-    setSelectedPage
+    selectedPage
 }: MainProps) {
     const renderContent = () => {
         switch (selectedPage) {

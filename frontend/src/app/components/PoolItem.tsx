@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import Image from 'next/image';
 import { DepositModal } from './DepositModal';
 import { WithdrawModal } from './WithdrawModal';
 
@@ -32,8 +33,22 @@ export default function PoolItem({
                 <div className="flex items-center justify-between flex-wrap gap-4">
                     <div className="flex items-center space-x-4">
                         <div className="flex -space-x-3">
-                            <img src={token1Image} alt="Token 1" className="w-10 h-10 rounded-full border-2 border-gray-700 z-10 shadow-md" />
-                            <img src={token2Image} alt="Token 2" className="w-10 h-10 rounded-full border-2 border-gray-700 shadow-md" />
+                            <div className="relative w-10 h-10 z-10">
+                                <Image 
+                                    src={token1Image} 
+                                    alt="Token 1" 
+                                    fill
+                                    className="rounded-full border-2 border-gray-700 shadow-md object-cover"
+                                />
+                            </div>
+                            <div className="relative w-10 h-10">
+                                <Image 
+                                    src={token2Image} 
+                                    alt="Token 2" 
+                                    fill
+                                    className="rounded-full border-2 border-gray-700 shadow-md object-cover"
+                                />
+                            </div>
                         </div>
                         <div>
                             <div className="font-bold text-lg text-white">{tokenPair}</div>

@@ -115,7 +115,7 @@ export function DepositModal({
   if (!isVisible) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div className="fixed inset-0 bg-black bg-opacity-95 flex items-center justify-center z-50">
       <div className="bg-gray-900 rounded-xl p-6 w-full max-w-lg">
         <div className="flex justify-between items-center mb-4">
           <div>
@@ -197,7 +197,7 @@ export function DepositModal({
               <span className="text-white">0.3%</span>
             </div>
             <div className="flex justify-between text-sm">
-              <span className="text-gray-400">LP tokens you'll receive</span>
+              <span className="text-gray-400">LP tokens you&apos;ll receive</span>
               <span className="text-white">{estimatedLpTokens}</span>
             </div>
           </div>

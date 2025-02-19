@@ -1,6 +1,7 @@
 "use client";
 import { useAccount } from "wagmi";
 import { useState, useEffect } from "react";
+import Image from 'next/image';
 
 interface SidebarProps {
   selectedPage: string;
@@ -11,7 +12,7 @@ export default function Sidebar({
   selectedPage,
   setSelectedPage,
 }: SidebarProps) {
-  const { address, isConnected } = useAccount();
+  const { address } = useAccount();
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
@@ -36,7 +37,13 @@ export default function Sidebar({
     return (
       <aside className="w-64 bg-gray-800 flex text-white flex-col border border-gray-300">
         <div className="h-16 text-xl font-bold flex items-center ps-4">
-          <img className="w-12 h-12 rounded-full" src="/avatar_3.png" alt="logo-gorillix" />
+          <Image 
+            className="w-12 h-12 rounded-full" 
+            src="/avatar_3.png" 
+            alt="logo-gorillix" 
+            width={48}
+            height={48}
+          />
           <span className="ps-2">Gorillix</span>
         </div>
         <nav className="flex-1 p-4">
@@ -71,7 +78,13 @@ export default function Sidebar({
         className="h-16 text-xl font-bold flex items-center ps-4 cursor-pointer"
         onClick={handleGorillixClick}
       >
-        <img className="w-12 h-12 rounded-full" src="/avatar_3.png" alt="logo-gorillix" />
+        <Image 
+          className="w-12 h-12 rounded-full" 
+          src="/avatar_3.png" 
+          alt="logo-gorillix" 
+          width={48}
+          height={48}
+        />
         <span className="ps-2">Gorillix</span>
       </div>
       <nav className="flex-1 p-4">

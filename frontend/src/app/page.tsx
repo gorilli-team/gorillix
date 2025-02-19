@@ -17,7 +17,6 @@ export default function Page() {
         <Header />
         <Main 
           selectedPage={selectedPage}
-          setSelectedPage={setSelectedPage}
         />
       </div>
     </div>
