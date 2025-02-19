@@ -514,6 +514,9 @@ contract GorillixTest is Test {
 
         uint256 totalSupplyBeforeBurn = gorillix.totalSupply();
         uint256 lpTokensToBurn = lpTokensUser1BeforeRemoveLiquidity;
+        uint256 poolShare = gorillix.getPoolShare(lpTokensUser1BeforeRemoveLiquidity);
+
+        console.log("Pool share for 158 LP tokens: ", poolShare);
 
         vm.prank(user1);
         gorillix.removeLiquidity(lpTokensUser1BeforeRemoveLiquidity);
@@ -558,6 +561,9 @@ contract GorillixTest is Test {
 
         uint256 totalSupplyBeforeBurn = gorillix.totalSupply();
         uint256 lpTokensToBurn = 100000000000000000000;
+        uint256 poolShare = gorillix.getPoolShare(100000000000000000000);
+
+        console.log("Pool share for 100 LP tokens: ", poolShare);
 
         vm.prank(user1);
         gorillix.removeLiquidity(100000000000000000000);
@@ -577,5 +583,51 @@ contract GorillixTest is Test {
 
         assertEq(gorillix.balanceOf(user1), lpTokensUser1BeforeRemoveLiquidity - lpTokensToBurn);
         assertEq(gorillix.totalSupply(), totalSupplyBeforeBurn - lpTokensToBurn);
+    }
+
+    //////////////////////////////////////////////
+    ///////////////// POOL SHARE /////////////////
+    //////////////////////////////////////////////
+
+    function testPoolShare() public {
+        vm.startPrank(deployer);
+        tokenA.approve(address(gorillix), 100000000000000000000);
+        tokenB.approve(address(gorillix), 1000000000000000000000);
+        // deployer inits the pool with 100 tokenA and 1000 tokenB
+        gorillix.init(100000000000000000000, 1000000000000000000000);
+        vm.stopPrank();
+
+        // deployer receives 316 LP tokens, which represents the 100% of the pool
+        uint256 deployerLPTokens = gorillix.balanceOf(deployer);
+        uint256 poolShareDeployer = gorillix.getPoolShare(deployerLPTokens);
+
+        console.log("Deployer LP tokens: ", deployerLPTokens);
+        console.log("Deployer pool share: ", poolShareDeployer);
+
+        vm.startPrank(user1);
+        tokenA.approve(address(gorillix), 1000000000000000000000);
+        tokenB.approve(address(gorillix), 1000000000000000000000);
+        // user1 wants to provide liquidity to the pool
+        // they intend to deposit 50 tokenA
+        gorillix.addLiquidityTokenA(50000000000000000000);
+        vm.stopPrank();
+
+        // deployer's LP tokens stays the same == 316
+        // their pool share changes from 100% to 66.66%
+        uint256 deployerLPTokensAfterUser1Deposit = gorillix.balanceOf(deployer);
+        uint256 poolShareDeployerAfterUser1Deposit = gorillix.getPoolShare(deployerLPTokensAfterUser1Deposit);
+
+        console.log("Deployer LP tokens after user1 deposit: ", deployerLPTokensAfterUser1Deposit);
+        console.log("Deployer pool share after user1 deposit: ", poolShareDeployerAfterUser1Deposit);
+
+        uint256 user1LPTokens = gorillix.balanceOf(user1);
+        uint256 poolShareUser1 = gorillix.getPoolShare(user1LPTokens);
+
+        // user1 LP tokens == 158, with a 33.33% share of the pool
+        console.log("User1 LP tokens: ", user1LPTokens);
+        console.log("User1 pool share: ", poolShareUser1);
+
+        // total supply of LP tokens == 474
+        console.log("Total supply LP tokens: ", gorillix.totalSupply());
     }
 }

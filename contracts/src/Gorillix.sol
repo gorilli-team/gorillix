@@ -35,7 +35,7 @@ contract Gorillix is Ownable, ERC2771Context, ERC20 {
     /////////////// STATE VARIABLES ////////////////
     ////////////////////////////////////////////////
 
-    uint256 public constant BASIS_POINTS = 1e8;
+    uint256 public constant BASIS_POINTS = 1e4;
 
     // are they really useful? or it is sufficient to call the balance?
     uint256 public s_totalLiquidityTokenA;
@@ -255,5 +255,9 @@ contract Gorillix is Ownable, ERC2771Context, ERC20 {
 
     function getLPTokensAddLiquidity(uint256 amountTokenA, uint256 reservesTokenA) external view returns(uint256) {
         return _calculateLPTokensAddLiquidity(amountTokenA, reservesTokenA);
+    }
+
+    function getPoolShare(uint256 amountLPTokens) external view returns(uint256) {
+        return _calculatePoolShare(amountLPTokens);
     }
 }
