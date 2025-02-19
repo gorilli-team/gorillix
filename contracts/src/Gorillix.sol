@@ -29,12 +29,13 @@ contract Gorillix is Ownable, ERC2771Context, ERC20 {
     event TokenAtoTokenBSwap(address indexed user, uint256 indexed amountTokenA, uint256 indexed outputTokenB);
     event TokenBtoTokenASwap(address indexed user, uint256 indexed amountTokenB, uint256 indexed outputTokenA);
     event AddLiquidity(address indexed liquidityProvider, uint256 indexed amountTokenA, uint256 indexed amountTokenB);
+    event RemoveLiquidity(address indexed liquidityProvider, uint256 indexed amountLPTokensBurned, uint256 indexed amountTokenA, uint256 amountTokenB);
 
     ////////////////////////////////////////////////
     /////////////// STATE VARIABLES ////////////////
     ////////////////////////////////////////////////
 
-    uint256 public constant BASIS_POINTS = 1e4;
+    uint256 public constant BASIS_POINTS = 1e8;
 
     // are they really useful? or it is sufficient to call the balance?
     uint256 public s_totalLiquidityTokenA;
@@ -165,6 +166,26 @@ contract Gorillix is Ownable, ERC2771Context, ERC20 {
         emit AddLiquidity(msg.sender, amountTokenA, amountTokenB);
     }
 
+    function removeLiquidity(uint256 amountLPTokens) external {
+        if (amountLPTokens == 0) {
+            revert Gorillix__AmountMustBeGreaterThanZero();
+        }
+        uint256 poolShare = _calculatePoolShare(amountLPTokens);
+        uint256 amountTokenAToSend = (poolShare * s_totalLiquidityTokenA) / BASIS_POINTS;
+        uint256 amountTokenBToSend = (poolShare * s_totalLiquidityTokenB) / BASIS_POINTS;
+        
+        s_totalLiquidityTokenA -= amountTokenAToSend;
+        s_totalLiquidityTokenB -= amountTokenBToSend;
+        s_liquidityTokenAPerUser[msg.sender] -= amountTokenAToSend;
+        s_liquidityTokenBPerUser[msg.sender] -= amountTokenBToSend;
+
+        i_tokenA.transfer(msg.sender, amountTokenAToSend);
+        i_tokenB.transfer(msg.sender, amountTokenBToSend);
+        _burn(msg.sender, amountLPTokens);
+
+        emit RemoveLiquidity(msg.sender, amountLPTokens, amountTokenAToSend, amountTokenBToSend);
+    }
+
     //////////////////////////////////////////////
     ////////////// PURE FUNCTIONS ////////////////
     //////////////////////////////////////////////
@@ -203,6 +224,10 @@ contract Gorillix is Ownable, ERC2771Context, ERC20 {
         // Solidity rounds down to zero
         // the return value will then be zero
         return (((amountInputToken * BASIS_POINTS) / reservesInputToken) * totalSupply()) / BASIS_POINTS;
+    }
+
+    function _calculatePoolShare(uint256 amountLPTokens) internal view returns(uint256) {
+        return (amountLPTokens * BASIS_POINTS) / totalSupply();
     }
 
     //////////////////////////////////////////////

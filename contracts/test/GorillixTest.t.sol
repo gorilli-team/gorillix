@@ -484,4 +484,98 @@ contract GorillixTest is Test {
         gorillix.addLiquidityTokenB(0);
         vm.stopPrank();
     }
+
+    ///////////////////////////////////////////
+    //////////// REMOVE LIQUIDITY /////////////
+    ///////////////////////////////////////////
+
+    // info if the liquidity provided is too small, the lp tokens calculated are 0.93422
+    // which is rounded down to 0, hence the user has donated to the pool without receiving any token
+    function testRemoveLiquidity() public {
+        vm.startPrank(deployer);
+        tokenA.approve(address(gorillix), 10000000000000000000);
+        tokenB.approve(address(gorillix), 100000000000000000000);
+        gorillix.init(10000000000000000000, 100000000000000000000);
+        vm.stopPrank();
+
+        vm.startPrank(user1);
+        tokenA.approve(address(gorillix), 100000000000000000000);
+        tokenB.approve(address(gorillix), 1000000000000000000000);
+        gorillix.addLiquidityTokenA(50000000000000000000);
+        vm.stopPrank();
+
+        uint256 lpTokensUser1BeforeRemoveLiquidity = gorillix.balanceOf(user1);
+        console.log("User1 LP tokens balance before remove liquidity: ", lpTokensUser1BeforeRemoveLiquidity);
+
+        uint256 balanceTokenAUser1BeforeRemoveLiquidity = tokenA.balanceOf(user1);
+        uint256 balanceTokenBUser1BeforeRemoveLiquidity = tokenB.balanceOf(user1);
+        console.log("Balance TokenA user1 before remove liquidity: ", balanceTokenAUser1BeforeRemoveLiquidity);
+        console.log("Balance TokenB user1 before remove liquidity: ", balanceTokenBUser1BeforeRemoveLiquidity);
+
+        uint256 totalSupplyBeforeBurn = gorillix.totalSupply();
+        uint256 lpTokensToBurn = lpTokensUser1BeforeRemoveLiquidity;
+
+        vm.prank(user1);
+        gorillix.removeLiquidity(lpTokensUser1BeforeRemoveLiquidity);
+
+        uint256 lpTokensUser1AfterRemoveLiquidity = gorillix.balanceOf(user1);
+        console.log("User1 LP tokens balance after remove liquidity: ", lpTokensUser1AfterRemoveLiquidity);
+
+        uint256 liquidityProvidedTokenAPerUser1 = gorillix.getLiquidityTokenAPerUser(user1);
+        uint256 liquidityProvidedTokenBPerUser1 = gorillix.getLiquidityTokenBPerUser(user1);
+        console.log("Liquidity TokenA user1 after remove liquidity: ", liquidityProvidedTokenAPerUser1);
+        console.log("Liquidity TokenB user1 after remove liquidity: ", liquidityProvidedTokenBPerUser1);
+
+        uint256 balanceTokenAUser1AfterRemoveLiquidity = tokenA.balanceOf(user1);
+        uint256 balanceTokenBUser1AfterRemoveLiquidity = tokenB.balanceOf(user1);
+        console.log("Balance TokenA user1 after remove liquidity: ", balanceTokenAUser1AfterRemoveLiquidity);
+        console.log("Balance TokenB user1 after remove liquidity: ", balanceTokenBUser1AfterRemoveLiquidity);
+
+        assertEq(gorillix.balanceOf(user1), lpTokensUser1BeforeRemoveLiquidity - lpTokensToBurn);
+        assertEq(gorillix.totalSupply(), totalSupplyBeforeBurn - lpTokensToBurn);
+    }
+
+    function testRemoveLiquidityArbitraryAmount() public {
+        vm.startPrank(deployer);
+        tokenA.approve(address(gorillix), 10000000000000000000);
+        tokenB.approve(address(gorillix), 100000000000000000000);
+        gorillix.init(10000000000000000000, 100000000000000000000);
+        vm.stopPrank();
+
+        vm.startPrank(user1);
+        tokenA.approve(address(gorillix), 100000000000000000000);
+        tokenB.approve(address(gorillix), 1000000000000000000000);
+        gorillix.addLiquidityTokenA(50000000000000000000);
+        vm.stopPrank();
+
+        uint256 lpTokensUser1BeforeRemoveLiquidity = gorillix.balanceOf(user1);
+        console.log("User1 LP tokens balance before remove liquidity: ", lpTokensUser1BeforeRemoveLiquidity);
+
+        uint256 balanceTokenAUser1BeforeRemoveLiquidity = tokenA.balanceOf(user1);
+        uint256 balanceTokenBUser1BeforeRemoveLiquidity = tokenB.balanceOf(user1);
+        console.log("Balance TokenA user1 before remove liquidity: ", balanceTokenAUser1BeforeRemoveLiquidity);
+        console.log("Balance TokenB user1 before remove liquidity: ", balanceTokenBUser1BeforeRemoveLiquidity);
+
+        uint256 totalSupplyBeforeBurn = gorillix.totalSupply();
+        uint256 lpTokensToBurn = 100000000000000000000;
+
+        vm.prank(user1);
+        gorillix.removeLiquidity(100000000000000000000);
+
+        uint256 lpTokensUser1AfterRemoveLiquidity = gorillix.balanceOf(user1);
+        console.log("User1 LP tokens balance after remove liquidity: ", lpTokensUser1AfterRemoveLiquidity);
+
+        uint256 liquidityProvidedTokenAPerUser1 = gorillix.getLiquidityTokenAPerUser(user1);
+        uint256 liquidityProvidedTokenBPerUser1 = gorillix.getLiquidityTokenBPerUser(user1);
+        console.log("Liquidity TokenA user1 after remove liquidity: ", liquidityProvidedTokenAPerUser1);
+        console.log("Liquidity TokenB user1 after remove liquidity: ", liquidityProvidedTokenBPerUser1);
+
+        uint256 balanceTokenAUser1AfterRemoveLiquidity = tokenA.balanceOf(user1);
+        uint256 balanceTokenBUser1AfterRemoveLiquidity = tokenB.balanceOf(user1);
+        console.log("Balance TokenA user1 after remove liquidity: ", balanceTokenAUser1AfterRemoveLiquidity);
+        console.log("Balance TokenB user1 after remove liquidity: ", balanceTokenBUser1AfterRemoveLiquidity);
+
+        assertEq(gorillix.balanceOf(user1), lpTokensUser1BeforeRemoveLiquidity - lpTokensToBurn);
+        assertEq(gorillix.totalSupply(), totalSupplyBeforeBurn - lpTokensToBurn);
+    }
 }
