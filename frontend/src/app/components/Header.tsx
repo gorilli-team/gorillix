@@ -3,7 +3,7 @@ import { useAccount, useDisconnect } from 'wagmi';
 import BalancePanel from './BalancePanel';
 
 export default function Header() {
-  const { address, isConnected } = useAccount();
+  const { isConnected } = useAccount();
   const { disconnect } = useDisconnect();
 
   return (
