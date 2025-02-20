@@ -48,6 +48,40 @@ contract FaucetTest is Test {
         assertEq(tokenB.balanceOf(address(faucet)), FAUCET_DEPOSIT);
     }
 
+    ////////////////////////////////////////////////
+    /////////////// REQUEST FAUCET /////////////////
+    ////////////////////////////////////////////////
+
+    function testRequestFaucet() public {
+        vm.prank(user1);
+        faucet.requestFaucet();
+
+        uint256 faucetAmount = faucet.s_faucetAmount();
+        assertEq(tokenA.balanceOf(user1), faucetAmount);
+        assertEq(tokenB.balanceOf(user1), faucetAmount);
+    }
+
+    function testRequestFaucetMultipleTimes() public {
+        vm.startPrank(user1);
+        faucet.requestFaucet();
+        faucet.requestFaucet();
+        faucet.requestFaucet();
+
+        uint256 faucetAmount = faucet.s_faucetAmount();
+        assertEq(tokenA.balanceOf(user1), faucetAmount * 3);
+        assertEq(tokenB.balanceOf(user1), faucetAmount * 3);
+    }
+
+    function testRevertsWhenFaucetIsEmpty() public {
+        vm.startPrank(user1);
+        while (tokenA.balanceOf(address(faucet)) > 0 ) {
+            faucet.requestFaucet();
+        }
+        vm.expectRevert(Faucet.Faucet__InsufficientBalance.selector);
+        faucet.requestFaucet();
+        vm.stopPrank();
+    }
+
     /////////////////////////////////////////////////
     /////////////// SET FAUCET AMOUNT ///////////////
     /////////////////////////////////////////////////

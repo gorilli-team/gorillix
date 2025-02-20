@@ -47,6 +47,9 @@ contract Faucet is Ownable {
     /////////////////////////////////////////////////
 
     // with an onchain faucet the user will need some native token to pay for gas fees
+    /**
+     * @dev the faucet will transfer the same amount of TokenA and TokenB to msg.sender
+     */
     function requestFaucet() external {
         uint256 faucetTokenAAmount = i_tokenA.balanceOf(address(this));
         uint256 faucetTokenBAmount = i_tokenB.balanceOf(address(this));
@@ -55,8 +58,8 @@ contract Faucet is Ownable {
         }
 
         // q is it better to use safeTransferFrom?
-        i_tokenA.transferFrom(address(this), msg.sender, s_faucetAmount);
-        i_tokenB.transferFrom(address(this), msg.sender, s_faucetAmount);
+        i_tokenA.transfer(msg.sender, s_faucetAmount);
+        i_tokenB.transfer(msg.sender, s_faucetAmount);
 
         emit RequestFaucet(msg.sender, s_faucetAmount, s_faucetAmount);
     }
