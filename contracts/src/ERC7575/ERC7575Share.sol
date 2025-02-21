@@ -6,7 +6,7 @@ import { IERC7575Share } from "../interfaces/IERC7575Share.sol";
 abstract contract ERC7575Share is IERC7575Share {
     mapping (address asset => address) private _vault;
 
-    function updateVault(address _asset, address vault_) external virtual {
+    function updateVault(address _asset, address vault_) public virtual {
         _vault[_asset] = vault_;
         emit UpdateVault(_asset, vault_);
     }
