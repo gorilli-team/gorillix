@@ -3,8 +3,10 @@ pragma solidity ^0.8.20;
 
 import { Ownable } from "@openzeppelin/contracts/access/Ownable.sol";
 import { IERC20 } from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import { ERC2771Context } from "@gelatonetwork/relay-context/contracts/vendor/ERC2771Context.sol";
+import { Context } from "@openzeppelin/contracts/utils/Context.sol";
 
-contract Faucet is Ownable {
+contract Faucet is Ownable, ERC2771Context {
 
     ////////////////////////////////////////////////
     //////////////// CUSTOM ERRORS /////////////////
@@ -35,7 +37,7 @@ contract Faucet is Ownable {
     //////////////// CONSTRUCTOR ////////////////////
     /////////////////////////////////////////////////
 
-    constructor(address _tokenA, address _tokenB, uint256 _faucetAmount) Ownable(msg.sender) {
+    constructor(address _tokenA, address _tokenB, uint256 _faucetAmount, address trustedForwarder) Ownable(msg.sender) ERC2771Context(trustedForwarder) {
         i_tokenA = IERC20(_tokenA);
         i_tokenB = IERC20(_tokenB);
 
@@ -67,5 +69,17 @@ contract Faucet is Ownable {
     function setFaucetAmount(uint256 _newFaucetAmount) external onlyOwner {
         s_faucetAmount = _newFaucetAmount;
         emit SetFaucetAmount(_newFaucetAmount);
+    }
+
+    //////////////////////////////////////////////
+    //////////// INTERNAL FUNCTIONS //////////////
+    //////////////////////////////////////////////
+
+    function _msgSender() internal view override(ERC2771Context, Context) returns(address sender) {
+        return ERC2771Context._msgSender();
+    }
+
+    function _msgData() internal view override(ERC2771Context, Context) returns(bytes calldata) {
+        return ERC2771Context._msgData();
     }
 }
