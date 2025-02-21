@@ -48,7 +48,6 @@ contract Faucet is Ownable, ERC2771Context {
     ////////////// EXTERNAL FUNCTIONS ///////////////
     /////////////////////////////////////////////////
 
-    // with an onchain faucet the user will need some native token to pay for gas fees
     /**
      * @dev the faucet will transfer the same amount of TokenA and TokenB to msg.sender
      */

@@ -13,6 +13,7 @@ contract FaucetTest is Test {
 
     address deployer = makeAddr("deployer");
     address user1 = makeAddr("user1");
+    address trustedForwarder = makeAddr("trustedForwarder");
 
     uint256 public INITIAL_FAUCET_AMOUNT = 10000000000000000000; // 10 token
     uint256 public FAUCET_DEPOSIT = 500_000 * 10 ** 18;
@@ -21,7 +22,7 @@ contract FaucetTest is Test {
         vm.startPrank(deployer);
         tokenA = new TokenA();
         tokenB = new TokenB();
-        faucet = new Faucet(address(tokenA), address(tokenB), INITIAL_FAUCET_AMOUNT);
+        faucet = new Faucet(address(tokenA), address(tokenB), INITIAL_FAUCET_AMOUNT, trustedForwarder);
 
         tokenA.transfer(address(faucet), FAUCET_DEPOSIT);
         tokenB.transfer(address(faucet), FAUCET_DEPOSIT);
