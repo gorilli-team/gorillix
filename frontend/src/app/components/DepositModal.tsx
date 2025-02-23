@@ -37,7 +37,6 @@ export function DepositModal({
     const value = e.target.value;
     if (value === '' || parseFloat(value) >= 0) {
       setToken1Amount(value);
-
       calculateToken2Amount(value);
     }
   };
@@ -82,16 +81,6 @@ export function DepositModal({
 
     const estimate = Math.sqrt(parseFloat(amount1) * parseFloat(amount2));
     setEstimatedLpTokens(estimate.toFixed(6));
-  };
-
-  const handleToken1Max = () => {
-    setToken1Amount(token1Balance);
-    calculateToken2Amount(token1Balance);
-  };
-
-  const handleToken2Max = () => {
-    setToken2Amount(token2Balance);
-    calculateToken1Amount(token2Balance);
   };
 
   const handleDeposit = () => {
@@ -146,21 +135,11 @@ export function DepositModal({
                 <span className="text-gray-500 text-sm ml-2">Balance: {token1Balance}</span>
               </div>
               <div className="flex items-center space-x-2">
-                <button 
-                  onClick={handleToken1Max}
-                  className="text-purple-500 text-sm hover:text-purple-400 transition-colors"
-                >
-                  MAX
-                </button>
                 <button className="bg-gray-700 text-white px-3 py-1 rounded-lg text-sm hover:bg-gray-600">
                   {token1Symbol}
                 </button>
               </div>
             </div>
-          </div>
-
-          <div className="text-center">
-            <span className="text-gray-400">+</span>
           </div>
 
           <div className="bg-gray-800 rounded-lg p-4">
@@ -178,12 +157,6 @@ export function DepositModal({
                 <span className="text-gray-500 text-sm ml-2">Balance: {token2Balance}</span>
               </div>
               <div className="flex items-center space-x-2">
-                <button 
-                  onClick={handleToken2Max}
-                  className="text-purple-500 text-sm hover:text-purple-400 transition-colors"
-                >
-                  MAX
-                </button>
                 <button className="bg-gray-700 text-white px-3 py-1 rounded-lg text-sm hover:bg-gray-600">
                   {token2Symbol}
                 </button>
