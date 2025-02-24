@@ -8,12 +8,6 @@ import '@rainbow-me/rainbowkit/styles.css';
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useState, useEffect } from 'react';
 
-const config = getDefaultConfig({
-  appName: "Gorillix",
-  projectId: process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID || "",
-  chains: [mainnet, sepolia],
-});
-
 const queryClient = new QueryClient();
 
 export function Providers({ children }: { children: React.ReactNode }) {
@@ -23,11 +17,21 @@ export function Providers({ children }: { children: React.ReactNode }) {
     setMounted(true);
   }, []);
 
+  if (!mounted) {
+    return (
+      <div style={{ height: '100vh', width: '100vw' }} />
+    );
+  }
+
   return (
-    <WagmiConfig config={config}>
+    <WagmiConfig config={getDefaultConfig({
+      appName: "Gorillix",
+      projectId: process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID || "",
+      chains: [mainnet, sepolia],
+    })}>
       <QueryClientProvider client={queryClient}>
         <RainbowKitProvider>
-          {mounted && children}
+          {children}
         </RainbowKitProvider>
       </QueryClientProvider>
     </WagmiConfig>

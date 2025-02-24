@@ -1,6 +1,7 @@
 "use client";
 import { useAccount } from "wagmi";
 import { useState, useEffect } from "react";
+import Image from 'next/image';
 
 interface SidebarProps {
   selectedPage: string;
@@ -11,7 +12,7 @@ export default function Sidebar({
   selectedPage,
   setSelectedPage,
 }: SidebarProps) {
-  const { address, isConnected } = useAccount();
+  const { address } = useAccount();
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
@@ -36,7 +37,13 @@ export default function Sidebar({
     return (
       <aside className="w-64 bg-gray-800 flex text-white flex-col border border-gray-300">
         <div className="h-16 text-xl font-bold flex items-center ps-4">
-          <img className="w-12 h-12 rounded-full" src="/avatar_3.png" alt="logo-gorillix" />
+          <Image 
+            className="w-12 h-12 rounded-full" 
+            src="/avatar_3.png" 
+            alt="logo-gorillix" 
+            width={48}
+            height={48}
+          />
           <span className="ps-2">Gorillix</span>
         </div>
         <nav className="flex-1 p-4">
@@ -48,13 +55,13 @@ export default function Sidebar({
               </button>
             </li>
             <li>
-              <button className="w-full text-left px-3 py-2 rounded-lg hover:bg-gray-200">
+              <button className="w-full text-left px-3 py-2 rounded-lg hover:bg-gray-700">
                 <i className="fa-solid fa-shield pr-2"></i>
                 <span>AI AGENT</span>
               </button>
             </li>
             <li>
-              <button className="w-full text-left px-3 py-2 rounded-lg hover:bg-gray-200">
+              <button className="w-full text-left px-3 py-2 rounded-lg hover:bg-gray-700">
                 <i className="fa-solid fa-shield pr-2"></i>
                 <span>STATS</span>
               </button>
@@ -66,19 +73,25 @@ export default function Sidebar({
   }
 
   return (
-    <aside className="w-64 bg-gray-800 border-r border-gray-900 flex text-white flex-col">
+    <aside className="w-64 bg-gray-800 border-r border-purple-600 flex text-white flex-col">
       <div
         className="h-16 text-xl font-bold flex items-center ps-4 cursor-pointer"
         onClick={handleGorillixClick}
       >
-        <img className="w-12 h-12 rounded-full" src="/avatar_3.png" alt="logo-gorillix" />
+        <Image 
+          className="w-12 h-12 rounded-full" 
+          src="/avatar_3.png" 
+          alt="logo-gorillix" 
+          width={48}
+          height={48}
+        />
         <span className="ps-2">Gorillix</span>
       </div>
       <nav className="flex-1 p-4">
         <ul className="space-y-2">
           <li>
             <button
-              className={`w-full text-left px-3 py-2 rounded-lg hover:bg-gray-600 ${
+              className={`w-full text-left px-3 py-2 rounded-lg hover:bg-gray-700 ${
                 selectedPage === "Dashboard" ? "bg-gray-700" : ""
               }`}
               onClick={() => handlePageChange("Dashboard")}
@@ -100,8 +113,8 @@ export default function Sidebar({
           </li>
           <li>
             <button
-              className={`w-full text-left px-3 py-2 rounded-lg hover:bg-gray-900 ${
-                selectedPage === "Stats" ? "bg-gray-900" : ""
+              className={`w-full text-left px-3 py-2 rounded-lg hover:bg-gray-700 ${
+                selectedPage === "Stats" ? "bg-gray-700" : ""
               }`}
               onClick={() => handlePageChange("Stats")}
             >
