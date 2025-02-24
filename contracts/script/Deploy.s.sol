@@ -15,8 +15,6 @@ contract Deploy is Script {
     TokenB tokenB;
 
     function run() external {
-        vm.startBroadcast();
-
         DeployTokenA deployTokenA = new DeployTokenA();
         tokenA = deployTokenA.run();
 
@@ -31,7 +29,5 @@ contract Deploy is Script {
 
         DeployEscrow deployEscrow = new DeployEscrow(address(tokenA), address(tokenB));
         deployEscrow.run();
-
-        vm.stopBroadcast();
     }
 }
