@@ -1,9 +1,14 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  devIndicators: {
-    appIsrStatus: false,
+  output: "export",
+  reactStrictMode: true,
+  images: {
+    unoptimized: true
   },
+  devIndicators: {
+    appIsrStatus: false
+  }
 };
 
 export default nextConfig;
