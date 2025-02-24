@@ -10,7 +10,7 @@ const riskLevels = [
     { level: 2, label: 'Conservative', color: 'bg-blue-200' },
     { level: 3, label: 'Moderate', color: 'bg-blue-300' },
     { level: 4, label: 'Aggressive', color: 'bg-blue-400' },
-    { level: 5, label: 'Very Aggressive', color: 'bg-blue-500' }
+    { level: 5, label: 'Degen', color: 'bg-blue-500' }
 ];
 
 export default function AiAgentConfiguration() {
