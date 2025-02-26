@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import FaucetComponent from './FaucetComponent';
 import DepositEscrow from './DepositEscrow';
 
 const tradingStrategies = [
@@ -48,7 +47,6 @@ export default function AiAgentConfiguration() {
     return (
         <div className="flex p-4 gap-4">
             <div>
-                <div><FaucetComponent/></div>
                 <div className='mt-4'><DepositEscrow /></div>
             </div>
             <div className="bg-gray-800 rounded-xl shadow-lg p-6 w-[55%] border border-purple-600">        

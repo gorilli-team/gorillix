@@ -28,7 +28,6 @@ const ERC20_ABI = [
   }
 ] as const;
 
-// Chain ID for ABC Testnet
 const ABC_CHAIN_ID = 112;
 
 interface FaucetComponentProps {
@@ -227,7 +226,7 @@ const FaucetComponent: React.FC<FaucetComponentProps> = ({ onSuccess }) => {
   }
 
   return (
-    <div className="p-4 rounded-xl bg-gray-700">
+    <div className="p-4 rounded-xl bg-gray-700 max-w-2xl mx-auto">
       <h2 className="text-xl font-bold mb-4">Gorillix Faucet</h2>
       
       {!isCorrectNetwork && (
