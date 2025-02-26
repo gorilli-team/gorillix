@@ -10,7 +10,6 @@ import {
 import { parseUnits, formatUnits } from 'viem';
 import { CONTRACT_ADDRESSES } from '../utils/addresses';
 
-// Simplified ERC20 ABI for token interactions
 const ERC20_ABI = [
   {
     "type": "function",
@@ -25,10 +24,29 @@ const ERC20_ABI = [
     "stateMutability": "view",
     "inputs": [],
     "outputs": [{"type": "uint8"}]
+  },
+  {
+    "type": "function",
+    "name": "approve",
+    "stateMutability": "nonpayable",
+    "inputs": [
+      {"name": "spender", "type": "address"},
+      {"name": "amount", "type": "uint256"}
+    ],
+    "outputs": [{"type": "bool"}]
+  },
+  {
+    "type": "function",
+    "name": "allowance",
+    "stateMutability": "view",
+    "inputs": [
+      {"name": "owner", "type": "address"},
+      {"name": "spender", "type": "address"}
+    ],
+    "outputs": [{"type": "uint256"}]
   }
 ] as const;
 
-// Gorillix DEX ABI for swap functions
 const GORILLIX_ABI = [
   {
     "type": "function",
@@ -71,10 +89,8 @@ const GORILLIX_ABI = [
   }
 ] as const;
 
-// Chain ID for ABC Testnet
 const ABC_CHAIN_ID = 112;
 
-// Props interface
 interface SwapComponentProps {
   className?: string;
   onSwapSuccess?: () => void;
@@ -84,26 +100,28 @@ const SwapComponent: React.FC<SwapComponentProps> = ({
   className = '', 
   onSwapSuccess 
 }) => {
-  // State for swap
   const [fromToken, setFromToken] = useState<'TokenA' | 'TokenB'>('TokenA');
   const [toToken, setToToken] = useState<'TokenA' | 'TokenB'>('TokenB');
   const [fromAmount, setFromAmount] = useState('');
   const [statusMessage, setStatusMessage] = useState('');
   const [priceTokenA, setPriceTokenA] = useState<string>('0');
   const [priceTokenB, setPriceTokenB] = useState<string>('0');
+  const [needsApproval, setNeedsApproval] = useState(false);
+  const [isApproving, setIsApproving] = useState(false);
 
-  // Wallet and network state
   const { address, isConnected } = useAccount();
   const chainId = useChainId();
   const { switchChain } = useSwitchChain();
 
-  // Token balances and decimals
   const [tokenABalance, setTokenABalance] = useState('0');
   const [tokenBBalance, setTokenBBalance] = useState('0');
   const [tokenADecimals, setTokenADecimals] = useState(18);
   const [tokenBDecimals, setTokenBDecimals] = useState(18);
 
-  // Read Token A balance
+  const fromTokenAddress = fromToken === 'TokenA' 
+    ? CONTRACT_ADDRESSES.TOKEN_A 
+    : CONTRACT_ADDRESSES.TOKEN_B;
+
   const { data: tokenABalanceData } = useReadContract({
     address: CONTRACT_ADDRESSES.TOKEN_A,
     abi: ERC20_ABI,
@@ -112,7 +130,6 @@ const SwapComponent: React.FC<SwapComponentProps> = ({
     query: { enabled: isConnected }
   });
 
-  // Read Token B balance
   const { data: tokenBBalanceData } = useReadContract({
     address: CONTRACT_ADDRESSES.TOKEN_B,
     abi: ERC20_ABI,
@@ -121,7 +138,6 @@ const SwapComponent: React.FC<SwapComponentProps> = ({
     query: { enabled: isConnected }
   });
 
-  // Read Token A decimals
   const { data: tokenADecimalsData } = useReadContract({
     address: CONTRACT_ADDRESSES.TOKEN_A,
     abi: ERC20_ABI,
@@ -129,7 +145,6 @@ const SwapComponent: React.FC<SwapComponentProps> = ({
     query: { enabled: isConnected }
   });
 
-  // Read Token B decimals
   const { data: tokenBDecimalsData } = useReadContract({
     address: CONTRACT_ADDRESSES.TOKEN_B,
     abi: ERC20_ABI,
@@ -137,7 +152,6 @@ const SwapComponent: React.FC<SwapComponentProps> = ({
     query: { enabled: isConnected }
   });
 
-  // Read total liquidity for Token A
   const { data: totalLiquidityTokenA } = useReadContract({
     address: CONTRACT_ADDRESSES.GORILLIX,
     abi: GORILLIX_ABI,
@@ -145,7 +159,6 @@ const SwapComponent: React.FC<SwapComponentProps> = ({
     query: { enabled: isConnected }
   });
 
-  // Read total liquidity for Token B
   const { data: totalLiquidityTokenB } = useReadContract({
     address: CONTRACT_ADDRESSES.GORILLIX,
     abi: GORILLIX_ABI,
@@ -153,7 +166,14 @@ const SwapComponent: React.FC<SwapComponentProps> = ({
     query: { enabled: isConnected }
   });
 
-  // Get price of Token A in terms of Token B
+  const { data: allowanceData, refetch: refetchAllowance } = useReadContract({
+    address: fromTokenAddress,
+    abi: ERC20_ABI,
+    functionName: 'allowance',
+    args: [address ?? '0x0000000000000000000000000000000000000000', CONTRACT_ADDRESSES.GORILLIX],
+    query: { enabled: isConnected && !!address && !!fromAmount && parseFloat(fromAmount) > 0 }
+  });
+
   const { data: priceTokenAData } = useReadContract({
     address: CONTRACT_ADDRESSES.GORILLIX,
     abi: GORILLIX_ABI,
@@ -164,7 +184,6 @@ const SwapComponent: React.FC<SwapComponentProps> = ({
     }
   });
 
-  // Get price of Token B in terms of Token A
   const { data: priceTokenBData } = useReadContract({
     address: CONTRACT_ADDRESSES.GORILLIX,
     abi: GORILLIX_ABI,
@@ -173,6 +192,34 @@ const SwapComponent: React.FC<SwapComponentProps> = ({
     query: { 
       enabled: isConnected && !!totalLiquidityTokenA && !!totalLiquidityTokenB 
     }
+  });
+
+  const { 
+    writeContract: approveToken, 
+    isPending: isApprovePending, 
+    data: approveTxData 
+  } = useWriteContract();
+
+  const { 
+    writeContract: swapTokens, 
+    isPending: isSwapping, 
+    data: swapTxData 
+  } = useWriteContract();
+
+  const { 
+    isLoading: isApproveConfirming, 
+    isSuccess: isApproveSuccess 
+  } = useWaitForTransactionReceipt({
+    hash: approveTxData,
+    query: { enabled: !!approveTxData }
+  });
+
+  const { 
+    isLoading: isSwapConfirming, 
+    isSuccess: isSwapSuccess 
+  } = useWaitForTransactionReceipt({
+    hash: swapTxData,
+    query: { enabled: !!swapTxData }
   });
 
   // Update TokenA balance and decimals
@@ -208,23 +255,35 @@ const SwapComponent: React.FC<SwapComponentProps> = ({
     }
   }, [priceTokenBData, tokenADecimalsData]);
 
-  // Swap tokens
-  const { 
-    writeContract: swapTokens, 
-    isPending: isSwapping, 
-    data: swapTxData 
-  } = useWriteContract();
+  // Check if approval is needed
+  useEffect(() => {
+    const checkAllowance = async () => {
+      if (fromAmount && parseFloat(fromAmount) > 0 && allowanceData !== undefined) {
+        const decimals = fromToken === 'TokenA' ? tokenADecimals : tokenBDecimals;
+        const amount = parseUnits(fromAmount, decimals);
+        
+        if (allowanceData < amount) {
+          setNeedsApproval(true);
+        } else {
+          setNeedsApproval(false);
+        }
+      }
+    };
+    
+    checkAllowance();
+  }, [fromAmount, fromToken, allowanceData, tokenADecimals, tokenBDecimals]);
 
-  // Wait for transaction
-  const { 
-    isLoading: isConfirming, 
-    isSuccess: isSwapSuccess 
-  } = useWaitForTransactionReceipt({
-    hash: swapTxData,
-    query: { enabled: !!swapTxData }
-  });
+  // Handle approve success
+  useEffect(() => {
+    if (isApproveSuccess) {
+      setStatusMessage("Approval successful. You can now swap.");
+      setIsApproving(false);
+      setNeedsApproval(false);
+      refetchAllowance();
+    }
+  }, [isApproveSuccess, refetchAllowance]);
 
-  // Swap success handler
+  // Handle swap success
   useEffect(() => {
     if (isSwapSuccess) {
       setStatusMessage("Swap completed successfully!");
@@ -234,6 +293,49 @@ const SwapComponent: React.FC<SwapComponentProps> = ({
       onSwapSuccess?.();
     }
   }, [isSwapSuccess, onSwapSuccess]);
+
+  // Refresh allowance when token changes
+  useEffect(() => {
+    if (isConnected && address) {
+      refetchAllowance();
+    }
+  }, [fromToken, address, isConnected, refetchAllowance]);
+
+  // Approve tokens
+  const handleApprove = async () => {
+    if (!isConnected) {
+      setStatusMessage('Please connect your wallet');
+      return;
+    }
+
+    if (chainId !== ABC_CHAIN_ID) {
+      try {
+        await switchChain({ chainId: ABC_CHAIN_ID });
+      } catch (error) {
+        setStatusMessage('Failed to switch network');
+        return;
+      }
+    }
+
+    try {
+      const decimals = fromToken === 'TokenA' ? tokenADecimals : tokenBDecimals;
+      const amount = parseUnits(fromAmount, decimals);
+      
+      approveToken({
+        address: fromTokenAddress,
+        abi: ERC20_ABI,
+        functionName: 'approve',
+        args: [CONTRACT_ADDRESSES.GORILLIX, amount]
+      });
+      
+      setIsApproving(true);
+      setStatusMessage("Approving tokens...");
+    } catch (error: any) {
+      console.error('Approval error:', error);
+      setStatusMessage(`Approval failed: ${error.message}`);
+      setIsApproving(false);
+    }
+  };
 
   // Perform swap
   const handleSwap = async () => {
@@ -252,18 +354,18 @@ const SwapComponent: React.FC<SwapComponentProps> = ({
     }
 
     try {
-      const amountIn = parseUnits(
-        fromAmount, 
-        fromToken === 'TokenA' ? tokenADecimals : tokenBDecimals
-      );
+      const decimals = fromToken === 'TokenA' ? tokenADecimals : tokenBDecimals;
+      const amount = parseUnits(fromAmount, decimals);
 
       // Perform swap based on token direction
       swapTokens({
         address: CONTRACT_ADDRESSES.GORILLIX,
         abi: GORILLIX_ABI,
         functionName: fromToken === 'TokenA' ? 'tokenAtoTokenB' : 'tokenBtoTokenA',
-        args: [amountIn]
+        args: [amount]
       });
+      
+      setStatusMessage("Swapping tokens...");
     } catch (error: any) {
       console.error('Swap error:', error);
       setStatusMessage(`Swap failed: ${error.message}`);
@@ -286,6 +388,18 @@ const SwapComponent: React.FC<SwapComponentProps> = ({
     const amount = parseFloat(fromAmount);
     const output = amount * parseFloat(currentPrice);
     return output.toFixed(6);
+  };
+
+  // Check if we can swap
+  const canSwap = () => {
+    return (
+      isConnected &&
+      fromAmount &&
+      parseFloat(fromAmount) > 0 &&
+      !needsApproval &&
+      !isSwapping &&
+      !isSwapConfirming
+    );
   };
 
   return (
@@ -362,27 +476,46 @@ const SwapComponent: React.FC<SwapComponentProps> = ({
         </div>
       </div>
 
+      {/* Approval Button (if needed) */}
+      {needsApproval && (
+        <button 
+          onClick={handleApprove}
+          disabled={isApprovePending || isApproveConfirming}
+          className={`w-full px-4 py-2 mb-2 rounded-lg font-medium ${
+            isApprovePending || isApproveConfirming
+              ? 'bg-gray-600 cursor-not-allowed' 
+              : 'bg-yellow-600 hover:bg-yellow-700'
+          }`}
+        >
+          {isApprovePending || isApproveConfirming 
+            ? 'Approving...' 
+            : 'Approve Tokens'}
+        </button>
+      )}
+
       {/* Swap Button */}
       <button 
         onClick={handleSwap}
-        disabled={!fromAmount || isSwapping || isConfirming}
+        disabled={!canSwap()}
         className={`w-full px-4 py-2 rounded-lg font-medium ${
-          !fromAmount || isSwapping || isConfirming
+          !canSwap()
             ? 'bg-gray-600 cursor-not-allowed' 
             : 'bg-purple-600 hover:bg-purple-700'
         }`}
       >
-        {isSwapping || isConfirming 
-          ? 'Processing...' 
-          : !fromAmount 
+        {isSwapping || isSwapConfirming 
+          ? 'Swapping...' 
+          : !fromAmount || parseFloat(fromAmount) <= 0
             ? 'Enter Amount' 
-            : 'Swap'}
+            : needsApproval
+              ? 'Approve Tokens First'
+              : 'Swap'}
       </button>
 
       {/* Status Message */}
       {statusMessage && (
         <div className={`mt-4 p-3 rounded-lg ${
-          statusMessage.includes('Error') 
+          statusMessage.includes('failed') || statusMessage.includes('Failed')
             ? 'bg-red-900/50 text-red-200' 
             : statusMessage.includes('successfully') 
               ? 'bg-green-900/50 text-green-200'

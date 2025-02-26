@@ -29,7 +29,7 @@ const ERC20_ABI = [
 ] as const;
 
 // Chain ID for ABC Testnet
-const ABC_CHAIN_ID = 112; // in decimal, not hexadecimal
+const ABC_CHAIN_ID = 112;
 
 interface FaucetComponentProps {
   onSuccess?: (tokenABalance: string, tokenBBalance: string) => void;
