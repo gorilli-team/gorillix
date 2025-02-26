@@ -16,6 +16,8 @@ export default function Main({
                 return <div className="p-4"><AiAgentConfiguration /></div>;
             case "Stats":
                 return <div><DexStats/></div>;
+            case "Faucet":
+                return <div>Faucet</div>
             case "Dashboard":
             default:
                 return <Dashboard />;

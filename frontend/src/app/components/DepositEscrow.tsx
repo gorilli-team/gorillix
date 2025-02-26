@@ -10,7 +10,6 @@ import {
 import { parseUnits, formatUnits } from 'viem';
 import { CONTRACT_ADDRESSES } from '../utils/addresses';
 
-// Simplified ERC20 ABI for token interactions
 const ERC20_ABI = [
   {
     "type": "function",
@@ -35,10 +34,19 @@ const ERC20_ABI = [
       {"name": "amount", "type": "uint256"}
     ],
     "outputs": [{"type": "bool"}]
+  },
+  {
+    "type": "function",
+    "name": "allowance",
+    "stateMutability": "view",
+    "inputs": [
+      {"name": "owner", "type": "address"},
+      {"name": "spender", "type": "address"}
+    ],
+    "outputs": [{"type": "uint256"}]
   }
 ] as const;
 
-// Escrow ABI for deposit function
 const ESCROW_ABI = [
   {
     "type": "function",
@@ -66,10 +74,10 @@ const ESCROW_ABI = [
   }
 ] as const;
 
-// Chain ID for ABC Testnet
 const ABC_CHAIN_ID = 112;
 
-// Props interface
+const MAX_UINT256 = BigInt("0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff");
+
 interface DepositEscrowProps {
   className?: string;
   onDepositSuccess?: () => void;
@@ -151,6 +159,15 @@ const DepositEscrow: React.FC<DepositEscrowProps> = ({
     query: { enabled: isConnected }
   });
 
+  // Read current token allowance for escrow contract
+  const { data: tokenAllowance, refetch: refetchAllowance } = useReadContract({
+    address: selectedTokenAddress,
+    abi: ERC20_ABI,
+    functionName: 'allowance',
+    args: [address ?? '0x0000000000000000000000000000000000000000', CONTRACT_ADDRESSES.ESCROW],
+    query: { enabled: isConnected && !!address }
+  });
+
   // Update TokenA balance and decimals
   useEffect(() => {
     if (tokenABalanceData && tokenADecimalsData) {
@@ -168,6 +185,29 @@ const DepositEscrow: React.FC<DepositEscrowProps> = ({
       setTokenBDecimals(tokenBDecimalsData);
     }
   }, [tokenBBalanceData, tokenBDecimalsData]);
+
+  // Check if approval is needed when amount or token changes
+  useEffect(() => {
+    const checkApprovalNeeded = async () => {
+      if (isConnected && depositAmount && parseFloat(depositAmount) > 0 && tokenAllowance !== undefined) {
+        const decimals = selectedToken === 'TokenA' ? tokenADecimals : tokenBDecimals;
+        try {
+          const amount = parseUnits(depositAmount, decimals);
+          
+          // Check if current allowance is less than the deposit amount
+          if (tokenAllowance < amount) {
+            setApprovalNeeded(true);
+          } else {
+            setApprovalNeeded(false);
+          }
+        } catch (error) {
+          console.error("Error parsing amount:", error);
+        }
+      }
+    };
+    
+    checkApprovalNeeded();
+  }, [depositAmount, selectedToken, tokenAllowance, isConnected, tokenADecimals, tokenBDecimals]);
 
   // Approve token spending for escrow
   const { 
@@ -201,25 +241,14 @@ const DepositEscrow: React.FC<DepositEscrowProps> = ({
     query: { enabled: !!depositTxData }
   });
 
-  // Handle approval success
+  // Debug logging
   useEffect(() => {
-    if (isApprovalSuccess) {
-      setStatusMessage("Approval completed successfully. You can now deposit.");
-      setApprovalNeeded(false);
-      setApprovalPending(false);
+    if (isConnected && selectedTokenAddress) {
+      console.log("Selected token address:", selectedTokenAddress);
+      console.log("Escrow address:", CONTRACT_ADDRESSES.ESCROW);
+      console.log("Current allowance:", tokenAllowance ? tokenAllowance.toString() : "Not fetched yet");
     }
-  }, [isApprovalSuccess]);
-
-  // Handle deposit success
-  useEffect(() => {
-    if (isDepositSuccess) {
-      setStatusMessage("Deposit completed successfully!");
-      setDepositAmount('');
-      
-      // Call optional onDepositSuccess callback
-      onDepositSuccess?.();
-    }
-  }, [isDepositSuccess, onDepositSuccess]);
+  }, [isConnected, selectedTokenAddress, tokenAllowance]);
 
   // Handle approve token
   const handleApprove = async () => {
@@ -238,17 +267,20 @@ const DepositEscrow: React.FC<DepositEscrowProps> = ({
     }
 
     try {
-      const decimals = selectedToken === 'TokenA' ? tokenADecimals : tokenBDecimals;
-      const amount = parseUnits(depositAmount, decimals);
-
+      console.log("Approving token:", selectedTokenAddress);
+      console.log("Spender (Escrow):", CONTRACT_ADDRESSES.ESCROW);
+      
+      // Approve maximum amount to avoid repeated approvals
       approveToken({
         address: selectedTokenAddress,
         abi: ERC20_ABI,
         functionName: 'approve',
-        args: [CONTRACT_ADDRESSES.ESCROW, amount]
+        args: [CONTRACT_ADDRESSES.ESCROW, MAX_UINT256],
+        gas: BigInt("500000")
       });
       
       setApprovalPending(true);
+      setStatusMessage('Approval transaction initiated. Please confirm in your wallet...');
     } catch (error: any) {
       console.error('Approval error:', error);
       setStatusMessage(`Approval failed: ${error.message}`);
@@ -274,18 +306,53 @@ const DepositEscrow: React.FC<DepositEscrowProps> = ({
     try {
       const decimals = selectedToken === 'TokenA' ? tokenADecimals : tokenBDecimals;
       const amount = parseUnits(depositAmount, decimals);
+      
+      // Check if allowance is sufficient
+      if (tokenAllowance && tokenAllowance < amount) {
+        setStatusMessage("Token approval required before deposit");
+        setApprovalNeeded(true);
+        return;
+      }
 
+      console.log("Depositing token:", selectedTokenAddress);
+      console.log("Amount:", amount.toString());
+      
       depositToEscrow({
         address: CONTRACT_ADDRESSES.ESCROW,
         abi: ESCROW_ABI,
         functionName: 'deposit',
-        args: [selectedTokenAddress, amount]
+        args: [selectedTokenAddress, amount],
+        gas: BigInt(700000),
       });
+      
+      setStatusMessage('Deposit transaction initiated. Please confirm in your wallet...');
     } catch (error: any) {
       console.error('Deposit error:', error);
       setStatusMessage(`Deposit failed: ${error.message}`);
     }
   };
+
+  // Handle approval success
+  useEffect(() => {
+    if (isApprovalSuccess) {
+      setStatusMessage("Approval completed successfully. You can now deposit.");
+      setApprovalNeeded(false);
+      setApprovalPending(false);
+      // Update allowance after approval
+      refetchAllowance();
+    }
+  }, [isApprovalSuccess, refetchAllowance]);
+
+  // Handle deposit success
+  useEffect(() => {
+    if (isDepositSuccess) {
+      setStatusMessage("Deposit completed successfully!");
+      setDepositAmount('');
+      
+      // Call optional onDepositSuccess callback
+      onDepositSuccess?.();
+    }
+  }, [isDepositSuccess, onDepositSuccess]);
 
   // Check if amount is valid
   const isValidAmount = () => {
@@ -322,6 +389,8 @@ const DepositEscrow: React.FC<DepositEscrowProps> = ({
             onChange={(e) => {
               setSelectedToken(e.target.value as 'TokenA' | 'TokenB');
               setApprovalNeeded(false);
+              // Trigger refetch of allowance when token changes
+              setTimeout(() => refetchAllowance(), 500);
             }}
             className="w-full bg-gray-700 rounded-lg p-2 text-white"
           >
@@ -348,7 +417,6 @@ const DepositEscrow: React.FC<DepositEscrowProps> = ({
             value={depositAmount}
             onChange={(e) => {
               setDepositAmount(e.target.value);
-              setApprovalNeeded(false);
             }}
             placeholder="0"
             className="w-full bg-gray-700 rounded-lg p-2 text-white"
@@ -356,8 +424,8 @@ const DepositEscrow: React.FC<DepositEscrowProps> = ({
         </div>
       </div>
 
-      {/* Approve Button (conditional) */}
-      {(approvalNeeded || approvalPending) && (
+      {/* Approve Button - always visible when needed */}
+      {approvalNeeded && (
         <button 
           onClick={handleApprove}
           disabled={!isValidAmount() || isApproving || isApprovalConfirming}
@@ -369,22 +437,24 @@ const DepositEscrow: React.FC<DepositEscrowProps> = ({
         >
           {isApproving || isApprovalConfirming 
             ? 'Approving...' 
-            : 'Approve'}
+            : 'Approve Token'}
         </button>
       )}
 
       {/* Deposit Button */}
       <button 
         onClick={() => {
-          if (!approvalNeeded && !approvalPending) {
+          // If approval is needed but not in progress, show message
+          if (approvalNeeded && !approvalPending && !isApproving && !isApprovalConfirming) {
+            setStatusMessage("You need to approve the token first");
+          } else if (!approvalNeeded && !approvalPending) {
+            // If no approval needed, proceed with deposit
             handleDeposit();
-          } else {
-            setApprovalNeeded(true);
           }
         }}
-        disabled={!isValidAmount() || isDepositing || isDepositConfirming || isApproving || isApprovalConfirming}
+        disabled={!isValidAmount() || isDepositing || isDepositConfirming || isApproving || isApprovalConfirming || (approvalNeeded && !isApprovalSuccess)}
         className={`w-full px-4 py-2 rounded-lg font-medium ${
-          !isValidAmount() || isDepositing || isDepositConfirming || isApproving || isApprovalConfirming
+          !isValidAmount() || isDepositing || isDepositConfirming || isApproving || isApprovalConfirming || (approvalNeeded && !isApprovalSuccess)
             ? 'bg-gray-600 cursor-not-allowed' 
             : 'bg-purple-600 hover:bg-purple-700'
         }`}
@@ -393,9 +463,9 @@ const DepositEscrow: React.FC<DepositEscrowProps> = ({
           ? 'Depositing...' 
           : !isValidAmount() 
             ? 'Enter Valid Amount' 
-            : approvalNeeded && !approvalPending
-            ? 'Approve Token'
-            : 'Deposit'}
+            : (approvalNeeded && !isApprovalSuccess)
+              ? 'Approve Before Deposit'
+              : 'Deposit'}
       </button>
 
       {/* Status Message */}

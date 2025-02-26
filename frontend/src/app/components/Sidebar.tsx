@@ -66,6 +66,12 @@ export default function Sidebar({
                 <span>STATS</span>
               </button>
             </li>
+            <li>
+              <button className="w-full text-left px-3 py-2 rounded-lg hover:bg-gray-700">
+                <i className="fa-solid fa-shield pr-2"></i>
+                <span>FAUCET</span>
+              </button>
+            </li>
           </ul>
         </nav>
       </aside>
@@ -120,6 +126,17 @@ export default function Sidebar({
             >
               <i className="fa-solid fa-shield pr-2"></i>
               <span>STATS</span>
+            </button>
+          </li>
+          <li>
+            <button
+              className={`w-full text-left px-3 py-2 rounded-lg hover:bg-gray-700 ${
+                selectedPage === "Faucet" ? "bg-gray-700" : ""
+              }`}
+              onClick={() => handlePageChange("Faucet")}
+            >
+              <i className="fa-solid fa-shield pr-2"></i>
+              <span>FAUCET</span>
             </button>
           </li>
         </ul>
