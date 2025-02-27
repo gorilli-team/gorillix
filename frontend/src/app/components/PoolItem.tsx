@@ -105,7 +105,7 @@ export default function PoolItem({
                         </button>
                         <button 
                             onClick={() => setShowDepositModal(true)}
-                            className="py-2.5 bg-purple-600 hover:bg-purple-500 text-white text-sm font-medium rounded-lg transition-colors"
+                            className="py-2.5 bg-violet-600 hover:bg-violet-500 text-white text-sm font-medium rounded-lg transition-colors"
                         >
                             Deposit
                         </button>

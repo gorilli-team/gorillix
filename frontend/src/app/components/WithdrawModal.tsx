@@ -368,7 +368,7 @@ export function WithdrawModal({
             <div className="flex justify-between items-center">
               <button 
                 onClick={handleMaxClick}
-                className="text-purple-500 text-sm hover:text-purple-400 transition-colors"
+                className="text-violet-500 text-sm hover:text-violet-400 transition-colors"
               >
                 MAX
               </button>
@@ -404,7 +404,7 @@ export function WithdrawModal({
           <button
             onClick={handleWithdraw}
             disabled={!canWithdraw()}
-            className="w-full py-3 rounded-lg font-medium text-white bg-purple-600 hover:bg-purple-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full py-3 rounded-lg font-medium text-white bg-violet-600 hover:bg-violet-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {isWithdrawing || isWithdrawConfirming 
               ? 'Withdrawing...' 

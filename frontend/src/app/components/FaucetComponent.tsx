@@ -236,7 +236,7 @@ const FaucetComponent: React.FC<FaucetComponentProps> = ({ onSuccess }) => {
           <p className="text-sm mt-1">Current network: {chainId}</p>
           <button 
             onClick={switchToABCTestnet}
-            className="mt-2 px-4 py-2 bg-purple-600 hover:bg-purple-700 rounded-lg font-medium"
+            className="mt-2 px-4 py-2 bg-violet-600 hover:bg-violet-700 rounded-lg font-medium"
           >
             Switch to ABC Testnet
           </button>
@@ -274,7 +274,7 @@ const FaucetComponent: React.FC<FaucetComponentProps> = ({ onSuccess }) => {
             className={`w-full px-4 py-2 rounded-lg font-medium ${
               isRequesting || !isCorrectNetwork
                 ? 'bg-gray-600 cursor-not-allowed' 
-                : 'bg-purple-600 hover:bg-purple-700'
+                : 'bg-violet-600 hover:bg-violet-700'
             }`}
           >
             {isRequesting ? 'Requesting...' : 'Request Tokens'}

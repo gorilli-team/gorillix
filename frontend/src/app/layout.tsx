@@ -6,7 +6,7 @@ export const metadata: Metadata = {
   title: "Gorillix",
   description: "AI-Powered Trading agent",
   icons: {
-    icon: "/avatar_3.png",
+    icon: "/fav.png",
   },
 };
 

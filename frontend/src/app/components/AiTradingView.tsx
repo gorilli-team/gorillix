@@ -97,7 +97,7 @@ export default function AITradingView() {
       case 'info':
         return <span className="text-blue-400">ℹ️</span>;
       case 'action':
-        return <span className="text-purple-400">⚡</span>;
+        return <span className="text-violet-400">⚡</span>;
       case 'warning':
         return <span className="text-yellow-400">⚠️</span>;
       case 'success':
@@ -113,7 +113,7 @@ export default function AITradingView() {
     <div className="p-6">
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-2xl font-bold">AI Trading Performance</h2>
-        <div className="bg-gray-700/50 border border-purple-500/20 rounded-lg px-4 py-1.5 text-sm">
+        <div className="bg-gray-700/50 border border-violet-500/20 rounded-lg px-4 py-1.5 text-sm">
           <span className="mr-2 inline-block w-2 h-2 rounded-full bg-green-500"></span>
           Agent Online
         </div>
@@ -121,10 +121,10 @@ export default function AITradingView() {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Agent Info */}
-        <div className="bg-gray-800 rounded-xl border border-purple-600/30 shadow-lg overflow-hidden">
-          <div className="bg-gradient-to-r from-purple-900/30 to-gray-800 p-4 border-b border-purple-600/20">
+        <div className="bg-gray-800 rounded-xl border border-violet-600/30 shadow-lg overflow-hidden">
+          <div className="bg-gradient-to-r from-violet-900/30 to-gray-800 p-4 border-b border-violet-600/20">
             <h3 className="font-semibold text-lg flex items-center">
-              <span className="bg-purple-600 w-2 h-6 rounded mr-2"></span>
+              <span className="bg-violet-600 w-2 h-6 rounded mr-2"></span>
               Agent Overview
             </h3>
           </div>
@@ -166,11 +166,11 @@ export default function AITradingView() {
         </div>
 
         {/* Agent Activities */}
-        <div className="lg:col-span-2 bg-gray-800 rounded-xl border border-purple-600/30 shadow-lg overflow-hidden flex flex-col">
-          <div className="bg-gradient-to-r from-purple-900/30 to-gray-800 border-b border-purple-600/20">
+        <div className="lg:col-span-2 bg-gray-800 rounded-xl border border-violet-600/30 shadow-lg overflow-hidden flex flex-col">
+          <div className="bg-gradient-to-r from-violet-900/30 to-gray-800 border-b border-violet-600/20">
             <div className="flex items-center justify-between p-4">
               <h3 className="font-semibold text-lg flex items-center">
-                <span className="bg-purple-600 w-2 h-6 rounded mr-2"></span>
+                <span className="bg-violet-600 w-2 h-6 rounded mr-2"></span>
                 Agent Activity Log
               </h3>
               <button className="bg-gray-700 hover:bg-gray-600 text-xs rounded-lg px-3 py-1.5 transition-colors">
@@ -183,7 +183,7 @@ export default function AITradingView() {
               <button
                 onClick={() => setActiveTab('all')}
                 className={`px-4 py-2 text-sm font-medium transition-colors ${
-                  activeTab === 'all' ? 'text-purple-400 border-b-2 border-purple-500' : 'text-gray-400 hover:text-white'
+                  activeTab === 'all' ? 'text-violet-400 border-b-2 border-violet-500' : 'text-gray-400 hover:text-white'
                 }`}
               >
                 All
@@ -191,7 +191,7 @@ export default function AITradingView() {
               <button
                 onClick={() => setActiveTab('info')}
                 className={`px-4 py-2 text-sm font-medium transition-colors ${
-                  activeTab === 'info' ? 'text-purple-400 border-b-2 border-purple-500' : 'text-gray-400 hover:text-white'
+                  activeTab === 'info' ? 'text-violet-400 border-b-2 border-violet-500' : 'text-gray-400 hover:text-white'
                 }`}
               >
                 Info
@@ -199,7 +199,7 @@ export default function AITradingView() {
               <button
                 onClick={() => setActiveTab('actions')}
                 className={`px-4 py-2 text-sm font-medium transition-colors ${
-                  activeTab === 'actions' ? 'text-purple-400 border-b-2 border-purple-500' : 'text-gray-400 hover:text-white'
+                  activeTab === 'actions' ? 'text-violet-400 border-b-2 border-violet-500' : 'text-gray-400 hover:text-white'
                 }`}
               >
                 Actions
@@ -207,7 +207,7 @@ export default function AITradingView() {
               <button
                 onClick={() => setActiveTab('warnings')}
                 className={`px-4 py-2 text-sm font-medium transition-colors ${
-                  activeTab === 'warnings' ? 'text-purple-400 border-b-2 border-purple-500' : 'text-gray-400 hover:text-white'
+                  activeTab === 'warnings' ? 'text-violet-400 border-b-2 border-violet-500' : 'text-gray-400 hover:text-white'
                 }`}
               >
                 Warnings
@@ -256,7 +256,7 @@ export default function AITradingView() {
                 <p>No activities found for the selected filter</p>
                 <button 
                   onClick={() => setActiveTab('all')}
-                  className="mt-3 text-sm text-purple-400 hover:underline"
+                  className="mt-3 text-sm text-violet-400 hover:underline"
                 >
                   View all activities
                 </button>

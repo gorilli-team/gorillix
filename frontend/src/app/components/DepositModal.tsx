@@ -658,7 +658,7 @@ export function DepositModal({
           <button
             onClick={handleDeposit}
             disabled={!canDeposit()}
-            className="w-full py-3 rounded-lg font-medium text-white bg-purple-600 hover:bg-purple-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full py-3 rounded-lg font-medium text-white bg-violet-600 hover:bg-violet-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {isDepositing || isDepositConfirming 
               ? 'Depositing...' 

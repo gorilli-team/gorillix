@@ -78,7 +78,7 @@ export default function Sidebar({
   }
 
   return (
-    <aside className="w-64 bg-gray-800 border-r border-purple-600 flex text-white flex-col">
+    <aside className="w-64 bg-gray-800 border-r border-violet-600 flex text-white flex-col">
       <div
         className="h-16 text-xl font-bold flex items-center ps-6 cursor-pointer"
         onClick={handleGorillixClick}

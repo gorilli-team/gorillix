@@ -427,7 +427,7 @@ const SwapComponent: React.FC<SwapComponentProps> = ({
             </span>
             <button 
               onClick={handleSetMaxAmount}
-              className="text-xs text-purple-400 hover:text-purple-300 font-medium px-1.5 py-0.5 bg-purple-800/30 rounded hover:bg-purple-800/50 transition-colors"
+              className="text-xs text-violet-400 hover:text-violet-300 font-medium px-1.5 py-0.5 bg-violet-800/30 rounded hover:bg-violet-800/50 transition-colors"
             >
               MAX
             </button>
@@ -445,13 +445,13 @@ const SwapComponent: React.FC<SwapComponentProps> = ({
             <select 
               value={fromToken}
               onChange={(e) => setFromToken(e.target.value as 'TokenA' | 'TokenB')}
-              className="appearance-none bg-purple-800/30 text-white px-4 py-1 rounded-lg border border-purple-600/30 cursor-pointer outline-none"
+              className="appearance-none bg-violet-800/30 text-white px-4 py-1 rounded-lg border border-violet-600/30 cursor-pointer outline-none"
             >
               <option value="TokenA">TKA</option>
               <option value="TokenB">TKB</option>
             </select>
             <div className="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
-              <svg className="w-4 h-4 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <svg className="w-4 h-4 text-violet-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path>
               </svg>
             </div>
@@ -463,9 +463,9 @@ const SwapComponent: React.FC<SwapComponentProps> = ({
       <div className="flex justify-center my-2">
         <button 
           onClick={switchTokens}
-          className="bg-purple-600/30 hover:bg-purple-600/50 rounded-full p-2 w-8 h-8 flex items-center justify-center border border-purple-600/20 transition-colors"
+          className="bg-violet-600/30 hover:bg-violet-600/50 rounded-full p-2 w-8 h-8 flex items-center justify-center border border-violet-600/20 transition-colors"
         >
-          <svg className="w-4 h-4 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <svg className="w-4 h-4 text-violet-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4"></path>
           </svg>
         </button>
@@ -487,13 +487,13 @@ const SwapComponent: React.FC<SwapComponentProps> = ({
             <select 
               value={toToken}
               onChange={(e) => setToToken(e.target.value as 'TokenA' | 'TokenB')}
-              className="appearance-none bg-purple-800/30 text-white px-4 py-1 rounded-lg border border-purple-600/30 cursor-pointer outline-none"
+              className="appearance-none bg-violet-800/30 text-white px-4 py-1 rounded-lg border border-violet-600/30 cursor-pointer outline-none"
             >
               <option value="TokenA">TKA</option>
               <option value="TokenB">TKB</option>
             </select>
             <div className="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
-              <svg className="w-4 h-4 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <svg className="w-4 h-4 text-violet-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path>
               </svg>
             </div>
@@ -532,8 +532,8 @@ const SwapComponent: React.FC<SwapComponentProps> = ({
           disabled={!canSwap()}
           className={`w-full px-4 py-3 rounded-lg font-medium text-white transition-colors ${
             !canSwap()
-              ? 'bg-purple-700/50 cursor-not-allowed' 
-              : 'bg-purple-600 hover:bg-purple-700'
+              ? 'bg-violet-700/50 cursor-not-allowed' 
+              : 'bg-violet-600 hover:bg-violet-700'
           }`}
         >
           {isSwapping || isSwapConfirming 
