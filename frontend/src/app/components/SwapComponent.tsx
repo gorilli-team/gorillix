@@ -301,6 +301,15 @@ const SwapComponent: React.FC<SwapComponentProps> = ({
     }
   }, [fromToken, address, isConnected, refetchAllowance]);
 
+  // Set maximum amount based on selected token
+  const handleSetMaxAmount = () => {
+    if (fromToken === 'TokenA') {
+      setFromAmount(tokenABalance);
+    } else {
+      setFromAmount(tokenBBalance);
+    }
+  };
+
   // Approve tokens
   const handleApprove = async () => {
     if (!isConnected) {
@@ -402,34 +411,51 @@ const SwapComponent: React.FC<SwapComponentProps> = ({
     );
   };
 
-  return (
-    <div className={`p-4 rounded-xl bg-gray-700 ${className}`}>
-      <h2 className="text-xl font-bold mb-4">Gorillix Swap</h2>
+  const getTokenLabel = (token: 'TokenA' | 'TokenB') => {
+    return token === 'TokenA' ? 'TKA' : 'TKB';
+  };
 
+  return (
+    <div className={`bg-gray-800/60 rounded-xl p-5 shadow-lg border border-gray-700/50 ${className}`}>
       {/* From Token Input */}
-      <div className="mb-4 bg-gray-800 rounded-lg p-4">
+      <div className="mb-4">
         <div className="flex justify-between items-center mb-2">
-          <span className="text-sm text-gray-400">From</span>
-          <span className="text-sm text-gray-400">
-            Balance: {fromToken === 'TokenA' ? tokenABalance : tokenBBalance}
-          </span>
+          <span className="text-xs text-gray-400">From</span>
+          <div className="flex items-center">
+            <span className="text-xs text-gray-400 mr-2">
+              Balance: {fromToken === 'TokenA' ? tokenABalance : tokenBBalance}
+            </span>
+            <button 
+              onClick={handleSetMaxAmount}
+              className="text-xs text-purple-400 hover:text-purple-300 font-medium px-1.5 py-0.5 bg-purple-800/30 rounded hover:bg-purple-800/50 transition-colors"
+            >
+              MAX
+            </button>
+          </div>
         </div>
-        <div className="flex">
+        <div className="flex bg-gray-900/70 rounded-lg p-3 border border-gray-700/50">
           <input 
             type="number" 
             value={fromAmount}
             onChange={(e) => setFromAmount(e.target.value)}
             placeholder="0"
-            className="w-full bg-gray-700 rounded-lg p-2 text-white"
+            className="w-full bg-transparent text-white outline-none border-none"
           />
-          <select 
-            value={fromToken}
-            onChange={(e) => setFromToken(e.target.value as 'TokenA' | 'TokenB')}
-            className="ml-2 bg-gray-700 rounded-lg p-2 text-white"
-          >
-            <option value="TokenA">TKA</option>
-            <option value="TokenB">TKB</option>
-          </select>
+          <div className="relative">
+            <select 
+              value={fromToken}
+              onChange={(e) => setFromToken(e.target.value as 'TokenA' | 'TokenB')}
+              className="appearance-none bg-purple-800/30 text-white px-4 py-1 rounded-lg border border-purple-600/30 cursor-pointer outline-none"
+            >
+              <option value="TokenA">TKA</option>
+              <option value="TokenB">TKB</option>
+            </select>
+            <div className="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
+              <svg className="w-4 h-4 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path>
+              </svg>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -437,53 +463,62 @@ const SwapComponent: React.FC<SwapComponentProps> = ({
       <div className="flex justify-center my-2">
         <button 
           onClick={switchTokens}
-          className="bg-purple-600 hover:bg-purple-700 rounded-full p-2"
+          className="bg-purple-600/30 hover:bg-purple-600/50 rounded-full p-2 w-8 h-8 flex items-center justify-center border border-purple-600/20 transition-colors"
         >
-          ↕️
+          <svg className="w-4 h-4 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4"></path>
+          </svg>
         </button>
       </div>
 
       {/* To Token Selection */}
-      <div className="mb-4 bg-gray-800 rounded-lg p-4">
+      <div className="mb-4">
         <div className="flex justify-between items-center mb-2">
-          <span className="text-sm text-gray-400">To</span>
-          <span className="text-sm text-gray-400">
+          <span className="text-xs text-gray-400">To</span>
+          <span className="text-xs text-gray-400">
             Balance: {toToken === 'TokenA' ? tokenABalance : tokenBBalance}
           </span>
         </div>
-        <div className="flex">
-          <div className="w-full bg-gray-600 rounded-lg p-2 text-gray-300">
+        <div className="flex bg-gray-900/70 rounded-lg p-3 border border-gray-700/50">
+          <div className="w-full text-white">
             {getSwapOutput()}
           </div>
-          <select 
-            value={toToken}
-            onChange={(e) => setToToken(e.target.value as 'TokenA' | 'TokenB')}
-            className="ml-2 bg-gray-700 rounded-lg p-2 text-white"
-          >
-            <option value="TokenA">TKA</option>
-            <option value="TokenB">TKB</option>
-          </select>
+          <div className="relative">
+            <select 
+              value={toToken}
+              onChange={(e) => setToToken(e.target.value as 'TokenA' | 'TokenB')}
+              className="appearance-none bg-purple-800/30 text-white px-4 py-1 rounded-lg border border-purple-600/30 cursor-pointer outline-none"
+            >
+              <option value="TokenA">TKA</option>
+              <option value="TokenB">TKB</option>
+            </select>
+            <div className="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
+              <svg className="w-4 h-4 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path>
+              </svg>
+            </div>
+          </div>
         </div>
       </div>
 
       {/* Price Display */}
-      <div className="mb-4 bg-gray-800 rounded-lg p-4">
+      <div className="mb-4 bg-gray-900/30 rounded-lg p-2 border border-gray-700/30">
         <div className="flex justify-between items-center">
-          <span className="text-sm text-gray-400">Price</span>
-          <span className="text-sm text-gray-400">
-            1 {fromToken} = {parseFloat(fromToken === 'TokenA' ? priceTokenA : priceTokenB).toFixed(6)} {toToken}
+          <span className="text-xs text-gray-400">Price</span>
+          <span className="text-xs text-white">
+            1 {getTokenLabel(fromToken)} = {parseFloat(fromToken === 'TokenA' ? priceTokenA : priceTokenB).toFixed(6)} {getTokenLabel(toToken)}
           </span>
         </div>
       </div>
 
-      {/* Approval Button (if needed) */}
-      {needsApproval && (
+      {/* Action Button */}
+      {needsApproval ? (
         <button 
           onClick={handleApprove}
           disabled={isApprovePending || isApproveConfirming}
-          className={`w-full px-4 py-2 mb-2 rounded-lg font-medium ${
+          className={`w-full px-4 py-3 rounded-lg font-medium text-white transition-colors ${
             isApprovePending || isApproveConfirming
-              ? 'bg-gray-600 cursor-not-allowed' 
+              ? 'bg-yellow-700/50 cursor-not-allowed' 
               : 'bg-yellow-600 hover:bg-yellow-700'
           }`}
         >
@@ -491,35 +526,32 @@ const SwapComponent: React.FC<SwapComponentProps> = ({
             ? 'Approving...' 
             : 'Approve Tokens'}
         </button>
-      )}
-
-      {/* Swap Button */}
-      <button 
-        onClick={handleSwap}
-        disabled={!canSwap()}
-        className={`w-full px-4 py-2 rounded-lg font-medium ${
-          !canSwap()
-            ? 'bg-gray-600 cursor-not-allowed' 
-            : 'bg-purple-600 hover:bg-purple-700'
-        }`}
-      >
-        {isSwapping || isSwapConfirming 
-          ? 'Swapping...' 
-          : !fromAmount || parseFloat(fromAmount) <= 0
-            ? 'Enter Amount' 
-            : needsApproval
-              ? 'Approve Tokens First'
+      ) : (
+        <button 
+          onClick={handleSwap}
+          disabled={!canSwap()}
+          className={`w-full px-4 py-3 rounded-lg font-medium text-white transition-colors ${
+            !canSwap()
+              ? 'bg-purple-700/50 cursor-not-allowed' 
+              : 'bg-purple-600 hover:bg-purple-700'
+          }`}
+        >
+          {isSwapping || isSwapConfirming 
+            ? 'Swapping...' 
+            : !fromAmount || parseFloat(fromAmount) <= 0
+              ? 'Enter Amount' 
               : 'Swap'}
-      </button>
+        </button>
+      )}
 
       {/* Status Message */}
       {statusMessage && (
-        <div className={`mt-4 p-3 rounded-lg ${
+        <div className={`mt-4 p-3 rounded-lg text-sm ${
           statusMessage.includes('failed') || statusMessage.includes('Failed')
-            ? 'bg-red-900/50 text-red-200' 
+            ? 'bg-red-900/30 text-red-200 border border-red-700/30' 
             : statusMessage.includes('successfully') 
-              ? 'bg-green-900/50 text-green-200'
-              : 'bg-gray-800 text-gray-300'
+              ? 'bg-green-900/30 text-green-200 border border-green-700/30'
+              : 'bg-gray-800/50 text-gray-300 border border-gray-700/30'
         }`}>
           {statusMessage}
         </div>

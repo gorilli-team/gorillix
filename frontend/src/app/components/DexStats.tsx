@@ -76,7 +76,7 @@ export default function DexStats() {
   return (
     <div className="p-4 max-w-7xl mx-auto">
       <div className="mb-4">
-        <h2 className="text-2xl font-bold mb-2">Dex Statistic</h2>
+        <h2 className="text-2xl font-bold mb-2">Dex Stats</h2>
         <p className="text-gray-300">Real-time pool and trading metrics</p>
       </div>
 
