@@ -241,15 +241,6 @@ const DepositEscrow: React.FC<DepositEscrowProps> = ({
     query: { enabled: !!depositTxData }
   });
 
-  // Debug logging
-  useEffect(() => {
-    if (isConnected && selectedTokenAddress) {
-      console.log("Selected token address:", selectedTokenAddress);
-      console.log("Escrow address:", CONTRACT_ADDRESSES.ESCROW);
-      console.log("Current allowance:", tokenAllowance ? tokenAllowance.toString() : "Not fetched yet");
-    }
-  }, [isConnected, selectedTokenAddress, tokenAllowance]);
-
   // Handle approve token
   const handleApprove = async () => {
     if (!isConnected) {
@@ -267,9 +258,6 @@ const DepositEscrow: React.FC<DepositEscrowProps> = ({
     }
 
     try {
-      console.log("Approving token:", selectedTokenAddress);
-      console.log("Spender (Escrow):", CONTRACT_ADDRESSES.ESCROW);
-      
       // Approve maximum amount to avoid repeated approvals
       approveToken({
         address: selectedTokenAddress,
@@ -313,9 +301,6 @@ const DepositEscrow: React.FC<DepositEscrowProps> = ({
         setApprovalNeeded(true);
         return;
       }
-
-      console.log("Depositing token:", selectedTokenAddress);
-      console.log("Amount:", amount.toString());
       
       depositToEscrow({
         address: CONTRACT_ADDRESSES.ESCROW,
@@ -372,46 +357,53 @@ const DepositEscrow: React.FC<DepositEscrowProps> = ({
   };
 
   return (
-    <div className={`p-4 rounded-xl bg-gray-700 ${className}`}>
-      <h2 className="text-xl font-bold mb-4">Deposit to Escrow</h2>
+    <div className={`p-6 rounded-xl bg-gray-800 border border-purple-600/40 shadow-lg ${className}`}>
+      <h2 className="text-xl font-bold mb-6 text-white flex items-center">
+        <span className="bg-purple-600 w-2 h-6 rounded mr-2"></span>
+        Deposit to Escrow
+      </h2>
 
       {/* Token Selection */}
-      <div className="mb-4 bg-gray-800 rounded-lg p-4">
+      <div className="mb-4 bg-gray-700/50 rounded-lg p-4">
         <div className="flex justify-between items-center mb-2">
-          <span className="text-sm text-gray-400">Select Token</span>
-          <span className="text-sm text-gray-400">
-            Balance: {selectedToken === 'TokenA' ? tokenABalance : tokenBBalance}
+          <span className="text-sm text-purple-300 font-medium">Select Token</span>
+          <span className="text-sm text-gray-300">
+            Balance: <span className="text-white font-medium">{selectedToken === 'TokenA' ? tokenABalance : tokenBBalance}</span>
           </span>
         </div>
-        <div className="flex">
+        <div className="relative">
           <select 
             value={selectedToken}
             onChange={(e) => {
               setSelectedToken(e.target.value as 'TokenA' | 'TokenB');
               setApprovalNeeded(false);
-              // Trigger refetch of allowance when token changes
               setTimeout(() => refetchAllowance(), 500);
             }}
-            className="w-full bg-gray-700 rounded-lg p-2 text-white"
+            className="w-full bg-gray-800 rounded-lg p-3 text-white border border-purple-500/30 appearance-none focus:outline-none focus:ring-2 focus:ring-purple-600 focus:border-transparent"
           >
             <option value="TokenA">TKA</option>
             <option value="TokenB">TKB</option>
           </select>
+          <div className="absolute inset-y-0 right-0 flex items-center px-3 pointer-events-none">
+            <svg className="w-4 h-4 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path>
+            </svg>
+          </div>
         </div>
       </div>
 
       {/* Amount Input */}
-      <div className="mb-4 bg-gray-800 rounded-lg p-4">
+      <div className="mb-6 bg-gray-700/50 rounded-lg p-4">
         <div className="flex justify-between items-center mb-2">
-          <span className="text-sm text-gray-400">Amount</span>
+          <span className="text-sm text-purple-300 font-medium">Amount</span>
           <button 
             onClick={handleSetMaxAmount} 
-            className="text-sm text-purple-400 hover:text-purple-300"
+            className="text-sm text-purple-400 hover:text-purple-300 font-medium px-2 py-1 bg-purple-800/30 rounded transition-colors"
           >
             Max
           </button>
         </div>
-        <div className="flex">
+        <div className="relative">
           <input 
             type="number" 
             value={depositAmount}
@@ -419,20 +411,20 @@ const DepositEscrow: React.FC<DepositEscrowProps> = ({
               setDepositAmount(e.target.value);
             }}
             placeholder="0"
-            className="w-full bg-gray-700 rounded-lg p-2 text-white"
+            className="w-full bg-gray-800 rounded-lg p-3 text-white border border-purple-500/30 focus:outline-none focus:ring-2 focus:ring-purple-600 focus:border-transparent"
           />
         </div>
       </div>
 
-      {/* Approve Button - always visible when needed */}
+      {/* Approve Button */}
       {approvalNeeded && (
         <button 
           onClick={handleApprove}
           disabled={!isValidAmount() || isApproving || isApprovalConfirming}
-          className={`w-full px-4 py-2 mb-2 rounded-lg font-medium ${
+          className={`w-full px-4 py-3 mb-3 rounded-lg font-medium transition-all transform ${
             !isValidAmount() || isApproving || isApprovalConfirming
               ? 'bg-gray-600 cursor-not-allowed' 
-              : 'bg-yellow-600 hover:bg-yellow-700'
+              : 'bg-yellow-600 hover:bg-yellow-700 hover:shadow-lg hover:-translate-y-0.5'
           }`}
         >
           {isApproving || isApprovalConfirming 
@@ -444,19 +436,17 @@ const DepositEscrow: React.FC<DepositEscrowProps> = ({
       {/* Deposit Button */}
       <button 
         onClick={() => {
-          // If approval is needed but not in progress, show message
           if (approvalNeeded && !approvalPending && !isApproving && !isApprovalConfirming) {
             setStatusMessage("You need to approve the token first");
           } else if (!approvalNeeded && !approvalPending) {
-            // If no approval needed, proceed with deposit
             handleDeposit();
           }
         }}
         disabled={!isValidAmount() || isDepositing || isDepositConfirming || isApproving || isApprovalConfirming || (approvalNeeded && !isApprovalSuccess)}
-        className={`w-full px-4 py-2 rounded-lg font-medium ${
+        className={`w-full px-4 py-3 rounded-lg font-medium transition-all transform ${
           !isValidAmount() || isDepositing || isDepositConfirming || isApproving || isApprovalConfirming || (approvalNeeded && !isApprovalSuccess)
-            ? 'bg-gray-600 cursor-not-allowed' 
-            : 'bg-purple-600 hover:bg-purple-700'
+            ? 'bg-gray-600 cursor-not-allowed text-gray-400' 
+            : 'bg-purple-600 hover:bg-purple-700 text-white hover:shadow-lg hover:-translate-y-0.5'
         }`}
       >
         {isDepositing || isDepositConfirming 
@@ -472,10 +462,10 @@ const DepositEscrow: React.FC<DepositEscrowProps> = ({
       {statusMessage && (
         <div className={`mt-4 p-3 rounded-lg ${
           statusMessage.includes('failed') || statusMessage.includes('Failed')
-            ? 'bg-red-900/50 text-red-200' 
+            ? 'bg-red-900/50 text-red-200 border border-red-700/30' 
             : statusMessage.includes('successfully') 
-              ? 'bg-green-900/50 text-green-200'
-              : 'bg-gray-800 text-gray-300'
+              ? 'bg-green-900/50 text-green-200 border border-green-700/30'
+              : 'bg-gray-800 text-gray-300 border border-gray-700'
         }`}>
           {statusMessage}
         </div>
