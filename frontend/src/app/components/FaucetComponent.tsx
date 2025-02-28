@@ -7,8 +7,12 @@ import {
   useWriteContract, 
   useWaitForTransactionReceipt 
 } from 'wagmi';
-import { parseUnits, formatUnits } from 'viem';
+import { parseUnits, formatUnits, encodeFunctionData } from 'viem';
 import { CONTRACT_ADDRESSES } from '../utils/addresses';
+import { GelatoRelay, SponsoredCallRequest, TaskState } from '@gelatonetwork/relay-sdk';
+
+// Gelato API key from environment variables
+const GELATO_API_KEY = process.env.NEXT_PUBLIC_GELATO_API_KEY || '';
 
 // Simplified ABI for ERC20 tokens
 const ERC20_ABI = [
@@ -40,6 +44,11 @@ const FaucetComponent: React.FC<FaucetComponentProps> = ({ onSuccess }) => {
   const [statusMessage, setStatusMessage] = useState('');
   const [faucetAbi, setFaucetAbi] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  
+  // Gelato relay states
+  const [isRelaying, setIsRelaying] = useState(false);
+  const [relayTaskId, setRelayTaskId] = useState<string | null>(null);
+  const [relayTaskStatus, setRelayTaskStatus] = useState<string | null>(null);
 
   // Wagmi hook for account management
   const { address, isConnected } = useAccount();
@@ -171,7 +180,7 @@ const FaucetComponent: React.FC<FaucetComponentProps> = ({ onSuccess }) => {
     }
   }, [isSuccess, refetchTokenABalance, refetchTokenBBalance]);
 
-  const isRequesting = isRequestingFaucet || isConfirming;
+  const isRequesting = isRequestingFaucet || isConfirming || isRelaying;
 
   // Function to switch to ABC Testnet
   const switchToABCTestnet = async () => {
@@ -189,7 +198,7 @@ const FaucetComponent: React.FC<FaucetComponentProps> = ({ onSuccess }) => {
     }
   };
 
-  // Function to request tokens
+  // Standard function to request tokens (with gas fees)
   const handleRequestTokens = async () => {
     if (!isConnected) {
       setStatusMessage("Please connect your wallet first");
@@ -214,6 +223,99 @@ const FaucetComponent: React.FC<FaucetComponentProps> = ({ onSuccess }) => {
       console.error("Error requesting tokens:", error);
       setStatusMessage(`Error: ${error.message}`);
     }
+  };
+
+  // Gasless function to request tokens using Gelato Relay
+  const handleGaslessRequestTokens = async () => {
+    if (!isConnected) {
+      setStatusMessage("Please connect your wallet first");
+      return;
+    }
+    
+    if (!isCorrectNetwork) {
+      setStatusMessage("Please switch to ABC Testnet");
+      await switchToABCTestnet();
+      return;
+    }
+    
+    try {
+      setIsRelaying(true);
+      setStatusMessage("Requesting tokens via Gelato Relay...");
+      
+      // Initialize Gelato Relay
+      const relay = new GelatoRelay();
+      
+      // Encode the faucet function call data
+      const data = encodeFunctionData({
+        abi: faucetAbi,
+        functionName: 'requestFaucet',
+        args: []
+      });
+
+      // Prepare sponsored request
+      const sponsoredCallRequest: SponsoredCallRequest = {
+        chainId: BigInt(ABC_CHAIN_ID),
+        target: CONTRACT_ADDRESSES.FAUCET,
+        data: data,
+      };
+
+      // Send request to Gelato
+      const relayResponse = await relay.sponsoredCall(sponsoredCallRequest, GELATO_API_KEY);
+      setRelayTaskId(relayResponse.taskId);
+      
+      // Poll for transaction status
+      startPollingForTaskStatus(relayResponse.taskId);
+    } catch (error: any) {
+      console.error("Error requesting tokens via Gelato:", error);
+      setStatusMessage(`Error: ${error.message}`);
+      setIsRelaying(false);
+    }
+  };
+
+  // Check Gelato task status
+  const startPollingForTaskStatus = async (taskId: string) => {
+    const relay = new GelatoRelay();
+    
+    const checkStatus = async () => {
+      try {
+        const status = await relay.getTaskStatus(taskId);
+        
+        if (status && status.taskState) {
+          setRelayTaskStatus(status.taskState);
+          
+          if (status.taskState === TaskState.ExecSuccess) {
+            // Transaction completed successfully
+            setStatusMessage("Tokens received successfully via Gelato!");
+            setIsRelaying(false);
+            setRelayTaskId(null);
+            setRelayTaskStatus(null);
+            
+            // Refresh balances
+            refetchTokenABalance();
+            refetchTokenBBalance();
+            return;
+          } else if (status.taskState === TaskState.ExecReverted || status.taskState === TaskState.Cancelled) {
+            // Transaction failed
+            setStatusMessage(`Transaction failed with status: ${status.taskState}`);
+            setIsRelaying(false);
+            return;
+          }
+          
+          // Continue checking if transaction is still in progress
+          setTimeout(checkStatus, 3000);
+        } else {
+          setStatusMessage('Error getting task status: Status response is empty');
+          setIsRelaying(false);
+        }
+      } catch (error) {
+        console.error('Error checking task status:', error);
+        setStatusMessage('Error checking transaction status');
+        setIsRelaying(false);
+      }
+    };
+    
+    // Start polling
+    checkStatus();
   };
 
   if (isLoading) {
@@ -268,18 +370,40 @@ const FaucetComponent: React.FC<FaucetComponentProps> = ({ onSuccess }) => {
             </div>
           </div>
           
-          <button 
-            onClick={handleRequestTokens}
-            disabled={isRequesting || !isCorrectNetwork}
-            className={`w-full px-4 py-2 rounded-lg font-medium ${
-              isRequesting || !isCorrectNetwork
-                ? 'bg-gray-600 cursor-not-allowed' 
-                : 'bg-violet-600 hover:bg-violet-700'
-            }`}
-          >
-            {isRequesting ? 'Requesting...' : 'Request Tokens'}
-          </button>
+          <div className="grid grid-cols-2 gap-4">
+            <button 
+              onClick={handleRequestTokens}
+              disabled={isRequesting || !isCorrectNetwork}
+              className={`px-4 py-2 rounded-lg font-medium ${
+                isRequesting || !isCorrectNetwork
+                  ? 'bg-gray-600 cursor-not-allowed' 
+                  : 'bg-violet-600 hover:bg-violet-700'
+              }`}
+            >
+              {isRequesting && !isRelaying ? 'Requesting...' : 'Request Tokens'}
+            </button>
+            
+            <button 
+              onClick={handleGaslessRequestTokens}
+              disabled={isRequesting || !isCorrectNetwork}
+              className={`px-4 py-2 rounded-lg font-medium ${
+                isRequesting || !isCorrectNetwork
+                  ? 'bg-gray-600 cursor-not-allowed' 
+                  : 'bg-yellow-600 hover:bg-yellow-700'
+              }`}
+            >
+              {isRelaying ? 'Requesting...' : 'Gasless Request'}
+            </button>
+          </div>
         </>
+      )}
+      
+      {/* Task Status for Gelato */}
+      {relayTaskId && (
+        <div className="mt-4 p-3 rounded-lg text-sm bg-gray-800/50 text-gray-300 border border-gray-700/30">
+          <p>Gelato Task ID: {relayTaskId}</p>
+          <p>Status: {relayTaskStatus || 'Pending'}</p>
+        </div>
       )}
       
       {statusMessage && (
@@ -296,6 +420,12 @@ const FaucetComponent: React.FC<FaucetComponentProps> = ({ onSuccess }) => {
       
       <div className="mt-4 text-sm text-gray-400">
         <p>The faucet allows you to obtain free TokenA and TokenB to test the Gorillix DEX platform.</p>
+        <p className="mt-2">
+          <span className="text-violet-400">Standard request:</span> Requires gas fees for the transaction.
+        </p>
+        <p>
+          <span className="text-yellow-400">Gasless request:</span> No gas fees required (sponsored by Gelato Relay).
+        </p>
       </div>
     </div>
   );
