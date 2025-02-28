@@ -5,6 +5,8 @@ import {
     type State,
 } from "@elizaos/core";
 import type { ClientBase } from "./base.ts";
+// import { coinmarketcapPlugin } from "@elizaos/plugin-coinmarketcap";
+// import { agentkitPlugin } from "@elizaos/plugin-agentkit";
 import { getEmbeddingZeroVector } from "@elizaos/core";
 import { stringToUuid } from "@elizaos/core";
 
@@ -19,16 +21,9 @@ export class GorillionaireTradeClient {
         this.runtime = runtime;
 
         console.log("TRADE Client Configuration:");
-        console.log(
-            `GORILLIOTRADE - Action Interval: ${this.client.twitterConfig.ACTION_INTERVAL} minutes`
-        );
     }
 
     async start() {
-        if (!this.client.profile) {
-            await this.client.init();
-        }
-
         const processActionsLoop = async () => {
             while (!this.stopProcessingActions) {
                 try {
