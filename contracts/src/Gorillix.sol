@@ -46,7 +46,7 @@ contract Gorillix is Ownable, ERC2771Context, ERC20 {
     //////////////// CONSTRUCTOR ////////////////////
     /////////////////////////////////////////////////
 
-    constructor(address _tokenA, address _tokenB, address trustedForwarder, string memory lpTokenName, string memory lpTokenSymbol) Ownable(msg.sender) ERC2771Context(trustedForwarder) ERC20(lpTokenName, lpTokenSymbol) {
+    constructor(address _tokenA, address _tokenB, address trustedForwarder, string memory lpTokenName, string memory lpTokenSymbol) Ownable(_msgSender()) ERC2771Context(trustedForwarder) ERC20(lpTokenName, lpTokenSymbol) {
         i_tokenA = IERC20(_tokenA);
         i_tokenB = IERC20(_tokenB);
     }
@@ -67,14 +67,14 @@ contract Gorillix is Ownable, ERC2771Context, ERC20 {
         s_totalLiquidityTokenA = amountTokenA;
         s_totalLiquidityTokenB = amountTokenB;
 
-        s_liquidityTokenAPerUser[msg.sender] = amountTokenA;
-        s_liquidityTokenBPerUser[msg.sender] = amountTokenB;
+        s_liquidityTokenAPerUser[_msgSender()] = amountTokenA;
+        s_liquidityTokenBPerUser[_msgSender()] = amountTokenB;
 
-        i_tokenA.transferFrom(msg.sender, address(this), amountTokenA);
-        i_tokenB.transferFrom(msg.sender, address(this), amountTokenB);
-        _mint(msg.sender, _calculateLPTokensInit(amountTokenA, amountTokenB));
+        i_tokenA.transferFrom(_msgSender(), address(this), amountTokenA);
+        i_tokenB.transferFrom(_msgSender(), address(this), amountTokenB);
+        _mint(_msgSender(), _calculateLPTokensInit(amountTokenA, amountTokenB));
 
-        emit Initialized(msg.sender, amountTokenA, amountTokenB);
+        emit Initialized(_msgSender(), amountTokenA, amountTokenB);
     }
 
     function tokenAtoTokenB(uint256 amountTokenA) external returns(uint256 outputTokenB) {
@@ -88,10 +88,10 @@ contract Gorillix is Ownable, ERC2771Context, ERC20 {
         s_totalLiquidityTokenA += amountTokenA;
         s_totalLiquidityTokenB -= outputTokenB;
 
-        i_tokenA.transferFrom(msg.sender, address(this), amountTokenA);
-        i_tokenB.transfer(msg.sender, outputTokenB);
+        i_tokenA.transferFrom(_msgSender(), address(this), amountTokenA);
+        i_tokenB.transfer(_msgSender(), outputTokenB);
 
-        emit TokenAtoTokenBSwap(msg.sender, amountTokenA, outputTokenB);
+        emit TokenAtoTokenBSwap(_msgSender(), amountTokenA, outputTokenB);
         return outputTokenB;
     }
 
@@ -106,10 +106,10 @@ contract Gorillix is Ownable, ERC2771Context, ERC20 {
         s_totalLiquidityTokenB += amountTokenB;
         s_totalLiquidityTokenA -= outputTokenA;
 
-        i_tokenB.transferFrom(msg.sender, address(this), amountTokenB);
-        i_tokenA.transfer(msg.sender, outputTokenA);
+        i_tokenB.transferFrom(_msgSender(), address(this), amountTokenB);
+        i_tokenA.transfer(_msgSender(), outputTokenA);
 
-        emit TokenBtoTokenASwap(msg.sender, amountTokenB, outputTokenA);
+        emit TokenBtoTokenASwap(_msgSender(), amountTokenB, outputTokenA);
         return outputTokenA;
     }
 
@@ -125,14 +125,14 @@ contract Gorillix is Ownable, ERC2771Context, ERC20 {
 
         s_totalLiquidityTokenA += amountTokenA;
         s_totalLiquidityTokenB += amountTokenB;
-        s_liquidityTokenAPerUser[msg.sender] += amountTokenA;
-        s_liquidityTokenBPerUser[msg.sender] += amountTokenB;
+        s_liquidityTokenAPerUser[_msgSender()] += amountTokenA;
+        s_liquidityTokenBPerUser[_msgSender()] += amountTokenB;
 
-        i_tokenA.transferFrom(msg.sender, address(this), amountTokenA);
-        i_tokenB.transferFrom(msg.sender, address(this), amountTokenB);
-        _mint(msg.sender, lpTokensToMint);
+        i_tokenA.transferFrom(_msgSender(), address(this), amountTokenA);
+        i_tokenB.transferFrom(_msgSender(), address(this), amountTokenB);
+        _mint(_msgSender(), lpTokensToMint);
 
-        emit AddLiquidity(msg.sender, amountTokenA, amountTokenB);
+        emit AddLiquidity(_msgSender(), amountTokenA, amountTokenB);
     }
 
     function addLiquidityTokenB(uint256 amountTokenB) external returns(uint256 amountTokenA) {
@@ -147,14 +147,14 @@ contract Gorillix is Ownable, ERC2771Context, ERC20 {
 
         s_totalLiquidityTokenA += amountTokenA;
         s_totalLiquidityTokenB += amountTokenB;
-        s_liquidityTokenAPerUser[msg.sender] += amountTokenA;
-        s_liquidityTokenBPerUser[msg.sender] += amountTokenB;
+        s_liquidityTokenAPerUser[_msgSender()] += amountTokenA;
+        s_liquidityTokenBPerUser[_msgSender()] += amountTokenB;
 
-        i_tokenA.transferFrom(msg.sender, address(this), amountTokenA);
-        i_tokenB.transferFrom(msg.sender, address(this), amountTokenB);
-        _mint(msg.sender, lpTokensToMint);
+        i_tokenA.transferFrom(_msgSender(), address(this), amountTokenA);
+        i_tokenB.transferFrom(_msgSender(), address(this), amountTokenB);
+        _mint(_msgSender(), lpTokensToMint);
 
-        emit AddLiquidity(msg.sender, amountTokenA, amountTokenB);
+        emit AddLiquidity(_msgSender(), amountTokenA, amountTokenB);
     }
 
     function removeLiquidity(uint256 amountLPTokens) external {
@@ -167,14 +167,14 @@ contract Gorillix is Ownable, ERC2771Context, ERC20 {
         
         s_totalLiquidityTokenA -= amountTokenAToSend;
         s_totalLiquidityTokenB -= amountTokenBToSend;
-        s_liquidityTokenAPerUser[msg.sender] -= amountTokenAToSend;
-        s_liquidityTokenBPerUser[msg.sender] -= amountTokenBToSend;
+        s_liquidityTokenAPerUser[_msgSender()] -= amountTokenAToSend;
+        s_liquidityTokenBPerUser[_msgSender()] -= amountTokenBToSend;
 
-        i_tokenA.transfer(msg.sender, amountTokenAToSend);
-        i_tokenB.transfer(msg.sender, amountTokenBToSend);
-        _burn(msg.sender, amountLPTokens);
+        i_tokenA.transfer(_msgSender(), amountTokenAToSend);
+        i_tokenB.transfer(_msgSender(), amountTokenBToSend);
+        _burn(_msgSender(), amountLPTokens);
 
-        emit RemoveLiquidity(msg.sender, amountLPTokens, amountTokenAToSend, amountTokenBToSend);
+        emit RemoveLiquidity(_msgSender(), amountLPTokens, amountTokenAToSend, amountTokenBToSend);
     }
 
     //////////////////////////////////////////////

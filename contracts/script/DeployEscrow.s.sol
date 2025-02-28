@@ -5,6 +5,8 @@ import { Script } from "forge-std/Script.sol";
 import { Escrow } from "../src/Escrow.sol";
 
 contract DeployEscrow is Script {
+    address public constant TRUSTED_FORWARDER = 0x61F2976610970AFeDc1d83229e1E21bdc3D5cbE4;
+
     address public tokenA;
     address public tokenB;
 
@@ -15,7 +17,7 @@ contract DeployEscrow is Script {
 
     function run() external returns (Escrow) {
         vm.startBroadcast();
-        Escrow escrow = new Escrow(tokenA, tokenB);
+        Escrow escrow = new Escrow(tokenA, tokenB, TRUSTED_FORWARDER);
         vm.stopBroadcast();
 
         return escrow;
