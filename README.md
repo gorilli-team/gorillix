@@ -16,12 +16,12 @@ The following smart contracts have been deployed on ABC Testnet.
 Gorillix, Escrow, and Faucet are now compatible with Gelato Relay via the ERC2771Context contract, allowing for gasless transactions.
 
 **Contract addresses:**
-- **TokenA**: 0x9455bd9d1dd4a7e66e34ffc2e5de83caa92092ae
-- **TokenB**: 0x1d96f7338ae4edfc835bd3d19297666c1e80b170
-- **Gorillix**: 0x80e93b9420746ac25c420c3a7cc29b46bec34d26
-- **Escrow**: 0xcd8aca3fba1192607a87fec234fd13ed439ff36c
-- **Faucet**: 0xce02e799a74ae683fceceaada62497e82ed7cb4a
-- **Trusted Forwarder (Gelato Relay)**: 0x61F2976610970AFeDc1d83229e1E21bdc3D5cbE4
+- **TokenA**: 0x4110db11e9fc29f645634091fef35a732ac6359a
+- **TokenB**: 0xf2769f12882151cc15b78f7a0f07d4c04bc7aa31
+- **Gorillix**: 0x14a678f6f5f5f897692a9db3dee8e2d3c656c483
+- **Escrow**: 0xdb8e20f8f51522b2053be0253bd54fab902b36bb
+- **Faucet**: 0x76995801f053d689f7e06e5e23e984caa31fbcf8
+- **Trusted Forwarder (Gelato Relay)**: 0xd8253782c45a12053594b9deB72d8e8aB2Fca54c
 
 ## 💫 Trading Modes
 

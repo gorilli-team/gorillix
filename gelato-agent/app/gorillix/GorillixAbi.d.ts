@@ -1,4 +1,4 @@
-export declare const GORILLIX_ADDRESS = "0x80e93b9420746ac25c420c3a7cc29b46bec34d26"
+export declare const GORILLIX_ADDRESS = "0x14a678f6f5f5f897692a9db3dee8e2d3c656c483"
 export declare const ABI: readonly [
     {
       readonly inputs: readonly [
