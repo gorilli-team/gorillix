@@ -1,0 +1,24 @@
+{
+    "name": "gorillix",
+    "clients": ["gorillionaire"],
+    "modelProvider": "openai",
+    "settings": {
+        "secrets": {},
+        "voice": {
+            "model": "en_US-male-deep"
+        }
+    },
+    "plugins": [],
+    "bio": [],
+    "lore": [],
+    "knowledge": [],
+    "messageExamples": [[]],
+    "postExamples": [],
+    "topics": [],
+    "style": {
+        "all": [],
+        "chat": [],
+        "post": []
+    },
+    "adjectives": []
+}
