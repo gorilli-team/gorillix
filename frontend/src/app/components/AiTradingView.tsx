@@ -10,6 +10,15 @@ type AgentActivity = {
   details?: string;
 };
 
+// Type for agent configuration from localStorage
+type AgentConfiguration = {
+  selectedStrategy: string;
+  riskLevel: number;
+  tokenAAllocation: string;
+  tokenBAllocation: string;
+  isAgentActive: boolean;
+};
+
 // Sample data for agent activities
 const mockActivities: AgentActivity[] = [
   {
@@ -49,25 +58,98 @@ const mockActivities: AgentActivity[] = [
   }
 ];
 
-// Sample stats for the agent
-const agentStats = {
-  uptime: '2h 15m',
-  activeLiquidity: '2,450.00 TKA / 1,875.50 TKB',
-  riskLevel: 'Conservative (2)',
-  strategy: 'LIQUIDITY MANAGEMENT',
-  status: 'Active'
+// Risk level mapping
+const riskLevels = [
+  { level: 1, label: 'Very Conservative' },
+  { level: 2, label: 'Conservative' },
+  { level: 3, label: 'Moderate' },
+  { level: 4, label: 'Aggressive' },
+  { level: 5, label: 'Degen' }
+];
+
+// Trading strategy mapping
+const tradingStrategies = {
+  'liquidity-management': 'LIQUIDITY MANAGEMENT',
+  'swap': 'SWAP'
 };
 
 export default function AITradingView() {
   const [activities, setActivities] = useState<AgentActivity[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<'all' | 'info' | 'actions' | 'warnings'>('all');
+  const [agentStats, setAgentStats] = useState({
+    tokenAAllocation: '0',
+    tokenBAllocation: '0',
+    riskLevel: 'Not set',
+    strategy: 'Not set',
+    status: 'Inactive'
+  });
 
-  // Simulate loading data
+  // Load agent configuration from localStorage
   useEffect(() => {
+    const loadAgentConfig = () => {
+      try {
+        const STORAGE_KEY = 'agent_configuration';
+        const savedConfig = localStorage.getItem(STORAGE_KEY);
+        
+        if (savedConfig) {
+          const config: AgentConfiguration = JSON.parse(savedConfig);
+          
+          // Get the risk level label
+          let riskLevelLabel = 'Not set';
+          const riskLevelInfo = riskLevels.find(r => r.level === config.riskLevel);
+          if (riskLevelInfo) {
+            riskLevelLabel = `${riskLevelInfo.label} (${config.riskLevel})`;
+          }
+          
+          // Get the strategy name
+          const strategyName = config.selectedStrategy ? 
+            (tradingStrategies[config.selectedStrategy as keyof typeof tradingStrategies] || 'Unknown') : 
+            'Not set';
+          
+          // Format the token allocations
+          const tokenAAllocation = config.tokenAAllocation ? 
+            parseFloat(config.tokenAAllocation).toLocaleString('en-US', { maximumFractionDigits: 2 }) : 
+            '0';
+          
+          const tokenBAllocation = config.tokenBAllocation ? 
+            parseFloat(config.tokenBAllocation).toLocaleString('en-US', { maximumFractionDigits: 2 }) : 
+            '0';
+          
+          // Get status from isAgentActive
+          const status = config.isAgentActive ? 'Active' : 'Inactive';
+          
+          setAgentStats({
+            tokenAAllocation,
+            tokenBAllocation,
+            riskLevel: riskLevelLabel,
+            strategy: strategyName,
+            status
+          });
+          
+          // Update the first activity message to reflect the actual risk level
+          if (activities.length > 0 && riskLevelInfo) {
+            const updatedActivities = [...activities];
+            updatedActivities[0] = {
+              ...updatedActivities[0],
+              message: `Agent initialized with risk level ${config.riskLevel}`,
+              details: `Trading strategy: ${strategyName}`
+            };
+            setActivities(updatedActivities);
+          }
+        }
+      } catch (error) {
+        console.error('Error loading configuration from localStorage:', error);
+      }
+    };
+
+    // Load mock activities
     const timer = setTimeout(() => {
       setActivities(mockActivities);
       setIsLoading(false);
+      
+      // Load agent configuration after activities are loaded
+      loadAgentConfig();
     }, 800);
     
     return () => clearTimeout(timer);
@@ -113,10 +195,6 @@ export default function AITradingView() {
     <div className="p-6">
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-2xl font-bold">AI Trading Performance</h2>
-        <div className="bg-gray-700/50 border border-violet-500/20 rounded-lg px-4 py-1.5 text-sm">
-          <span className="mr-2 inline-block w-2 h-2 rounded-full bg-green-500"></span>
-          Agent Online
-        </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -136,30 +214,37 @@ export default function AITradingView() {
                 <div className="h-4 bg-gray-700 rounded w-1/2 mb-3"></div>
                 <div className="h-4 bg-gray-700 rounded w-5/6 mb-3"></div>
                 <div className="h-4 bg-gray-700 rounded w-2/3 mb-3"></div>
-                <div className="h-4 bg-gray-700 rounded w-3/4"></div>
+                <div className="h-4 bg-gray-700 rounded w-3/4 mb-3"></div>
               </div>
             ) : (
               <div className="space-y-4">
                 <div className="flex justify-between border-b border-gray-700 pb-2">
                   <span className="text-gray-400">Status</span>
-                  <span className="font-medium text-white">{agentStats.status}</span>
+                  <div className={`bg-gray-700/50 border border-violet-500/20 rounded-lg px-3 py-1 text-sm ${agentStats.status === 'Active' ? '' : 'border-red-500/20'}`}>
+                    <span className={`mr-2 inline-block w-2 h-2 rounded-full ${agentStats.status === 'Active' ? 'bg-green-500' : 'bg-red-500'}`}></span>
+                    {agentStats.status === 'Active' ? 'Agent Online' : 'Agent Offline'}
+                  </div>
                 </div>
-                <div className="flex justify-between border-b border-gray-700 pb-2">
-                  <span className="text-gray-400">Uptime</span>
-                  <span className="font-medium text-white">{agentStats.uptime}</span>
-                </div>
-                <div className="flex justify-between border-b border-gray-700 pb-2">
-                  <span className="text-gray-400">Strategy</span>
-                  <span className="font-medium text-white">{agentStats.strategy}</span>
-                </div>
-                <div className="flex justify-between border-b border-gray-700 pb-2">
-                  <span className="text-gray-400">Risk Level</span>
-                  <span className="font-medium text-white">{agentStats.riskLevel}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-400">Active Liquidity</span>
-                  <span className="font-medium text-white">{agentStats.activeLiquidity}</span>
-                </div>
+                {agentStats.status === 'Active' && (
+                  <>
+                    <div className="flex justify-between border-b border-gray-700 pb-2">
+                      <span className="text-gray-400">Strategy</span>
+                      <span className="font-medium text-white">{agentStats.strategy}</span>
+                    </div>
+                    <div className="flex justify-between border-b border-gray-700 pb-2">
+                      <span className="text-gray-400">Risk Level</span>
+                      <span className="font-medium text-white">{agentStats.riskLevel}</span>
+                    </div>
+                    <div className="flex justify-between border-b border-gray-700 pb-2">
+                      <span className="text-gray-400">Token A Allocation</span>
+                      <span className="font-medium text-white">{agentStats.tokenAAllocation} TKA</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-400">Token B Allocation</span>
+                      <span className="font-medium text-white">{agentStats.tokenBAllocation} TKB</span>
+                    </div>
+                  </>
+                )}
               </div>
             )}
           </div>

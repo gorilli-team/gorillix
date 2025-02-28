@@ -35,7 +35,7 @@ export default function Sidebar({
 
   if (!mounted) {
     return (
-      <aside className="w-64 bg-gray-800 flex text-white flex-col border border-gray-300">
+      <aside className="w-64 bg-gray-800 flex text-white flex-col border-r border-gray-600">
         <div className="h-16 text-xl font-bold flex items-center ps-4">
           <Image 
             className="w-12 h-12 rounded-full" 
@@ -78,7 +78,7 @@ export default function Sidebar({
   }
 
   return (
-    <aside className="w-64 bg-gray-800 border-r border-violet-600 flex text-white flex-col">
+    <aside className="w-64 bg-gray-800 border-r border-gray-600 flex text-white flex-col">
       <div
         className="h-16 text-xl font-bold flex items-center ps-6 cursor-pointer"
         onClick={handleGorillixClick}

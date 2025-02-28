@@ -6,7 +6,7 @@ export default function Header() {
   const { isConnected } = useAccount();
 
   return (
-    <header className="h-16 px-6 flex items-center justify-end bg-gray-800 border-b border-violet-600">  
+    <header className="h-16 px-6 flex items-center justify-end bg-gray-800 border-b border-gray-600">  
       <div className="flex items-center">
         <ConnectButton.Custom>
           {({
