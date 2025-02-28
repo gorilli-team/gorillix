@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ABI = void 0;
-exports.FAUCET_ADDRESS = "0xda92650877E8ED0656aC6DE6F4C69A3680Ba831f";
+exports.FAUCET_ADDRESS = "0xce02e799a74ae683fceceaada62497e82ed7cb4a";
 exports.ABI = [
   {
     inputs: [

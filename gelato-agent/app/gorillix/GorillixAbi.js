@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ABI = void 0;
-exports.GORILLIX_ADDRESS = "0x2de70d920c3b43c3c32ab97fc0850b1bd2ff5a3d";
+exports.GORILLIX_ADDRESS = "0x80e93b9420746ac25c420c3a7cc29b46bec34d26";
 exports.ABI = [
   {
     inputs: [

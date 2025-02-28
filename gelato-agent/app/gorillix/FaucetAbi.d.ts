@@ -1,4 +1,4 @@
-export declare const FAUCET_ADDRESS = "0xda92650877E8ED0656aC6DE6F4C69A3680Ba831f"
+export declare const FAUCET_ADDRESS = "0xce02e799a74ae683fceceaada62497e82ed7cb4a"
 export declare const ABI: readonly [
     {
       readonly inputs: readonly [
