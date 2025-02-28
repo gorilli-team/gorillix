@@ -1,6 +1,7 @@
 import express from 'express';
 import mongoose from 'mongoose';
 import * as agentConfigController from '../controllers/agentConfigController.js';
+import * as agentResponseController from '../controllers/agentResponseController.js';
 
 const router = express.Router();
 
@@ -23,5 +24,6 @@ router.get('/api/agent/trading-strategies', agentConfigController.getTradingStra
 router.post('/api/agent/config', agentConfigController.createOrUpdateAgentConfig);
 router.get('/api/agent/config/:walletAddress', agentConfigController.getAgentConfigByWallet);
 router.get('/api/agent/configs', agentConfigController.getAllAgentConfigs);
+router.post('/api/agent/response', agentResponseController.saveAgentResponse);
 
 export default router;
