@@ -1,15 +1,6 @@
 "use client";
 import { useState, useEffect } from 'react';
 
-// Type for agent activities
-type AgentActivity = {
-  id: string;
-  timestamp: Date;
-  type: 'info' | 'action' | 'warning' | 'success' | 'error';
-  message: string;
-  details?: string;
-};
-
 // Type for agent configuration from localStorage
 type AgentConfiguration = {
   selectedStrategy: string;
@@ -18,45 +9,6 @@ type AgentConfiguration = {
   tokenBAllocation: string;
   isAgentActive: boolean;
 };
-
-// Sample data for agent activities
-const mockActivities: AgentActivity[] = [
-  {
-    id: '1',
-    timestamp: new Date(Date.now() - 5 * 60000),
-    type: 'info',
-    message: 'Agent initialized with risk level 2',
-    details: 'Trading strategy: LIQUIDITY MANAGEMENT'
-  },
-  {
-    id: '2',
-    timestamp: new Date(Date.now() - 4 * 60000),
-    type: 'action',
-    message: 'Scanning market conditions',
-    details: 'Analyzing price trends and liquidity pools'
-  },
-  {
-    id: '3',
-    timestamp: new Date(Date.now() - 3 * 60000),
-    type: 'warning',
-    message: 'Elevated price volatility detected',
-    details: 'Market volatility index: 0.72'
-  },
-  {
-    id: '4',
-    timestamp: new Date(Date.now() - 2 * 60000),
-    type: 'success',
-    message: 'Liquidity position adjusted',
-    details: 'Rebalanced position in TKA/TKB pool'
-  },
-  {
-    id: '5',
-    timestamp: new Date(Date.now() - 1 * 60000),
-    type: 'action',
-    message: 'Monitoring price movements',
-    details: 'TKA: +0.3%, TKB: -0.1% (last 5 minutes)'
-  }
-];
 
 // Risk level mapping
 const riskLevels = [
@@ -73,16 +25,177 @@ const tradingStrategies = {
   'swap': 'SWAP'
 };
 
+// Mock activities for testing panel scrolling and layout
+const testActivities = [
+  {
+    id: '1',
+    message: 'Agent initialized with SWAP strategy',
+    timestamp: '10:15:20',
+    icon: 'ℹ️',
+    iconColor: 'text-blue-400',
+    details: 'Initialization complete with risk level 3 (Moderate)'
+  },
+  {
+    id: '2',
+    message: 'Connected to price feed',
+    timestamp: '10:15:25',
+    icon: '✅',
+    iconColor: 'text-green-400'
+  },
+  {
+    id: '3',
+    message: 'Analyzing market conditions',
+    timestamp: '10:15:30',
+    icon: '⚡',
+    iconColor: 'text-violet-400',
+    details: 'Scanning liquidity pools and price trends'
+  },
+  {
+    id: '4',
+    message: 'Market volatility detected',
+    timestamp: '10:15:45',
+    icon: '⚠️',
+    iconColor: 'text-yellow-400',
+    details: 'Current volatility index: 0.72'
+  },
+  {
+    id: '5',
+    message: 'Swap transaction prepared',
+    timestamp: '10:16:00',
+    icon: '⚡',
+    iconColor: 'text-violet-400',
+    details: 'Preparing to swap 5 TKA for TKB'
+  },
+  {
+    id: '6',
+    message: 'Slippage calculation completed',
+    timestamp: '10:16:05',
+    icon: '✅',
+    iconColor: 'text-green-400',
+    details: 'Expected slippage: 0.15%'
+  },
+  {
+    id: '7',
+    message: 'Swap transaction submitted',
+    timestamp: '10:16:10',
+    icon: '⚡',
+    iconColor: 'text-violet-400',
+    details: 'Transaction hash: 0x8a7fe85c...3d2b'
+  },
+  {
+    id: '8',
+    message: 'Transaction pending',
+    timestamp: '10:16:15',
+    icon: '⚡',
+    iconColor: 'text-violet-400'
+  },
+  {
+    id: '9',
+    message: 'Transaction completed',
+    timestamp: '10:16:30',
+    icon: '✅',
+    iconColor: 'text-green-400',
+    details: 'Received 25.032 TKB for 5 TKA'
+  },
+  {
+    id: '10',
+    message: 'Updated portfolio balance',
+    timestamp: '10:16:35',
+    icon: 'ℹ️',
+    iconColor: 'text-blue-400',
+    details: 'New balances: 15 TKA, 55.032 TKB'
+  },
+  {
+    id: '11',
+    message: 'Monitoring price movements',
+    timestamp: '10:17:00',
+    icon: '⚡',
+    iconColor: 'text-violet-400',
+    details: 'TKA: +0.3%, TKB: -0.1% (last 5 minutes)'
+  },
+  {
+    id: '12',
+    message: 'Price alert triggered',
+    timestamp: '10:20:15',
+    icon: '⚠️',
+    iconColor: 'text-yellow-400',
+    details: 'TKB price dropped by 1.2% in the last 3 minutes'
+  },
+  {
+    id: '13',
+    message: 'Swap opportunity identified',
+    timestamp: '10:21:00',
+    icon: '✅',
+    iconColor: 'text-green-400',
+    details: 'Favorable conditions to swap TKB back to TKA'
+  },
+  {
+    id: '14',
+    message: 'Preparing reverse swap',
+    timestamp: '10:21:10',
+    icon: '⚡',
+    iconColor: 'text-violet-400',
+    details: 'Planning to swap 20 TKB for TKA'
+  },
+  {
+    id: '15',
+    message: 'Swap transaction submitted',
+    timestamp: '10:21:20',
+    icon: '⚡',
+    iconColor: 'text-violet-400',
+    details: 'Transaction hash: 0x7b6fe92d...4e3c'
+  },
+  {
+    id: '16',
+    message: 'Transaction failed',
+    timestamp: '10:21:30',
+    icon: '❌',
+    iconColor: 'text-red-400',
+    details: 'Error: Insufficient gas provided'
+  },
+  {
+    id: '17',
+    message: 'Retrying with higher gas',
+    timestamp: '10:21:40',
+    icon: '⚡',
+    iconColor: 'text-violet-400',
+    details: 'Increasing gas limit by 20%'
+  },
+  {
+    id: '18',
+    message: 'Transaction submitted',
+    timestamp: '10:21:45',
+    icon: '⚡',
+    iconColor: 'text-violet-400',
+    details: 'Transaction hash: 0x9c5de23f...8a7b'
+  },
+  {
+    id: '19',
+    message: 'Transaction completed',
+    timestamp: '10:22:00',
+    icon: '✅',
+    iconColor: 'text-green-400',
+    details: 'Received 4.05 TKA for 20 TKB'
+  },
+  {
+    id: '20',
+    message: 'Updated portfolio balance',
+    timestamp: '10:22:05',
+    icon: 'ℹ️',
+    iconColor: 'text-blue-400',
+    details: 'New balances: 19.05 TKA, 35.032 TKB'
+  }
+];
+
 export default function AITradingView() {
-  const [activities, setActivities] = useState<AgentActivity[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<'all' | 'info' | 'actions' | 'warnings'>('all');
+  const [activities, setActivities] = useState(testActivities);
+  const [isLoading, setIsLoading] = useState(false);
   const [agentStats, setAgentStats] = useState({
-    tokenAAllocation: '0',
-    tokenBAllocation: '0',
-    riskLevel: 'Not set',
-    strategy: 'Not set',
-    status: 'Inactive'
+    tokenAAllocation: '19.05',
+    tokenBAllocation: '35.032',
+    riskLevel: 'Moderate (3)',
+    strategy: 'SWAP',
+    status: 'Active'
   });
 
   // Load agent configuration from localStorage
@@ -126,70 +239,16 @@ export default function AITradingView() {
             strategy: strategyName,
             status
           });
-          
-          // Update the first activity message to reflect the actual risk level
-          if (activities.length > 0 && riskLevelInfo) {
-            const updatedActivities = [...activities];
-            updatedActivities[0] = {
-              ...updatedActivities[0],
-              message: `Agent initialized with risk level ${config.riskLevel}`,
-              details: `Trading strategy: ${strategyName}`
-            };
-            setActivities(updatedActivities);
-          }
         }
       } catch (error) {
         console.error('Error loading configuration from localStorage:', error);
       }
     };
 
-    // Load mock activities
-    const timer = setTimeout(() => {
-      setActivities(mockActivities);
-      setIsLoading(false);
-      
-      // Load agent configuration after activities are loaded
-      loadAgentConfig();
-    }, 800);
-    
-    return () => clearTimeout(timer);
+    // Usiamo i dati di test invece di caricare dalla localStorage
+    // loadAgentConfig();
+    setIsLoading(false);
   }, []);
-
-  // Filter activities based on active tab
-  const filteredActivities = activities.filter(activity => {
-    if (activeTab === 'all') return true;
-    if (activeTab === 'info') return activity.type === 'info';
-    if (activeTab === 'actions') return activity.type === 'action' || activity.type === 'success';
-    if (activeTab === 'warnings') return activity.type === 'warning' || activity.type === 'error';
-    return true;
-  });
-
-  // Helper function to format time
-  const formatTime = (date: Date) => {
-    return date.toLocaleTimeString('it-IT', { 
-      hour: '2-digit', 
-      minute: '2-digit',
-      second: '2-digit'
-    });
-  };
-
-  // Return appropriate emoji for activity type
-  const getActivityIcon = (type: string) => {
-    switch (type) {
-      case 'info':
-        return <span className="text-blue-400">ℹ️</span>;
-      case 'action':
-        return <span className="text-violet-400">⚡</span>;
-      case 'warning':
-        return <span className="text-yellow-400">⚠️</span>;
-      case 'success':
-        return <span className="text-green-400">✅</span>;
-      case 'error':
-        return <span className="text-red-400">❌</span>;
-      default:
-        return <span className="text-gray-400">🔹</span>;
-    }
-  };
 
   return (
     <div className="p-6">
@@ -253,50 +312,11 @@ export default function AITradingView() {
         {/* Agent Activities */}
         <div className="lg:col-span-2 bg-gray-800 rounded-xl border border-violet-600/30 shadow-lg overflow-hidden flex flex-col">
           <div className="bg-gradient-to-r from-violet-900/30 to-gray-800 border-b border-violet-600/20">
-            <div className="flex items-center justify-between p-4">
+            <div className="p-4">
               <h3 className="font-semibold text-lg flex items-center">
                 <span className="bg-violet-600 w-2 h-6 rounded mr-2"></span>
                 Agent Activity Log
               </h3>
-              <button className="bg-gray-700 hover:bg-gray-600 text-xs rounded-lg px-3 py-1.5 transition-colors">
-                Clear Log
-              </button>
-            </div>
-            
-            {/* Tabs */}
-            <div className="flex border-t border-gray-700">
-              <button
-                onClick={() => setActiveTab('all')}
-                className={`px-4 py-2 text-sm font-medium transition-colors ${
-                  activeTab === 'all' ? 'text-violet-400 border-b-2 border-violet-500' : 'text-gray-400 hover:text-white'
-                }`}
-              >
-                All
-              </button>
-              <button
-                onClick={() => setActiveTab('info')}
-                className={`px-4 py-2 text-sm font-medium transition-colors ${
-                  activeTab === 'info' ? 'text-violet-400 border-b-2 border-violet-500' : 'text-gray-400 hover:text-white'
-                }`}
-              >
-                Info
-              </button>
-              <button
-                onClick={() => setActiveTab('actions')}
-                className={`px-4 py-2 text-sm font-medium transition-colors ${
-                  activeTab === 'actions' ? 'text-violet-400 border-b-2 border-violet-500' : 'text-gray-400 hover:text-white'
-                }`}
-              >
-                Actions
-              </button>
-              <button
-                onClick={() => setActiveTab('warnings')}
-                className={`px-4 py-2 text-sm font-medium transition-colors ${
-                  activeTab === 'warnings' ? 'text-violet-400 border-b-2 border-violet-500' : 'text-gray-400 hover:text-white'
-                }`}
-              >
-                Warnings
-              </button>
             </div>
           </div>
           
@@ -316,13 +336,13 @@ export default function AITradingView() {
                   </div>
                 ))}
               </div>
-            ) : filteredActivities.length > 0 ? (
+            ) : activities.length > 0 ? (
               <div className="space-y-4">
-                {filteredActivities.map((activity) => (
+                {activities.map((activity) => (
                   <div key={activity.id} className="border-b border-gray-700 pb-4 last:border-b-0">
                     <div className="flex items-start">
-                      <div className="mr-3 mt-0.5 flex-shrink-0 text-lg">
-                        {getActivityIcon(activity.type)}
+                      <div className={`mr-3 mt-0.5 flex-shrink-0 text-lg ${activity.iconColor}`}>
+                        {activity.icon}
                       </div>
                       <div className="flex-1">
                         <p className="font-medium text-white">{activity.message}</p>
@@ -330,7 +350,7 @@ export default function AITradingView() {
                           <p className="text-sm text-gray-400 mt-1">{activity.details}</p>
                         )}
                       </div>
-                      <span className="text-xs text-gray-500 ml-2">{formatTime(activity.timestamp)}</span>
+                      <span className="text-xs text-gray-500 ml-2">{activity.timestamp}</span>
                     </div>
                   </div>
                 ))}
@@ -338,13 +358,8 @@ export default function AITradingView() {
             ) : (
               <div className="flex flex-col items-center justify-center h-full text-gray-500 py-12">
                 <div className="text-4xl mb-3 opacity-30">🔍</div>
-                <p>No activities found for the selected filter</p>
-                <button 
-                  onClick={() => setActiveTab('all')}
-                  className="mt-3 text-sm text-violet-400 hover:underline"
-                >
-                  View all activities
-                </button>
+                <p>No activities found</p>
+                <p className="text-sm mt-1">Activities will appear here when the agent starts working</p>
               </div>
             )}
           </div>
