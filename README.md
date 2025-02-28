@@ -10,14 +10,18 @@ The following smart contracts have been deployed on ABC Testnet.
 
 - **💰 TokenA & TokenB**: Mock tokens for single pool creation.
 - **📈 Gorillix**: Lightweight AMM equipped with swap and deposit functions. The TokenA/TokenB pool is stored within the DEX and LP tokens (GOR-LP) are emitted to reward Liquidity Providers.
+- **🔐 Escrow**: The place where the user can safely store the tokens that will be used by the AI Agent to trade on Gorillix.
+- **🚰 Faucet**: Faucet contract that allows every user to get 10 TokenA and 10 TokenB.
 
-Gorillix is compatible with Gelato Relay via the ERC2771Context contract, allowing for gasless transactions.
+Gorillix, Escrow, and Faucet are now compatible with Gelato Relay via the ERC2771Context contract, allowing for gasless transactions.
 
 **Contract addresses:**
-- **TokenA**: 0xAaAaAAaAaaAAaAaAAaAaAaaAaAaaAAaAAaAaAaA;
-- **TokenB**: 0xBbBBbBbbBBbBBbBbBbBbbBbbBBbBbBBbBBbBbBb;
-- **Gorillix**: 0xGgGGgGggGGgGGgGgGgGgGggGGgGGgGGgGGgGGg;
-- **Trusted Forwarder (Gelato Relay)**: 0xTtTTtTttTTtTTtTtTtTtTttTTtTTtTTtTTtTTt;
+- **TokenA**: 0x9455bd9d1dd4a7e66e34ffc2e5de83caa92092ae
+- **TokenB**: 0x1d96f7338ae4edfc835bd3d19297666c1e80b170
+- **Gorillix**: 0x80e93b9420746ac25c420c3a7cc29b46bec34d26
+- **Escrow**: 0xcd8aca3fba1192607a87fec234fd13ed439ff36c
+- **Faucet**: 0xce02e799a74ae683fceceaada62497e82ed7cb4a
+- **Trusted Forwarder (Gelato Relay)**: 0x61F2976610970AFeDc1d83229e1E21bdc3D5cbE4
 
 ## 💫 Trading Modes
 
