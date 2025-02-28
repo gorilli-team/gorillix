@@ -6,7 +6,7 @@ import { Faucet } from "../src/Faucet.sol";
 
 contract DeployFaucet is Script {
     uint256 public constant FAUCET_AMOUNT = 10000000000000000000;
-    address public constant TRUSTED_FORWARDER = 0x61F2976610970AFeDc1d83229e1E21bdc3D5cbE4;
+    address public constant TRUSTED_FORWARDER = 0xd8253782c45a12053594b9deB72d8e8aB2Fca54c;
 
     address public tokenA;
     address public tokenB;
