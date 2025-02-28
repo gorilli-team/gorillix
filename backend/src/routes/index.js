@@ -22,5 +22,6 @@ router.get('/api/agent/risk-levels', agentConfigController.getRiskLevels);
 router.get('/api/agent/trading-strategies', agentConfigController.getTradingStrategies);
 router.post('/api/agent/config', agentConfigController.createOrUpdateAgentConfig);
 router.get('/api/agent/config/:walletAddress', agentConfigController.getAgentConfigByWallet);
+router.get('/api/agent/configs', agentConfigController.getAllAgentConfigs);
 
 export default router;

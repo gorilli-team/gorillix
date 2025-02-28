@@ -122,3 +122,33 @@ export const getAgentConfigByWallet = async (req, res) => {
     res.status(500).json({ success: false, message: 'Server error' });
   }
 };
+
+// Get all agent configurations
+export const getAllAgentConfigs = async (req, res) => {
+    try {
+      const query = {};
+      
+      if (req.query.isActive !== undefined) {
+        query.isActive = req.query.isActive === 'true';
+      }
+
+      if (req.query.tradingStrategy) {
+        query.tradingStrategy = req.query.tradingStrategy;
+      }
+      
+      if (req.query.riskLevel) {
+        query.riskLevel = req.query.riskLevel;
+      }
+  
+      const configs = await AgentConfig.find(query).sort({ createdAt: -1 });
+      
+      res.json({ 
+        success: true, 
+        count: configs.length,
+        data: configs 
+      });
+    } catch (error) {
+      console.error('Error retrieving agent configurations:', error);
+      res.status(500).json({ success: false, message: 'Server error' });
+    }
+  };
