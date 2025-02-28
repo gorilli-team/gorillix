@@ -41,6 +41,18 @@ export class GorillionaireTradeClient {
 
                     console.log("\x1b[38;5;214m", responseData.data, "\x1b[0m");
 
+                    const agentKitCall = await fetch(
+                        "http://localhost:3001/api/agent/call",
+                        {
+                            method: "POST",
+                            body: JSON.stringify(responseData.data),
+                        }
+                    );
+
+                    const agentKitCallData = await agentKitCall.json();
+
+                    console.log("\x1b[38;5;214m", agentKitCallData, "\x1b[0m");
+
                     await new Promise((resolve) =>
                         setTimeout(resolve, 60 * 1000)
                     );
