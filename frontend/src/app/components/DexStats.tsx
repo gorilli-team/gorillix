@@ -61,7 +61,7 @@ const tradeHistory: TradeHistoryItem[] = [
 export default function DexStats() {
   const getAuthorBadgeStyle = (author: 'Agent AI' | 'User'): string => {
     if (author === 'Agent AI') {
-      return 'bg-purple-100 text-purple-800';
+      return 'bg-violet-100 text-violet-800';
     }
     return 'bg-gray-100 text-gray-800';
   };
@@ -76,7 +76,7 @@ export default function DexStats() {
   return (
     <div className="p-4 max-w-7xl mx-auto">
       <div className="mb-4">
-        <h2 className="text-2xl font-bold mb-2">Dex Statistic</h2>
+        <h2 className="text-2xl font-bold mb-2">Dex Stats</h2>
         <p className="text-gray-300">Real-time pool and trading metrics</p>
       </div>
 

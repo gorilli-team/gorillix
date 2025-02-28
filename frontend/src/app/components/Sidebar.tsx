@@ -35,16 +35,15 @@ export default function Sidebar({
 
   if (!mounted) {
     return (
-      <aside className="w-64 bg-gray-800 flex text-white flex-col border border-gray-300">
+      <aside className="w-64 bg-gray-800 flex text-white flex-col border-r border-gray-600">
         <div className="h-16 text-xl font-bold flex items-center ps-4">
           <Image 
             className="w-12 h-12 rounded-full" 
-            src="/avatar_3.png" 
+            src="/logo.png" 
             alt="logo-gorillix" 
             width={48}
             height={48}
           />
-          <span className="ps-2">Gorillix</span>
         </div>
         <nav className="flex-1 p-4">
           <ul className="space-y-2">
@@ -56,14 +55,20 @@ export default function Sidebar({
             </li>
             <li>
               <button className="w-full text-left px-3 py-2 rounded-lg hover:bg-gray-700">
-                <i className="fa-solid fa-shield pr-2"></i>
+                <i className="fa-solid fa-brain pr-2"></i>
                 <span>AI AGENT</span>
               </button>
             </li>
             <li>
               <button className="w-full text-left px-3 py-2 rounded-lg hover:bg-gray-700">
-                <i className="fa-solid fa-shield pr-2"></i>
+                <i className="fa-solid fa-chart-simple pr-2"></i>
                 <span>STATS</span>
+              </button>
+            </li>
+            <li>
+              <button className="w-full text-left px-3 py-2 rounded-lg hover:bg-gray-700">
+                <i className="fa-solid fa-faucet pr-2"></i>
+                <span>FAUCET</span>
               </button>
             </li>
           </ul>
@@ -73,19 +78,17 @@ export default function Sidebar({
   }
 
   return (
-    <aside className="w-64 bg-gray-800 border-r border-purple-600 flex text-white flex-col">
+    <aside className="w-64 bg-gray-800 border-r border-gray-600 flex text-white flex-col">
       <div
-        className="h-16 text-xl font-bold flex items-center ps-4 cursor-pointer"
+        className="h-16 text-xl font-bold flex items-center ps-6 cursor-pointer"
         onClick={handleGorillixClick}
       >
         <Image 
-          className="w-12 h-12 rounded-full" 
-          src="/avatar_3.png" 
+          src="/logo.png" 
           alt="logo-gorillix" 
-          width={48}
-          height={48}
+          width={100}
+          height={100}
         />
-        <span className="ps-2">Gorillix</span>
       </div>
       <nav className="flex-1 p-4">
         <ul className="space-y-2">
@@ -107,7 +110,7 @@ export default function Sidebar({
               }`}
               onClick={() => handlePageChange("AI Agent")}
             >
-              <i className="fa-solid fa-shield pr-2"></i>
+              <i className="fa-solid fa-brain pr-2"></i>
               <span>AI AGENT</span>
             </button>
           </li>
@@ -118,8 +121,19 @@ export default function Sidebar({
               }`}
               onClick={() => handlePageChange("Stats")}
             >
-              <i className="fa-solid fa-shield pr-2"></i>
+              <i className="fa-solid fa-chart-simple pr-2"></i>
               <span>STATS</span>
+            </button>
+          </li>
+          <li>
+            <button
+              className={`w-full text-left px-3 py-2 rounded-lg hover:bg-gray-700 ${
+                selectedPage === "Faucet" ? "bg-gray-700" : ""
+              }`}
+              onClick={() => handlePageChange("Faucet")}
+            >
+              <i className="fa-solid fa-faucet pr-2"></i>
+              <span>FAUCET</span>
             </button>
           </li>
         </ul>

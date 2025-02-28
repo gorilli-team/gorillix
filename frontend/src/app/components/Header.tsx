@@ -6,10 +6,7 @@ export default function Header() {
   const { isConnected } = useAccount();
 
   return (
-    <header className="h-16 px-6 flex items-center justify-between bg-gray-800 border-b border-purple-600">  
-      <div className="flex-1 flex justify-start">
-        {isConnected && <BalancePanel />}
-      </div>
+    <header className="h-16 px-6 flex items-center justify-end bg-gray-800 border-b border-gray-600">  
       <div className="flex items-center">
         <ConnectButton.Custom>
           {({
@@ -26,7 +23,7 @@ export default function Header() {
                 <button
                   type="button"
                   onClick={connected ? openAccountModal : openConnectModal}
-                  className="px-6 py-2 rounded-lg font-medium transition-colors bg-purple-600 text-white hover:bg-purple-700"
+                  className="px-6 py-2 rounded-lg font-medium transition-colors bg-violet-600 text-white hover:bg-violet-700"
                 >
                   {connected ? (
                     <span className="flex items-center gap-2">

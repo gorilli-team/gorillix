@@ -17,9 +17,9 @@ export interface PoolItemProps {
 export default function PoolItem({ 
     tokenPair, 
     poolNumber, 
-    fee, 
-    volume24h, 
-    liquidity, 
+    fee,
+    volume24h,
+    liquidity,
     apr,
     token1Image,
     token2Image 
@@ -27,64 +27,88 @@ export default function PoolItem({
     const [showDepositModal, setShowDepositModal] = useState(false);
     const [showWithdrawModal, setShowWithdrawModal] = useState(false);
 
+    // Split the APR into min and max values if it contains a range
+    const renderApr = () => {
+        if (apr.includes('-')) {
+            const [min, max] = apr.split('-').map(val => val.trim());
+            return (
+                <div className="font-semibold text-white text-xl">
+                    <span className="text-green-400">{min}</span>
+                    <span className="text-gray-400"> - </span>
+                    <span className="text-green-400">{max}</span>
+                </div>
+            );
+        }
+        return <div className="font-semibold text-green-400 text-xl">{apr}</div>;
+    };
+
     return (
         <>
-            <div className="bg-gray-800 rounded-xl p-5 shadow-lg">
-                <div className="flex items-center justify-between flex-wrap gap-4">
-                    <div className="flex items-center space-x-4">
-                        <div className="flex -space-x-3">
-                            <div className="relative w-10 h-10 z-10">
-                                <Image 
-                                    src={token1Image} 
-                                    alt="Token 1" 
-                                    fill
-                                    className="rounded-full border-2 border-gray-700 shadow-md object-cover"
-                                />
+            <div className="bg-gray-800/80 rounded-xl p-6 shadow-lg border border-gray-700/50">
+                <div className="flex flex-col space-y-6">
+                    {/* Top row with token info */}
+                    <div className="flex items-center justify-between">
+                        <div className="flex items-center space-x-3">
+                            <div className="flex -space-x-2">
+                                <div className="relative w-8 h-8 z-10">
+                                    <Image 
+                                        src={token1Image} 
+                                        alt="Token 1" 
+                                        width={32}
+                                        height={32}
+                                        className="rounded-full border border-gray-700 shadow-md object-cover"
+                                    />
+                                </div>
+                                <div className="relative w-8 h-8">
+                                    <Image 
+                                        src={token2Image} 
+                                        alt="Token 2" 
+                                        width={32}
+                                        height={32}
+                                        className="rounded-full border border-gray-700 shadow-md object-cover"
+                                    />
+                                </div>
                             </div>
-                            <div className="relative w-10 h-10">
-                                <Image 
-                                    src={token2Image} 
-                                    alt="Token 2" 
-                                    fill
-                                    className="rounded-full border-2 border-gray-700 shadow-md object-cover"
-                                />
-                            </div>
-                        </div>
-                        <div>
-                            <div className="font-bold text-lg text-white">{tokenPair}</div>
-                            <div className="text-sm text-gray-400 flex items-center">
-                                <span className="bg-blue-500/20 text-blue-300 px-2 py-0.5 rounded-full mr-2">Pool #{poolNumber}</span>
-                                <span className="text-gray-500">{fee}</span>
+                            <div>
+                                <div className="font-bold text-white text-lg">{tokenPair}</div>
+                                <div className="text-xs text-gray-400 flex items-center">
+                                    <span className="bg-blue-900/30 text-blue-300 text-xs px-2 py-0.5 rounded-full">Pool #{poolNumber}</span>
+                                    <span className="ml-2 text-gray-500">{fee}</span>
+                                </div>
                             </div>
                         </div>
                     </div>
-                    <div className="flex items-center space-x-8">
-                        <div className="text-right">
-                            <div className="font-semibold text-white">{volume24h}</div>
-                            <div className="text-xs text-gray-400 uppercase tracking-wider">Volume (24H)</div>
+
+                    {/* Stats section */}
+                    <div className="grid grid-cols-3 gap-4">
+                        <div>
+                            <div className="font-semibold text-white text-xl">{volume24h}</div>
+                            <div className="text-xs text-gray-400 uppercase tracking-wider">VOLUME (24H)</div>
                         </div>
-                        <div className="text-right">
-                            <div className="font-semibold text-white">{liquidity}</div>
-                            <div className="text-xs text-gray-400 uppercase tracking-wider">Liquidity</div>
+                        <div>
+                            <div className="font-semibold text-white text-xl">{liquidity}</div>
+                            <div className="text-xs text-gray-400 uppercase tracking-wider">LIQUIDITY</div>
                         </div>
-                        <div className="text-right">
-                            <div className="font-semibold text-green-400">{apr}</div>
+                        <div>
+                            {renderApr()}
                             <div className="text-xs text-gray-400 uppercase tracking-wider">APR</div>
                         </div>
-                        <div className="flex space-x-2">
-                            <button 
-                                onClick={() => setShowDepositModal(true)}
-                                className="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg transition-colors"
-                            >
-                                Deposit
-                            </button>
-                            <button 
-                                onClick={() => setShowWithdrawModal(true)}
-                                className="px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded-lg transition-colors"
-                            >
-                                Withdraw
-                            </button>
-                        </div>
+                    </div>
+
+                    {/* Action buttons */}
+                    <div className="grid grid-cols-2 gap-3">
+                        <button 
+                            onClick={() => setShowWithdrawModal(true)}
+                            className="py-2.5 bg-gray-700 hover:bg-gray-600 text-white text-sm font-medium rounded-lg transition-colors border border-gray-600/50"
+                        >
+                            Withdraw
+                        </button>
+                        <button 
+                            onClick={() => setShowDepositModal(true)}
+                            className="py-2.5 bg-violet-600 hover:bg-violet-500 text-white text-sm font-medium rounded-lg transition-colors"
+                        >
+                            Deposit
+                        </button>
                     </div>
                 </div>
             </div>
