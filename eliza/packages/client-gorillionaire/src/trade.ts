@@ -32,31 +32,17 @@ export class GorillionaireTradeClient {
                         "ELIZA => Executing agent strategy"
                     );
 
-                    // console.log(
-                    //     "\x1b[34m%s\x1b[0m",
-                    //     "ALL PLUGINS:",
-                    //     this.runtime.plugins.map((p) => p.name)
-                    // );
-
-                    const agentkit = await this.runtime.plugins.find(
-                        (plugin) => plugin.name === "[AgentKit] Integration"
+                    //fetch from api
+                    const response = await fetch(
+                        "http://localhost:5001/api/agent/configs"
                     );
 
-                    if (!agentkit) {
-                        throw new Error("Agentkit plugin not found");
-                    }
+                    const responseData = await response.json();
 
-                    const getAllActions = agentkit.actions;
+                    console.log("\x1b[38;5;214m", responseData.data, "\x1b[0m");
 
-                    console.log(
-                        "\x1b[36m%s\x1b[0m",
-                        "ELIZA => Actions:",
-                        getAllActions.map((action) => action.name)
-                    );
-
-                    // Wait for 1 hour before next execution
                     await new Promise((resolve) =>
-                        setTimeout(resolve, 10 * 1000)
+                        setTimeout(resolve, 60 * 1000)
                     );
                 } catch (error) {
                     console.error("Error in action processing loop:", error);
