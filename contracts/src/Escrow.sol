@@ -3,8 +3,10 @@ pragma solidity ^0.8.20;
 
 import { IERC20 } from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import { Ownable } from "@openzeppelin/contracts/access/Ownable.sol";
+import { ERC2771Context } from "@gelatonetwork/relay-context/contracts/vendor/ERC2771Context.sol";
+import { Context } from "@openzeppelin/contracts/utils/Context.sol";
 
-contract Escrow is Ownable {
+contract Escrow is Ownable, ERC2771Context {
 
     ////////////////////////////////////////////////
     //////////////// CUSTOM ERRORS /////////////////
@@ -39,7 +41,7 @@ contract Escrow is Ownable {
         if (s_aiAgent == address(0)) {
             revert Escrow__AIAgentNotSet();
         }
-        if (msg.sender != s_aiAgent) {
+        if (_msgSender() != s_aiAgent) {
             revert Escrow__OnlyAIAgent();
         }
         _;
@@ -56,7 +58,7 @@ contract Escrow is Ownable {
     //////////////// CONSTRUCTOR ////////////////////
     /////////////////////////////////////////////////
 
-    constructor(address _tokenA, address _tokenB) Ownable(msg.sender) {
+    constructor(address _tokenA, address _tokenB, address trustedForwarder) Ownable(_msgSender()) ERC2771Context(trustedForwarder) {
         i_tokenA = IERC20(_tokenA);
         i_tokenB = IERC20(_tokenB);
     }
@@ -68,23 +70,34 @@ contract Escrow is Ownable {
 
     function deposit(address _token, uint256 _amount) public onlyOwner onlyAllowedTokens(_token) {
         IERC20 token = IERC20(_token);
-        token.transferFrom(msg.sender, address(this), _amount);
-        emit Deposit(msg.sender, _amount);
+        token.transferFrom(_msgSender(), address(this), _amount);
+        emit Deposit(_msgSender(), _amount);
     }
 
     function withdrawAIAgent(address _token, uint256 _amount) public onlyAIAgent onlyAllowedTokens(_token) {
         IERC20 token = IERC20(_token);
-        token.transfer(msg.sender, _amount);
-        emit WithdrawAIAgent(msg.sender, _amount);
+        token.transfer(_msgSender(), _amount);
+        emit WithdrawAIAgent(_msgSender(), _amount);
     }
 
     function withdrawOwner(address _token, uint256 _amount) public onlyOwner {
         IERC20 token = IERC20(_token);
-        token.transfer(msg.sender, _amount);
-        emit WithdrawOwner(msg.sender, _amount);
+        token.transfer(_msgSender(), _amount);
+        emit WithdrawOwner(_msgSender(), _amount);
     }
 
     function setAIAgent(address _aiAgent) public onlyOwner {
         s_aiAgent = _aiAgent;
+    }
+
+    ///////////////////////////////////////////////
+    ///////////// INTERNAL FUNCTIONS //////////////
+    ///////////////////////////////////////////////
+    function _msgSender() internal view override(ERC2771Context, Context) returns(address sender) {
+        return ERC2771Context._msgSender();
+    }
+
+    function _msgData() internal view override(ERC2771Context, Context) returns(bytes calldata) {
+        return ERC2771Context._msgData();
     }
 }

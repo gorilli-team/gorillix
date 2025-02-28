@@ -12,9 +12,6 @@ contract Faucet is Ownable, ERC2771Context {
     //////////////// CUSTOM ERRORS /////////////////
     ////////////////////////////////////////////////
 
-    // info if tokens in faucet finish
-    // the deployer could transfer some other tokens
-    // they have been minted 1 million tokenA and tokenB at deploy
     error Faucet__InsufficientBalance();
 
     ////////////////////////////////////////////////
@@ -37,7 +34,7 @@ contract Faucet is Ownable, ERC2771Context {
     //////////////// CONSTRUCTOR ////////////////////
     /////////////////////////////////////////////////
 
-    constructor(address _tokenA, address _tokenB, uint256 _faucetAmount, address trustedForwarder) Ownable(msg.sender) ERC2771Context(trustedForwarder) {
+    constructor(address _tokenA, address _tokenB, uint256 _faucetAmount, address trustedForwarder) Ownable(_msgSender()) ERC2771Context(trustedForwarder) {
         i_tokenA = IERC20(_tokenA);
         i_tokenB = IERC20(_tokenB);
 
@@ -49,7 +46,7 @@ contract Faucet is Ownable, ERC2771Context {
     /////////////////////////////////////////////////
 
     /**
-     * @dev the faucet will transfer the same amount of TokenA and TokenB to msg.sender
+     * @dev the faucet will transfer the same amount of TokenA and TokenB to _msgSender()
      */
     function requestFaucet() external {
         uint256 faucetTokenAAmount = i_tokenA.balanceOf(address(this));
@@ -58,11 +55,10 @@ contract Faucet is Ownable, ERC2771Context {
             revert Faucet__InsufficientBalance();
         }
 
-        // q is it better to use safeTransferFrom?
-        i_tokenA.transfer(msg.sender, s_faucetAmount);
-        i_tokenB.transfer(msg.sender, s_faucetAmount);
+        i_tokenA.transfer(_msgSender(), s_faucetAmount);
+        i_tokenB.transfer(_msgSender(), s_faucetAmount);
 
-        emit RequestFaucet(msg.sender, s_faucetAmount, s_faucetAmount);
+        emit RequestFaucet(_msgSender(), s_faucetAmount, s_faucetAmount);
     }
 
     function setFaucetAmount(uint256 _newFaucetAmount) external onlyOwner {
