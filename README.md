@@ -11,7 +11,7 @@ Gorillix is an innovative decentralized exchange (DEX) that offers flexible trad
 #### Frontend
 ```
 # Clone the repository
-git clone https://github.com/yourusername/gorillix-frontend.git
+git clone https://github.com/gorilli-team/gorillix/tree/main/frontend
 cd gorillix-frontend
 
 # Install dependencies
@@ -28,7 +28,7 @@ npm run dev
 #### Backend
 ```
 # Clone the repository
-git clone https://github.com/yourusername/gorillix-backend.git
+git clone https://github.com/gorilli-team/gorillix/tree/main/backend
 cd gorillix-backend
 
 # Install dependencies
@@ -42,22 +42,6 @@ cp .env.example .env
 npm run dev
 ```
 
-### Environment Variables
-
-#### Frontend (.env.local example)
-```
-NEXT_PUBLIC_BACKEND_URL=http://localhost:5001
-NEXT_PUBLIC_CHAIN_ID=112
-NEXT_PUBLIC_GELATO_API_KEY=your-gelato-api-key
-```
-
-#### Backend (.env example)
-```
-PORT=3001
-MONGODB_URI=mongodb://localhost:27017/gorillix
-JWT_SECRET=your-secret-key
-OPENAI_API_KEY=your-openai-api-key
-```
 
 ## Smart Contracts
 
