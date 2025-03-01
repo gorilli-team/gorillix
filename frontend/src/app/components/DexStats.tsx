@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
 type ChartDataPoint = {
   time: string;
@@ -18,22 +17,51 @@ type SimplifiedTransaction = {
   toName?: string;
 };
 
+type Token = {
+  address: string;
+  decimals: string;
+  holders: string;
+  name: string;
+  symbol: string;
+  total_supply: string;
+  type: string;
+  icon_url: string | null;
+};
+
+type TokenItem = {
+  token: Token;
+  value: string;
+  token_id: string | null;
+  token_instance: any | null;
+};
+
+type TokenData = {
+  items: TokenItem[];
+};
+
 export default function DexStats() {
   const [transactions, setTransactions] = useState<SimplifiedTransaction[]>([]);
   const [chartData, setChartData] = useState<ChartDataPoint[]>([]);
+  const [tokenData, setTokenData] = useState<TokenData | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchTransactions = async () => {
+    const fetchData = async () => {
       try {
-        const response = await fetch('https://explorer.abc.t.raas.gelato.cloud/api/v2/addresses/0x14a678f6F5f5F897692a9dB3dEe8E2D3c656C483/transactions');
-        const data = await response.json();
-        console.log('Dati delle transazioni ricevuti:', data);
+        // Fetch transactions
+        const txResponse = await fetch('https://explorer.abc.t.raas.gelato.cloud/api/v2/addresses/0x14a678f6F5f5F897692a9dB3dEe8E2D3c656C483/transactions');
+        const txData = await txResponse.json();
+        console.log('Transaction data received:', txData);
         
-        if (data && data.items && Array.isArray(data.items)) {
-          // Semplifica i dati delle transazioni
-          // Filtra le transazioni per escludere quelle con metodo sconosciuto
-          const simplifiedTxs = data.items
+        // Fetch token data
+        const tokenResponse = await fetch('https://explorer.abc.t.raas.gelato.cloud/api/v2/addresses/0x14a678f6F5f5F897692a9dB3dEe8E2D3c656C483/tokens?type=ERC-20');
+        const tokenData = await tokenResponse.json();
+        console.log('Token data received:', tokenData);
+        
+        setTokenData(tokenData);
+        
+        if (txData && txData.items && Array.isArray(txData.items)) {
+          const simplifiedTxs = txData.items
             .filter((tx: any) => tx.method && tx.method !== 'Unknown')
             .map((tx: any) => ({
               hash: tx.hash,
@@ -46,24 +74,24 @@ export default function DexStats() {
           
           setTransactions(simplifiedTxs);
           
-          // Genera dati del grafico basati sulle transazioni
+          // Generate chart data based on transactions
           const newChartData = generateChartData(simplifiedTxs);
           setChartData(newChartData);
         }
         
         setLoading(false);
       } catch (error) {
-        console.error('Errore durante il recupero delle transazioni:', error);
+        console.error('Error fetching data:', error);
         setLoading(false);
       }
     };
 
-    fetchTransactions();
+    fetchData();
   }, []);
 
-  // Funzione per generare dati di grafico dalle transazioni
+  // Function to generate chart data from transactions
   const generateChartData = (txs: SimplifiedTransaction[]): ChartDataPoint[] => {
-    // Raggruppa le transazioni per giorno
+    // Group transactions by day
     const groupedByDay = txs.reduce((acc, tx) => {
       const date = new Date(tx.timestamp);
       const day = date.toISOString().split('T')[0];
@@ -76,11 +104,10 @@ export default function DexStats() {
       return acc;
     }, {} as Record<string, SimplifiedTransaction[]>);
     
-    // Crea punti dati per ogni giorno
+    // Create data points for each day
     return Object.keys(groupedByDay)
       .sort()
       .map((day, index) => {
-        // Valori di riserva simulati basati sull'indice per scopi dimostrativi
         const baseReserveA = 100000;
         const baseReserveB = 500000;
         const reserveAIncrement = 1000 * (index + 1);
@@ -101,13 +128,13 @@ export default function DexStats() {
       });
   };
 
-  // Formatta gli indirizzi per migliorare la leggibilità
+  // Format addresses for better readability
   const shortenAddress = (address: string): string => {
     if (!address) return '';
     return `${address.substring(0, 6)}...${address.substring(address.length - 4)}`;
   };
 
-  // Formatta il timestamp per mostrare il tempo relativo
+  // Format timestamps to show relative time
   const formatTimeAgo = (timestamp: string): string => {
     const now = new Date();
     const txTime = new Date(timestamp);
@@ -127,7 +154,7 @@ export default function DexStats() {
     }
   };
 
-  // Ottieni lo stile del badge per il tipo di metodo
+  // Get badge style for method type
   const getMethodBadgeStyle = (method: string): string => {
     if (method === 'approve') {
       return 'bg-blue-100 text-blue-800';
@@ -139,88 +166,88 @@ export default function DexStats() {
     return 'bg-gray-100 text-gray-800';
   };
 
-  // Calcola statistiche dalle transazioni
-  const calculateStats = () => {
-    const latestData = chartData.length > 0 ? chartData[chartData.length - 1] : null;
-    const previousData = chartData.length > 1 ? chartData[chartData.length - 2] : null;
+  // Format token balance
+  const formatTokenBalance = (value: string, decimals: string): string => {
+    if (!value) return '0';
+    const decimalValue = parseInt(decimals, 10);
+    const valueNum = BigInt(value);
+    const divisor = BigInt(10) ** BigInt(decimalValue);
     
-    const tokenAReserve = latestData?.tokenAReserve || 104000;
-    const tokenBReserve = latestData?.tokenBReserve || 520000;
-    const priceAinB = latestData?.priceAinB || 5.3;
-    const priceBinA = latestData?.priceBinA || 0.189;
+    // Convert to decimal representation
+    const integerPart = valueNum / divisor;
+    const fractionalPart = valueNum % divisor;
     
-    // Calcola le variazioni nelle 24 ore
-    let tokenAChange = 0;
-    let tokenBChange = 0;
-    let priceChange = 0;
+    // Convert to string with proper formatting
+    let fractionalString = fractionalPart.toString().padStart(decimalValue, '0');
+    // Trim trailing zeros
+    fractionalString = fractionalString.replace(/0+$/, '');
     
-    if (previousData) {
-      tokenAChange = tokenAReserve - previousData.tokenAReserve;
-      tokenBChange = tokenBReserve - previousData.tokenBReserve;
-      priceChange = ((priceAinB / previousData.priceAinB) - 1) * 100;
-    }
-    
-    return {
-      tokenAReserve,
-      tokenBReserve,
-      priceAinB,
-      priceBinA,
-      tokenAChange,
-      tokenBChange,
-      priceChange
-    };
+    return fractionalString ? `${integerPart}.${fractionalString}` : `${integerPart}`;
   };
-  
-  const stats = calculateStats();
+
+  const formatTokenSupply = (supply: string, decimals: string): string => {
+    if (!supply) return '0';
+    const decimalValue = parseInt(decimals, 10);
+    const supplyNum = BigInt(supply);
+    const divisor = BigInt(10) ** BigInt(decimalValue);
+    
+    return (Number(supplyNum) / Number(divisor)).toLocaleString();
+  };
 
   return (
     <div className="p-4 max-w-7xl mx-auto">
       <div className="mb-4">
         <h2 className="text-2xl font-bold mb-2">Dex Stats</h2>
-        <p className="text-gray-300">Real-time pool and trading metrics</p>
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-        <div className="bg-gray-800 p-6 rounded-xl shadow-lg">
-          <h3 className="text-sm font-medium text-gray-300">TokenA Reserve</h3>
-          <p className="text-2xl font-bold mt-2">{stats.tokenAReserve.toLocaleString()}</p>
-          <span className={`${stats.tokenAChange >= 0 ? 'text-green-500' : 'text-red-500'} text-sm`}>
-            {stats.tokenAChange >= 0 ? '+' : ''}{stats.tokenAChange.toLocaleString()} (24h)
-          </span>
-        </div>
-        <div className="bg-gray-800 p-6 rounded-xl shadow-lg">
-          <h3 className="text-sm font-medium text-gray-300">TokenB Reserve</h3>
-          <p className="text-2xl font-bold mt-2">{stats.tokenBReserve.toLocaleString()}</p>
-          <span className={`${stats.tokenBChange >= 0 ? 'text-green-500' : 'text-red-500'} text-sm`}>
-            {stats.tokenBChange >= 0 ? '+' : ''}{stats.tokenBChange.toLocaleString()} (24h)
-          </span>
-        </div>
-        <div className="bg-gray-800 p-6 rounded-xl shadow-lg">
-          <h3 className="text-sm font-medium text-gray-300">Token Prices</h3>
-          <div>
-            <p className="text-lg font-bold mt-2">1 TokenA = {stats.priceAinB.toFixed(3)} TokenB</p>
-            <span className={`${stats.priceChange >= 0 ? 'text-green-500' : 'text-red-500'} text-sm`}>
-              {stats.priceChange >= 0 ? '+' : ''}{stats.priceChange.toFixed(2)}% (24h)
-            </span>
-          </div>
-          <div className="mt-2">
-            <p className="text-lg font-bold">1 TokenB = {stats.priceBinA.toFixed(3)} TokenA</p>
-            <span className={`${stats.priceChange >= 0 ? 'text-red-500' : 'text-green-500'} text-sm`}>
-              {stats.priceChange >= 0 ? '-' : '+'}{Math.abs(stats.priceChange).toFixed(2)}% (24h)
-            </span>
-          </div>
-        </div>
-        <div className="bg-gray-800 p-6 rounded-xl shadow-lg">
-          <h3 className="text-sm font-medium text-gray-300">Pool Ratio</h3>
-          <p className="text-2xl font-bold mt-2">1:{(stats.tokenBReserve / stats.tokenAReserve).toFixed(1)}</p>
-          <span className="text-gray-300 text-sm">TokenA:TokenB</span>
-        </div>
+        <p className="text-gray-300">Real-time pool datas</p>
       </div>
 
       {loading ? (
-        <div className="text-center py-8">Caricamento dati in corso...</div>
+        <div className="text-center py-8">Loading data...</div>
       ) : (
         <>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
+            {tokenData && tokenData.items && tokenData.items.map((item, index) => (
+              <div key={index} className="bg-gray-800 p-6 rounded-xl shadow-lg">
+                <div className="flex items-center justify-between mb-2">
+                  <h3 className="text-xl font-bold">{item.token.name}</h3>
+                  <span className="px-2 py-1 bg-gray-700 rounded-full text-sm">{item.token.symbol}</span>
+                </div>
+                
+                <div className="mt-4 space-y-2">
+                  <div className="flex justify-between">
+                    <span className="text-gray-400">Address:</span>
+                    <span className="font-mono text-sm">{shortenAddress(item.token.address)}</span>
+                  </div>
+                  
+                  <div className="flex justify-between">
+                    <span className="text-gray-400">Decimals:</span>
+                    <span>{item.token.decimals}</span>
+                  </div>
+                  
+                  <div className="flex justify-between">
+                    <span className="text-gray-400">Holders:</span>
+                    <span>{item.token.holders}</span>
+                  </div>
+                  
+                  <div className="flex justify-between">
+                    <span className="text-gray-400">Type:</span>
+                    <span>{item.token.type}</span>
+                  </div>
+                  
+                  <div className="flex justify-between">
+                    <span className="text-gray-400">Balance:</span>
+                    <span className="font-bold">{formatTokenBalance(item.value, item.token.decimals)}</span>
+                  </div>
+                  
+                  <div className="flex justify-between">
+                    <span className="text-gray-400">Total Supply:</span>
+                    <span>{formatTokenSupply(item.token.total_supply, item.token.decimals)}</span>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+          
           <div className="bg-gray-800 p-6 rounded-xl shadow-lg mb-8">
             <h3 className="text-lg font-semibold mb-4">Transaction History</h3>
             <div className="overflow-x-auto">
@@ -269,7 +296,7 @@ export default function DexStats() {
                     ))
                   ) : (
                     <tr>
-                      <td colSpan={5} className="py-4 text-center">Nessuna transazione trovata</td>
+                      <td colSpan={5} className="py-4 text-center">No transactions found</td>
                     </tr>
                   )}
                 </tbody>
