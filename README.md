@@ -12,7 +12,7 @@ Gorillix is an innovative decentralized exchange (DEX) that offers flexible trad
 ```
 # Clone the repository
 git clone https://github.com/gorilli-team/gorillix/tree/main/frontend
-cd gorillix-frontend
+cd frontend
 
 # Install dependencies
 npm install
@@ -29,7 +29,7 @@ npm run dev
 ```
 # Clone the repository
 git clone https://github.com/gorilli-team/gorillix/tree/main/backend
-cd gorillix-backend
+cd backend
 
 # Install dependencies
 npm install
@@ -42,6 +42,22 @@ cp .env.example .env
 npm run dev
 ```
 
+#### Agent
+```
+# Clone the repository
+git clone https://github.com/gorilli-team/gorillix/tree/main/gelato-agent
+cd gelato-agent
+
+# Install dependencies
+npm install
+
+# Set up environment variables
+cp .env.example .env
+# Edit .env with your configuration
+
+# Start development server
+npm run dev
+```
 
 ## Smart Contracts
 
