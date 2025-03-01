@@ -41,16 +41,16 @@ The standard implementation would require the agent to directly access the user'
 * Add/remove liquidity in pools
 * Automatically manage trading operations
 
-However, to ensure greater security, we propose implementing a vault-based system:
+However, to ensure greater security, we propose implementing an escrow-based system:
 
-#### 🔒 Vault Mechanism
+#### 🔐 Escrow Mechanism
 
-* Instead of giving direct wallet access to the agent, the user deposits a specified amount of Token A and Token B in a multi-token vault
-* The agent can access and operate ONLY on tokens present in the vault
-* This approach significantly limits operational risk, as:
- * The agent never has direct access to the user's wallet
- * Exposure is limited to only the tokens deposited in the vault
- * The user maintains complete control over tokens in the main wallet
+* The user will decide the amount of TokenA and TokenB to be managed by the AI Agent
+* The intended amount will be deposited by the user in the Escrow contract
+* The owner of the Escrow contract will have 100% rights over the funds stored in the contract
+* The AI Agent will be able to withdraw a certain amount of TokenA and TokenB for its operations of Gorillix DEX
+* Once the AI Agent is done with its trading strategy, it will return the funds in the Escrow contract
+* The user will then be able to withdraw the funds with either a profit or a loss
 
 ## 🔄 Token Management Scenarios
 

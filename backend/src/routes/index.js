@@ -1,6 +1,7 @@
 import express from 'express';
 import mongoose from 'mongoose';
 import * as agentConfigController from '../controllers/agentConfigController.js';
+import * as agentResponseController from '../controllers/agentResponseController.js';
 
 const router = express.Router();
 
@@ -24,4 +25,7 @@ router.post('/api/agent/config', agentConfigController.createOrUpdateAgentConfig
 router.get('/api/agent/config/:walletAddress', agentConfigController.getAgentConfigByWallet);
 router.get('/api/agent/configs', agentConfigController.getAllAgentConfigs);
 
+// Agent response routes
+router.post('/api/agent/response', agentResponseController.saveAgentResponse);
+router.get('/api/agent/responses', agentResponseController.getAllAgentResponses);
 export default router;

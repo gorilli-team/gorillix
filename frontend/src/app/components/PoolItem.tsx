@@ -12,6 +12,7 @@ export interface PoolItemProps {
     apr: string;
     token1Image: string;
     token2Image: string;
+    className?: string; // Aggiunta la proprietà className
 }
 
 export default function PoolItem({ 
@@ -22,7 +23,8 @@ export default function PoolItem({
     liquidity,
     apr,
     token1Image,
-    token2Image 
+    token2Image,
+    className = '' // Default a stringa vuota
 }: PoolItemProps) {
     const [showDepositModal, setShowDepositModal] = useState(false);
     const [showWithdrawModal, setShowWithdrawModal] = useState(false);
@@ -44,8 +46,8 @@ export default function PoolItem({
 
     return (
         <>
-            <div className="bg-gray-800/80 rounded-xl p-6 shadow-lg border border-gray-700/50">
-                <div className="flex flex-col space-y-6">
+            <div className={`bg-gray-800/80 rounded-xl p-6 shadow-lg border border-gray-700/50 ${className}`}>
+                <div className="flex flex-col space-y-6 h-full">
                     {/* Top row with token info */}
                     <div className="flex items-center justify-between">
                         <div className="flex items-center space-x-3">
@@ -94,6 +96,9 @@ export default function PoolItem({
                             <div className="text-xs text-gray-400 uppercase tracking-wider">APR</div>
                         </div>
                     </div>
+
+                    {/* Spacer per fare in modo che i pulsanti stiano in fondo */}
+                    <div className="flex-grow"></div>
 
                     {/* Action buttons */}
                     <div className="grid grid-cols-2 gap-3">

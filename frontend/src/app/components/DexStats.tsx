@@ -1,5 +1,4 @@
-import React from 'react';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import React, { useEffect, useState } from 'react';
 
 type ChartDataPoint = {
   time: string;
@@ -9,179 +8,303 @@ type ChartDataPoint = {
   priceBinA: number;
 };
 
-type TradeHistoryItem = {
-  time: string;
-  type: string;
-  amountIn: string;
-  amountOut: string;
-  author: 'Agent AI' | 'User';
-  priceImpact: string;
-  value: string;
+type SimplifiedTransaction = {
+  hash: string;
+  timestamp: string;
+  method: string;
+  from: string;
+  to: string;
+  toName?: string;
 };
 
-const mockData: ChartDataPoint[] = [
-  { time: '00:00', tokenAReserve: 100000, tokenBReserve: 500000, priceAinB: 5.0, priceBinA: 0.2 },
-  { time: '04:00', tokenAReserve: 102000, tokenBReserve: 510000, priceAinB: 5.1, priceBinA: 0.196 },
-  { time: '08:00', tokenAReserve: 98000, tokenBReserve: 490000, priceAinB: 4.9, priceBinA: 0.204 },
-  { time: '12:00', tokenAReserve: 103000, tokenBReserve: 515000, priceAinB: 5.2, priceBinA: 0.192 },
-  { time: '16:00', tokenAReserve: 101000, tokenBReserve: 505000, priceAinB: 5.0, priceBinA: 0.2 },
-  { time: '20:00', tokenAReserve: 104000, tokenBReserve: 520000, priceAinB: 5.3, priceBinA: 0.189 }
-];
+type Token = {
+  address: string;
+  decimals: string;
+  holders: string;
+  name: string;
+  symbol: string;
+  total_supply: string;
+  type: string;
+  icon_url: string | null;
+};
 
-const tradeHistory: TradeHistoryItem[] = [
-  {
-    time: '12:30:45',
-    type: 'TokenA → TokenB',
-    amountIn: '1,500 TokenA',
-    amountOut: '7,425 TokenB',
-    author: 'Agent AI',
-    priceImpact: '0.12%',
-    value: '$1,890'
-  },
-  {
-    time: '12:28:15',
-    type: 'TokenB → TokenA',
-    amountIn: '10,000 TokenB',
-    amountOut: '2,000 TokenA',
-    author: 'User',
-    priceImpact: '0.18%',
-    value: '$2,520'
-  },
-  {
-    time: '12:25:30',
-    type: 'TokenA → TokenB',
-    amountIn: '2,000 TokenA',
-    amountOut: '9,900 TokenB',
-    author: 'Agent AI',
-    priceImpact: '0.15%',
-    value: '$2,475'
-  }
-];
+type TokenItem = {
+  token: Token;
+  value: string;
+  token_id: string | null;
+  token_instance: any | null;
+};
+
+type TokenData = {
+  items: TokenItem[];
+};
 
 export default function DexStats() {
-  const getAuthorBadgeStyle = (author: 'Agent AI' | 'User'): string => {
-    if (author === 'Agent AI') {
-      return 'bg-violet-100 text-violet-800';
+  const [transactions, setTransactions] = useState<SimplifiedTransaction[]>([]);
+  const [chartData, setChartData] = useState<ChartDataPoint[]>([]);
+  const [tokenData, setTokenData] = useState<TokenData | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        // Fetch transactions
+        const txResponse = await fetch('https://explorer.abc.t.raas.gelato.cloud/api/v2/addresses/0x14a678f6F5f5F897692a9dB3dEe8E2D3c656C483/transactions');
+        const txData = await txResponse.json();
+        console.log('Transaction data received:', txData);
+        
+        // Fetch token data
+        const tokenResponse = await fetch('https://explorer.abc.t.raas.gelato.cloud/api/v2/addresses/0x14a678f6F5f5F897692a9dB3dEe8E2D3c656C483/tokens?type=ERC-20');
+        const tokenData = await tokenResponse.json();
+        console.log('Token data received:', tokenData);
+        
+        setTokenData(tokenData);
+        
+        if (txData && txData.items && Array.isArray(txData.items)) {
+          const simplifiedTxs = txData.items
+            .filter((tx: any) => tx.method && tx.method !== 'Unknown')
+            .map((tx: any) => ({
+              hash: tx.hash,
+              timestamp: tx.timestamp,
+              method: tx.method,
+              from: tx.from?.hash || '',
+              to: tx.to?.hash || '',
+              toName: tx.to?.name || undefined
+            }));
+          
+          setTransactions(simplifiedTxs);
+          
+          // Generate chart data based on transactions
+          const newChartData = generateChartData(simplifiedTxs);
+          setChartData(newChartData);
+        }
+        
+        setLoading(false);
+      } catch (error) {
+        console.error('Error fetching data:', error);
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  // Function to generate chart data from transactions
+  const generateChartData = (txs: SimplifiedTransaction[]): ChartDataPoint[] => {
+    // Group transactions by day
+    const groupedByDay = txs.reduce((acc, tx) => {
+      const date = new Date(tx.timestamp);
+      const day = date.toISOString().split('T')[0];
+      
+      if (!acc[day]) {
+        acc[day] = [];
+      }
+      
+      acc[day].push(tx);
+      return acc;
+    }, {} as Record<string, SimplifiedTransaction[]>);
+    
+    // Create data points for each day
+    return Object.keys(groupedByDay)
+      .sort()
+      .map((day, index) => {
+        const baseReserveA = 100000;
+        const baseReserveB = 500000;
+        const reserveAIncrement = 1000 * (index + 1);
+        const reserveBIncrement = 5000 * (index + 1);
+        
+        const tokenAReserve = baseReserveA + reserveAIncrement;
+        const tokenBReserve = baseReserveB + reserveBIncrement;
+        const priceAinB = tokenBReserve / tokenAReserve;
+        const priceBinA = tokenAReserve / tokenBReserve;
+        
+        return {
+          time: day,
+          tokenAReserve,
+          tokenBReserve,
+          priceAinB,
+          priceBinA
+        };
+      });
+  };
+
+  // Format addresses for better readability
+  const shortenAddress = (address: string): string => {
+    if (!address) return '';
+    return `${address.substring(0, 6)}...${address.substring(address.length - 4)}`;
+  };
+
+  // Format timestamps to show relative time
+  const formatTimeAgo = (timestamp: string): string => {
+    const now = new Date();
+    const txTime = new Date(timestamp);
+    const diffInSeconds = Math.floor((now.getTime() - txTime.getTime()) / 1000);
+    
+    if (diffInSeconds < 60) {
+      return `${diffInSeconds} sec ago`;
+    } else if (diffInSeconds < 3600) {
+      const minutes = Math.floor(diffInSeconds / 60);
+      return `${minutes} min${minutes > 1 ? 's' : ''} ago`;
+    } else if (diffInSeconds < 86400) {
+      const hours = Math.floor(diffInSeconds / 3600);
+      return `${hours} hr${hours > 1 ? 's' : ''} ago`;
+    } else {
+      const days = Math.floor(diffInSeconds / 86400);
+      return `${days} day${days > 1 ? 's' : ''} ago`;
+    }
+  };
+
+  // Get badge style for method type
+  const getMethodBadgeStyle = (method: string): string => {
+    if (method === 'approve') {
+      return 'bg-blue-100 text-blue-800';
+    } else if (method.includes('transfer')) {
+      return 'bg-green-100 text-green-800';
+    } else if (method.includes('swap')) {
+      return 'bg-purple-100 text-purple-800';
     }
     return 'bg-gray-100 text-gray-800';
   };
 
-  const getTypeBadgeStyle = (type: string): string => {
-    if (type.includes('TokenA →')) {
-      return 'bg-green-100 text-green-800';
-    }
-    return 'bg-blue-100 text-blue-800';
+  // Format token balance
+  const formatTokenBalance = (value: string, decimals: string): string => {
+    if (!value) return '0';
+    const decimalValue = parseInt(decimals, 10);
+    const valueNum = BigInt(value);
+    const divisor = BigInt(10) ** BigInt(decimalValue);
+    
+    // Convert to decimal representation
+    const integerPart = valueNum / divisor;
+    const fractionalPart = valueNum % divisor;
+    
+    // Convert to string with proper formatting
+    let fractionalString = fractionalPart.toString().padStart(decimalValue, '0');
+    // Trim trailing zeros
+    fractionalString = fractionalString.replace(/0+$/, '');
+    
+    return fractionalString ? `${integerPart}.${fractionalString}` : `${integerPart}`;
+  };
+
+  const formatTokenSupply = (supply: string, decimals: string): string => {
+    if (!supply) return '0';
+    const decimalValue = parseInt(decimals, 10);
+    const supplyNum = BigInt(supply);
+    const divisor = BigInt(10) ** BigInt(decimalValue);
+    
+    return (Number(supplyNum) / Number(divisor)).toLocaleString();
   };
 
   return (
     <div className="p-4 max-w-7xl mx-auto">
       <div className="mb-4">
         <h2 className="text-2xl font-bold mb-2">Dex Stats</h2>
-        <p className="text-gray-300">Real-time pool and trading metrics</p>
+        <p className="text-gray-300">Real-time pool datas</p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-        <div className="bg-gray-800 p-6 rounded-xl shadow-lg">
-          <h3 className="text-sm font-medium text-gray-300">TokenA Reserve</h3>
-          <p className="text-2xl font-bold mt-2">104,000</p>
-          <span className="text-green-500 text-sm">+4,000 (24h)</span>
-        </div>
-        <div className="bg-gray-800 p-6 rounded-xl shadow-lg">
-          <h3 className="text-sm font-medium text-gray-300">TokenB Reserve</h3>
-          <p className="text-2xl font-bold mt-2">520,000</p>
-          <span className="text-green-500 text-sm">+20,000 (24h)</span>
-        </div>
-        <div className="bg-gray-800 p-6 rounded-xl shadow-lg">
-          <h3 className="text-sm font-medium text-gray-300">Token Prices</h3>
-          <div>
-            <p className="text-lg font-bold mt-2">1 TokenA = 5.3 TokenB</p>
-            <span className="text-green-500 text-sm">+2.4% (24h)</span>
+      {loading ? (
+        <div className="text-center py-8">Loading data...</div>
+      ) : (
+        <>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
+            {tokenData && tokenData.items && tokenData.items.map((item, index) => (
+              <div key={index} className="bg-gray-800 p-6 rounded-xl shadow-lg">
+                <div className="flex items-center justify-between mb-2">
+                  <h3 className="text-xl font-bold">{item.token.name}</h3>
+                  <span className="px-2 py-1 bg-gray-700 rounded-full text-sm">{item.token.symbol}</span>
+                </div>
+                
+                <div className="mt-4 space-y-2">
+                  <div className="flex justify-between">
+                    <span className="text-gray-400">Address:</span>
+                    <span className="font-mono text-sm">{shortenAddress(item.token.address)}</span>
+                  </div>
+                  
+                  <div className="flex justify-between">
+                    <span className="text-gray-400">Decimals:</span>
+                    <span>{item.token.decimals}</span>
+                  </div>
+                  
+                  <div className="flex justify-between">
+                    <span className="text-gray-400">Holders:</span>
+                    <span>{item.token.holders}</span>
+                  </div>
+                  
+                  <div className="flex justify-between">
+                    <span className="text-gray-400">Type:</span>
+                    <span>{item.token.type}</span>
+                  </div>
+                  
+                  <div className="flex justify-between">
+                    <span className="text-gray-400">Balance:</span>
+                    <span className="font-bold">{formatTokenBalance(item.value, item.token.decimals)}</span>
+                  </div>
+                  
+                  <div className="flex justify-between">
+                    <span className="text-gray-400">Total Supply:</span>
+                    <span>{formatTokenSupply(item.token.total_supply, item.token.decimals)}</span>
+                  </div>
+                </div>
+              </div>
+            ))}
           </div>
-          <div className="mt-2">
-            <p className="text-lg font-bold">1 TokenB = 0.189 TokenA</p>
-            <span className="text-red-500 text-sm">-2.4% (24h)</span>
+          
+          <div className="bg-gray-800 p-6 rounded-xl shadow-lg mb-8">
+            <h3 className="text-lg font-semibold mb-4">Transaction History</h3>
+            <div className="overflow-x-auto">
+              <table className="min-w-full">
+                <thead>
+                  <tr className="border-b border-gray-700">
+                    <th className="text-left py-3 px-4">Time</th>
+                    <th className="text-left py-3 px-4">Method</th>
+                    <th className="text-left py-3 px-4">From</th>
+                    <th className="text-left py-3 px-4">To</th>
+                    <th className="text-left py-3 px-4">Hash</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {transactions.length > 0 ? (
+                    transactions.map((tx, index) => (
+                      <tr key={index} className="border-b border-gray-700">
+                        <td className="py-3 px-4">{formatTimeAgo(tx.timestamp)}</td>
+                        <td className="py-3 px-4">
+                          <span className={`px-2 py-1 ${getMethodBadgeStyle(tx.method)} rounded-full text-sm`}>
+                            {tx.method}
+                          </span>
+                        </td>
+                        <td className="py-3 px-4">
+                          <span className="px-2 py-1 bg-gray-100 text-gray-800 rounded-full text-sm">
+                            {shortenAddress(tx.from)}
+                          </span>
+                        </td>
+                        <td className="py-3 px-4">
+                          <div className="flex flex-col">
+                            <span className="px-2 py-1 bg-gray-100 text-gray-800 rounded-full text-sm">
+                              {shortenAddress(tx.to)}
+                            </span>
+                            {tx.toName && (
+                              <div className="mt-1 text-xs text-gray-400 flex items-center">
+                                <span className="inline-block w-2 h-2 rounded-full bg-blue-400 mr-1"></span>
+                                {tx.toName}
+                              </div>
+                            )}
+                          </div>
+                        </td>
+                        <td className="py-3 px-4 font-mono text-xs">
+                          {shortenAddress(tx.hash)}
+                        </td>
+                      </tr>
+                    ))
+                  ) : (
+                    <tr>
+                      <td colSpan={5} className="py-4 text-center">No transactions found</td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
           </div>
-        </div>
-        <div className="bg-gray-800 p-6 rounded-xl shadow-lg">
-          <h3 className="text-sm font-medium text-gray-300">Pool Ratio</h3>
-          <p className="text-2xl font-bold mt-2">1:5</p>
-          <span className="text-gray-300 text-sm">TokenA:TokenB</span>
-        </div>
-      </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-        <div className="bg-gray-800 p-6 rounded-xl shadow-lg">
-          <h3 className="text-lg font-semibold mb-4">Pool Reserves History</h3>
-          <div className="h-64">
-            <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={mockData}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="time" />
-                <YAxis />
-                <Tooltip />
-                <Line type="monotone" dataKey="tokenAReserve" stroke="#8884d8" name="TokenA" />
-                <Line type="monotone" dataKey="tokenBReserve" stroke="#82ca9d" name="TokenB" />
-              </LineChart>
-            </ResponsiveContainer>
-          </div>
-        </div>
-
-        <div className="bg-gray-800 p-6 rounded-xl shadow-lg text-white">
-          <h3 className="text-lg font-semibold mb-4">Price History</h3>
-          <div className="h-64">
-            <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={mockData}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="time" />
-                <YAxis />
-                <Tooltip />
-                <Line type="monotone" dataKey="priceAinB" stroke="#8884d8" name="TokenA in TokenB" />
-                <Line type="monotone" dataKey="priceBinA" stroke="#82ca9d" name="TokenB in TokenA" />
-              </LineChart>
-            </ResponsiveContainer>
-          </div>
-        </div>
-      </div>
-
-      <div className="bg-gray-800 p-6 rounded-xl shadow-lg">
-        <h3 className="text-lg font-semibold mb-4">Trade History</h3>
-        <div className="overflow-x-auto">
-          <table className="min-w-full">
-            <thead>
-              <tr className="border-b border-gray-700">
-                <th className="text-left py-3 px-4">Time</th>
-                <th className="text-left py-3 px-4">Type</th>
-                <th className="text-left py-3 px-4">Amount In</th>
-                <th className="text-left py-3 px-4">Amount Out</th>
-                <th className="text-left py-3 px-4">Author</th>
-                <th className="text-right py-3 px-4">Price Impact</th>
-                <th className="text-right py-3 px-4">Value</th>
-              </tr>
-            </thead>
-            <tbody>
-              {tradeHistory.map((trade, index) => (
-                <tr key={index} className="border-b border-gray-700">
-                  <td className="py-3 px-4">{trade.time}</td>
-                  <td className="py-3 px-4">
-                    <span className={`px-2 py-1 ${getTypeBadgeStyle(trade.type)} rounded-full text-sm`}>
-                      {trade.type}
-                    </span>
-                  </td>
-                  <td className="py-3 px-4">{trade.amountIn}</td>
-                  <td className="py-3 px-4">{trade.amountOut}</td>
-                  <td className="py-3 px-4">
-                    <span className={`px-2 py-1 ${getAuthorBadgeStyle(trade.author)} rounded-full text-sm`}>
-                      {trade.author}
-                    </span>
-                  </td>
-                  <td className="py-3 px-4 text-right">{trade.priceImpact}</td>
-                  <td className="py-3 px-4 text-right">{trade.value}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </div>
+        </>
+      )}
     </div>
   );
 }
