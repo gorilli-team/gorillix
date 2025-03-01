@@ -4,6 +4,61 @@
 
 Gorillix is an innovative decentralized exchange (DEX) that offers flexible trading options through both manual and AI-based approaches, focusing on interactions between Token A and Token B.
 
+## 🚀 Getting Started
+
+### Repository Setup
+
+#### Frontend
+```
+# Clone the repository
+git clone https://github.com/yourusername/gorillix-frontend.git
+cd gorillix-frontend
+
+# Install dependencies
+npm install
+
+# Set up environment variables
+cp .env.example .env.local
+# Edit .env.local with your configuration
+
+# Start development server
+npm run dev
+```
+
+#### Backend
+```
+# Clone the repository
+git clone https://github.com/yourusername/gorillix-backend.git
+cd gorillix-backend
+
+# Install dependencies
+npm install
+
+# Set up environment variables
+cp .env.example .env
+# Edit .env with your configuration
+
+# Start development server
+npm run dev
+```
+
+### Environment Variables
+
+#### Frontend (.env.local example)
+```
+NEXT_PUBLIC_BACKEND_URL=http://localhost:5001
+NEXT_PUBLIC_CHAIN_ID=112
+NEXT_PUBLIC_GELATO_API_KEY=your-gelato-api-key
+```
+
+#### Backend (.env example)
+```
+PORT=3001
+MONGODB_URI=mongodb://localhost:27017/gorillix
+JWT_SECRET=your-secret-key
+OPENAI_API_KEY=your-openai-api-key
+```
+
 ## Smart Contracts
 
 The following smart contracts have been deployed on ABC Testnet.
@@ -59,8 +114,8 @@ However, to ensure greater security, we propose implementing an escrow-based sys
 * User receives Token A and Token B via faucet
 * Connects wallet to the Gorillix application
 * Has full control over operations:
- * Swap between Token A and Token B
- * Add/remove liquidity in Token A/Token B pool
+  * Swap between Token A and Token B
+  * Add/remove liquidity in Token A/Token B pool
 
 ### Scenario 2: AI Agent Trading
 
@@ -70,24 +125,29 @@ However, to ensure greater security, we propose implementing an escrow-based sys
 * Configures agent parameters
 
 #### Agent Operations:
-* Agent withdraws necessary tokens FROM THE VAULT (not from the wallet)
+* Agent withdraws necessary tokens FROM THE ESCROW (not from the wallet)
 * Executes trading operations on the DEX (swap, add/remove liquidity)
 * Operates exclusively within the limits of available tokens in the vault
 
 ## ⚙️ Trading Configurations
 
 ### Trading Strategy
-* HODL
-* Buy
-* Sell
+
+**LIQUIDITY MANAGEMENT**
+
+**SWAP**
 
 ### Risk Levels
 
-Determined by the percentage of tokens that the agent can use from the vault:
+**1** Very Conservative
 
-| Conservative
-| Moderate
-| Aggressive |
+**2** Conservative
+
+**3** Moderate
+
+**4** Aggressive
+
+**5** Degen
 
 ## 🛠 Technical Stack
 
