@@ -11,11 +11,7 @@ export default function SwapInterface() {
           <div className="flex-grow flex">
             <PoolItem 
               tokenPair="TKA/TKB"
-              poolNumber="0"
               fee="0.03%"
-              volume24h="$1,708,112"
-              liquidity="$231,643"
-              apr="0.3% - 42.9%"
               token1Image="/tknA.png"
               token2Image="/tknB.png"
               className="w-full flex flex-col h-full"

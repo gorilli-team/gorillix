@@ -5,45 +5,22 @@ import { WithdrawModal } from './WithdrawModal';
 
 export interface PoolItemProps {
     tokenPair: string;
-    poolNumber: string;
     fee: string;
-    volume24h: string;
-    liquidity: string;
-    apr: string;
     token1Image: string;
     token2Image: string;
-    className?: string; // Aggiunta la proprietà className
+    className?: string;
 }
 
 export default function PoolItem({ 
-    tokenPair, 
-    poolNumber, 
+    tokenPair,
     fee,
-    volume24h,
-    liquidity,
-    apr,
     token1Image,
     token2Image,
-    className = '' // Default a stringa vuota
+    className = ''
 }: PoolItemProps) {
     const [showDepositModal, setShowDepositModal] = useState(false);
     const [showWithdrawModal, setShowWithdrawModal] = useState(false);
-
-    // Split the APR into min and max values if it contains a range
-    const renderApr = () => {
-        if (apr.includes('-')) {
-            const [min, max] = apr.split('-').map(val => val.trim());
-            return (
-                <div className="font-semibold text-white text-xl">
-                    <span className="text-green-400">{min}</span>
-                    <span className="text-gray-400"> - </span>
-                    <span className="text-green-400">{max}</span>
-                </div>
-            );
-        }
-        return <div className="font-semibold text-green-400 text-xl">{apr}</div>;
-    };
-
+    
     return (
         <>
             <div className={`bg-gray-800/80 rounded-xl p-6 shadow-lg border border-gray-700/50 ${className}`}>
@@ -74,26 +51,9 @@ export default function PoolItem({
                             <div>
                                 <div className="font-bold text-white text-lg">{tokenPair}</div>
                                 <div className="text-xs text-gray-400 flex items-center">
-                                    <span className="bg-blue-900/30 text-blue-300 text-xs px-2 py-0.5 rounded-full">Pool #{poolNumber}</span>
                                     <span className="ml-2 text-gray-500">{fee}</span>
                                 </div>
                             </div>
-                        </div>
-                    </div>
-
-                    {/* Stats section */}
-                    <div className="grid grid-cols-3 gap-4">
-                        <div>
-                            <div className="font-semibold text-white text-xl">{volume24h}</div>
-                            <div className="text-xs text-gray-400 uppercase tracking-wider">VOLUME (24H)</div>
-                        </div>
-                        <div>
-                            <div className="font-semibold text-white text-xl">{liquidity}</div>
-                            <div className="text-xs text-gray-400 uppercase tracking-wider">LIQUIDITY</div>
-                        </div>
-                        <div>
-                            {renderApr()}
-                            <div className="text-xs text-gray-400 uppercase tracking-wider">APR</div>
                         </div>
                     </div>
 
