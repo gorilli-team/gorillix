@@ -33,50 +33,157 @@ export class GorillionaireTradeClient {
 
                     const responseData = await response.json();
 
-                    console.log("\x1b[38;5;214m", responseData.data, "\x1b[0m");
+                    if (responseData.data.length > 0) {
+                        console.log(
+                            "\x1b[38;5;214m",
+                            responseData.data,
+                            "\x1b[0m"
+                        );
 
-                    //make a call to the agent to know token A and token B balances
-                    const agentKitCall3 = await fetch(
-                        this.agentKitApiEndpoint,
-                        {
-                            method: "POST",
-                            body: JSON.stringify({
-                                userMessage: "what's your balance of token A?",
-                            }),
+                        let tokenAPercentage = 0;
+
+                        if (responseData.data.tradingStrategy === "swap") {
+                            if (
+                                responseData.data.riskLevel ===
+                                "very-conservative"
+                            ) {
+                            }
+
+                            if (
+                                responseData.data.riskLevel === "conservative"
+                            ) {
+                                tokenAPercentage = 10;
+                            }
+
+                            if (responseData.data.riskLevel === "moderate") {
+                                tokenAPercentage = 20;
+                            }
+
+                            if (responseData.data.riskLevel === "aggressive") {
+                                tokenAPercentage = 30;
+                            }
+
+                            if (
+                                responseData.data.riskLevel ===
+                                "very-aggressive"
+                            ) {
+                                tokenAPercentage = 40;
+                            }
                         }
-                    );
 
-                    const agentKitCallData3 = await agentKitCall3.json();
-                    console.log("\x1b[38;5;214m", agentKitCallData3, "\x1b[0m");
+                        //make a call to the agent to know token A and token B balances
+                        const agentKitCall3 = await fetch(
+                            this.agentKitApiEndpoint,
+                            {
+                                method: "POST",
+                                body: JSON.stringify({
+                                    userMessage:
+                                        "what's your balance of token A?",
+                                }),
+                            }
+                        );
 
-                    const agentKitCall5 = await fetch(
-                        this.agentKitApiEndpoint,
-                        {
-                            method: "POST",
-                            body: JSON.stringify({
-                                userMessage: "what's your balance of token B?",
-                            }),
-                        }
-                    );
+                        const agentKitCallData3 = await agentKitCall3.json();
+                        console.log(
+                            "\x1b[38;5;214m",
+                            agentKitCallData3,
+                            "\x1b[0m"
+                        );
 
-                    const agentKitCallData5 = await agentKitCall5.json();
-                    console.log("\x1b[38;5;214m", agentKitCallData5, "\x1b[0m");
+                        const agentKitCall5 = await fetch(
+                            this.agentKitApiEndpoint,
+                            {
+                                method: "POST",
+                                body: JSON.stringify({
+                                    userMessage:
+                                        "what's your balance of token B?",
+                                }),
+                            }
+                        );
 
-                    //make a call to the agent to know token A and token B balances
-                    const agentKitCall4 = await fetch(
-                        this.agentKitApiEndpoint,
-                        {
-                            method: "POST",
-                            body: JSON.stringify({
-                                userMessage:
-                                    "can you swap 30 token A for some token B?",
-                            }),
-                        }
-                    );
+                        const agentKitCallData5 = await agentKitCall5.json();
+                        console.log(
+                            "\x1b[38;5;214m",
+                            agentKitCallData5,
+                            "\x1b[0m"
+                        );
 
-                    const agentKitCallData4 = await agentKitCall4.json();
+                        //push response to the database
+                        // /api/agent/response
+                        const agentResponse = await fetch(
+                            `${this.backendApiEndpoint}/api/agent/response`,
+                            {
+                                method: "POST",
+                                headers: {
+                                    "Content-Type": "application/json",
+                                },
+                                body: JSON.stringify({
+                                    response: agentKitCallData3.response,
+                                }),
+                            }
+                        );
 
-                    console.log("\x1b[38;5;214m", agentKitCallData4, "\x1b[0m");
+                        console.log("\x1b[38;5;214m", agentResponse, "\x1b[0m");
+
+                        const agentResponse2 = await fetch(
+                            `${this.backendApiEndpoint}/api/agent/response`,
+                            {
+                                method: "POST",
+                                headers: {
+                                    "Content-Type": "application/json",
+                                },
+                                body: JSON.stringify({
+                                    response: agentKitCallData5.response,
+                                }),
+                            }
+                        );
+
+                        console.log(
+                            "\x1b[38;5;214m",
+                            agentResponse2,
+                            "\x1b[0m"
+                        );
+
+                        const tokenABalance = agentKitCallData3.response;
+
+                        //make a call to the agent to know token A and token B balances
+                        const agentKitCall4 = await fetch(
+                            this.agentKitApiEndpoint,
+                            {
+                                method: "POST",
+                                body: JSON.stringify({
+                                    userMessage: `can you swap this percentage of token A balance is: ${tokenABalance} for some token B? ${tokenAPercentage}`,
+                                }),
+                            }
+                        );
+
+                        const agentKitCallData4 = await agentKitCall4.json();
+
+                        console.log(
+                            "\x1b[38;5;214m",
+                            agentKitCallData4,
+                            "\x1b[0m"
+                        );
+
+                        const agentResponse3 = await fetch(
+                            `${this.backendApiEndpoint}/api/agent/response`,
+                            {
+                                method: "POST",
+                                headers: {
+                                    "Content-Type": "application/json",
+                                },
+                                body: JSON.stringify({
+                                    response: agentKitCallData4.response,
+                                }),
+                            }
+                        );
+
+                        console.log(
+                            "\x1b[38;5;214m",
+                            agentResponse3,
+                            "\x1b[0m"
+                        );
+                    }
 
                     await new Promise((resolve) =>
                         setTimeout(resolve, 60 * 1000)
