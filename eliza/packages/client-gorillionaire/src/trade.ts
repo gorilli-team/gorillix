@@ -1,24 +1,18 @@
-import {
-    type IAgentRuntime,
-    type Memory,
-    type Content,
-    type State,
-} from "@elizaos/core";
+import { type IAgentRuntime } from "@elizaos/core";
 import type { ClientBase } from "./base.ts";
-// import { coinmarketcapPlugin } from "@elizaos/plugin-coinmarketcap";
-// import { agentkitPlugin } from "@elizaos/plugin-agentkit";
-import { getEmbeddingZeroVector } from "@elizaos/core";
-import { stringToUuid } from "@elizaos/core";
 
 export class GorillionaireTradeClient {
     client: ClientBase;
     runtime: IAgentRuntime;
-
     private stopProcessingActions = false;
+    private agentKitApiEndpoint: string;
+    private backendApiEndpoint: string;
 
     constructor(client: ClientBase, runtime: IAgentRuntime) {
         this.client = client;
         this.runtime = runtime;
+        this.agentKitApiEndpoint = process.env.AGENT_API_ENDPOINT;
+        this.backendApiEndpoint = process.env.BACKEND_API_ENDPOINT;
 
         console.log("TRADE Client Configuration:");
     }
@@ -34,24 +28,55 @@ export class GorillionaireTradeClient {
 
                     //fetch from api
                     const response = await fetch(
-                        "http://localhost:5001/api/agent/configs"
+                        `${this.backendApiEndpoint}/api/agent/configs`
                     );
 
                     const responseData = await response.json();
 
                     console.log("\x1b[38;5;214m", responseData.data, "\x1b[0m");
 
-                    const agentKitCall = await fetch(
-                        "http://localhost:3001/api/agent/call",
+                    //make a call to the agent to know token A and token B balances
+                    const agentKitCall3 = await fetch(
+                        this.agentKitApiEndpoint,
                         {
                             method: "POST",
-                            body: JSON.stringify(responseData.data),
+                            body: JSON.stringify({
+                                userMessage: "what's your balance of token A?",
+                            }),
                         }
                     );
 
-                    const agentKitCallData = await agentKitCall.json();
+                    const agentKitCallData3 = await agentKitCall3.json();
+                    console.log("\x1b[38;5;214m", agentKitCallData3, "\x1b[0m");
 
-                    console.log("\x1b[38;5;214m", agentKitCallData, "\x1b[0m");
+                    const agentKitCall5 = await fetch(
+                        this.agentKitApiEndpoint,
+                        {
+                            method: "POST",
+                            body: JSON.stringify({
+                                userMessage: "what's your balance of token B?",
+                            }),
+                        }
+                    );
+
+                    const agentKitCallData5 = await agentKitCall5.json();
+                    console.log("\x1b[38;5;214m", agentKitCallData5, "\x1b[0m");
+
+                    //make a call to the agent to know token A and token B balances
+                    const agentKitCall4 = await fetch(
+                        this.agentKitApiEndpoint,
+                        {
+                            method: "POST",
+                            body: JSON.stringify({
+                                userMessage:
+                                    "can you swap 30 token A for some token B?",
+                            }),
+                        }
+                    );
+
+                    const agentKitCallData4 = await agentKitCall4.json();
+
+                    console.log("\x1b[38;5;214m", agentKitCallData4, "\x1b[0m");
 
                     await new Promise((resolve) =>
                         setTimeout(resolve, 60 * 1000)
