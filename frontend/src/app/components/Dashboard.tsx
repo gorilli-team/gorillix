@@ -60,8 +60,9 @@ export default function Dashboard() {
          </div>
        )}
 
-       <div className="flex justify-start items-center">
-         <div className="flex items-center gap-3">
+       <div className="flex justify-between items-center">
+         <div className="flex items-center justify-between gap-3 w-full mb-4">
+          {isAiEnabled ?<h2 className="text-2xl font-bold text-white">AI Trading Performance</h2>:<h2 className="text-2xl font-bold text-white">Manual Trading</h2>}
            <button
              onClick={handleModeSwitch}
              className="px-4 py-2 rounded-lg text-sm transition-colors bg-violet-600 text-white hover:bg-violet-700 transition-colors focus:outline-none"

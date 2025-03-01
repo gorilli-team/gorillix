@@ -1,6 +1,22 @@
 "use client";
 import { useState, useEffect } from 'react';
 
+// Type for agent activities
+type AgentActivity = {
+  id: string;
+  timestamp: Date;
+  type: 'info' | 'action' | 'warning' | 'success' | 'error';
+  message: string;
+  details?: string;
+};
+
+// Type for agent responses from backend
+type AgentResponse = {
+  _id: string;
+  response: string;
+  createdAt: string;
+};
+
 // Type for agent configuration from localStorage
 type AgentConfiguration = {
   selectedStrategy: string;
@@ -25,237 +41,182 @@ const tradingStrategies = {
   'swap': 'SWAP'
 };
 
-// Mock activities for testing panel scrolling and layout
-const testActivities = [
-  {
-    id: '1',
-    message: 'Agent initialized with SWAP strategy',
-    timestamp: '10:15:20',
-    icon: 'ℹ️',
-    iconColor: 'text-blue-400',
-    details: 'Initialization complete with risk level 3 (Moderate)'
-  },
-  {
-    id: '2',
-    message: 'Connected to price feed',
-    timestamp: '10:15:25',
-    icon: '✅',
-    iconColor: 'text-green-400'
-  },
-  {
-    id: '3',
-    message: 'Analyzing market conditions',
-    timestamp: '10:15:30',
-    icon: '⚡',
-    iconColor: 'text-violet-400',
-    details: 'Scanning liquidity pools and price trends'
-  },
-  {
-    id: '4',
-    message: 'Market volatility detected',
-    timestamp: '10:15:45',
-    icon: '⚠️',
-    iconColor: 'text-yellow-400',
-    details: 'Current volatility index: 0.72'
-  },
-  {
-    id: '5',
-    message: 'Swap transaction prepared',
-    timestamp: '10:16:00',
-    icon: '⚡',
-    iconColor: 'text-violet-400',
-    details: 'Preparing to swap 5 TKA for TKB'
-  },
-  {
-    id: '6',
-    message: 'Slippage calculation completed',
-    timestamp: '10:16:05',
-    icon: '✅',
-    iconColor: 'text-green-400',
-    details: 'Expected slippage: 0.15%'
-  },
-  {
-    id: '7',
-    message: 'Swap transaction submitted',
-    timestamp: '10:16:10',
-    icon: '⚡',
-    iconColor: 'text-violet-400',
-    details: 'Transaction hash: 0x8a7fe85c...3d2b'
-  },
-  {
-    id: '8',
-    message: 'Transaction pending',
-    timestamp: '10:16:15',
-    icon: '⚡',
-    iconColor: 'text-violet-400'
-  },
-  {
-    id: '9',
-    message: 'Transaction completed',
-    timestamp: '10:16:30',
-    icon: '✅',
-    iconColor: 'text-green-400',
-    details: 'Received 25.032 TKB for 5 TKA'
-  },
-  {
-    id: '10',
-    message: 'Updated portfolio balance',
-    timestamp: '10:16:35',
-    icon: 'ℹ️',
-    iconColor: 'text-blue-400',
-    details: 'New balances: 15 TKA, 55.032 TKB'
-  },
-  {
-    id: '11',
-    message: 'Monitoring price movements',
-    timestamp: '10:17:00',
-    icon: '⚡',
-    iconColor: 'text-violet-400',
-    details: 'TKA: +0.3%, TKB: -0.1% (last 5 minutes)'
-  },
-  {
-    id: '12',
-    message: 'Price alert triggered',
-    timestamp: '10:20:15',
-    icon: '⚠️',
-    iconColor: 'text-yellow-400',
-    details: 'TKB price dropped by 1.2% in the last 3 minutes'
-  },
-  {
-    id: '13',
-    message: 'Swap opportunity identified',
-    timestamp: '10:21:00',
-    icon: '✅',
-    iconColor: 'text-green-400',
-    details: 'Favorable conditions to swap TKB back to TKA'
-  },
-  {
-    id: '14',
-    message: 'Preparing reverse swap',
-    timestamp: '10:21:10',
-    icon: '⚡',
-    iconColor: 'text-violet-400',
-    details: 'Planning to swap 20 TKB for TKA'
-  },
-  {
-    id: '15',
-    message: 'Swap transaction submitted',
-    timestamp: '10:21:20',
-    icon: '⚡',
-    iconColor: 'text-violet-400',
-    details: 'Transaction hash: 0x7b6fe92d...4e3c'
-  },
-  {
-    id: '16',
-    message: 'Transaction failed',
-    timestamp: '10:21:30',
-    icon: '❌',
-    iconColor: 'text-red-400',
-    details: 'Error: Insufficient gas provided'
-  },
-  {
-    id: '17',
-    message: 'Retrying with higher gas',
-    timestamp: '10:21:40',
-    icon: '⚡',
-    iconColor: 'text-violet-400',
-    details: 'Increasing gas limit by 20%'
-  },
-  {
-    id: '18',
-    message: 'Transaction submitted',
-    timestamp: '10:21:45',
-    icon: '⚡',
-    iconColor: 'text-violet-400',
-    details: 'Transaction hash: 0x9c5de23f...8a7b'
-  },
-  {
-    id: '19',
-    message: 'Transaction completed',
-    timestamp: '10:22:00',
-    icon: '✅',
-    iconColor: 'text-green-400',
-    details: 'Received 4.05 TKA for 20 TKB'
-  },
-  {
-    id: '20',
-    message: 'Updated portfolio balance',
-    timestamp: '10:22:05',
-    icon: 'ℹ️',
-    iconColor: 'text-blue-400',
-    details: 'New balances: 19.05 TKA, 35.032 TKB'
-  }
-];
-
 export default function AITradingView() {
-  const [activities, setActivities] = useState(testActivities);
-  const [isLoading, setIsLoading] = useState(false);
+  const [activities, setActivities] = useState<AgentActivity[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isConnected, setIsConnected] = useState(false);
   const [agentStats, setAgentStats] = useState({
-    tokenAAllocation: '19.05',
-    tokenBAllocation: '35.032',
-    riskLevel: 'Moderate (3)',
-    strategy: 'SWAP',
-    status: 'Active'
+    tokenAAllocation: '0',
+    tokenBAllocation: '0',
+    riskLevel: 'Not set',
+    strategy: 'Not set',
+    status: 'Inactive'
   });
 
-  // Load agent configuration from localStorage
-  useEffect(() => {
-    const loadAgentConfig = () => {
-      try {
-        const STORAGE_KEY = 'agent_configuration';
-        const savedConfig = localStorage.getItem(STORAGE_KEY);
-        
-        if (savedConfig) {
-          const config: AgentConfiguration = JSON.parse(savedConfig);
-          
-          // Get the risk level label
-          let riskLevelLabel = 'Not set';
-          const riskLevelInfo = riskLevels.find(r => r.level === config.riskLevel);
-          if (riskLevelInfo) {
-            riskLevelLabel = `${riskLevelInfo.label} (${config.riskLevel})`;
-          }
-          
-          // Get the strategy name
-          const strategyName = config.selectedStrategy ? 
-            (tradingStrategies[config.selectedStrategy as keyof typeof tradingStrategies] || 'Unknown') : 
-            'Not set';
-          
-          // Format the token allocations
-          const tokenAAllocation = config.tokenAAllocation ? 
-            parseFloat(config.tokenAAllocation).toLocaleString('en-US', { maximumFractionDigits: 2 }) : 
-            '0';
-          
-          const tokenBAllocation = config.tokenBAllocation ? 
-            parseFloat(config.tokenBAllocation).toLocaleString('en-US', { maximumFractionDigits: 2 }) : 
-            '0';
-          
-          // Get status from isAgentActive
-          const status = config.isAgentActive ? 'Active' : 'Inactive';
-          
-          setAgentStats({
-            tokenAAllocation,
-            tokenBAllocation,
-            riskLevel: riskLevelLabel,
-            strategy: strategyName,
-            status
-          });
-        }
-      } catch (error) {
-        console.error('Error loading configuration from localStorage:', error);
-      }
-    };
+  // Storage key
+  const STORAGE_KEY = 'agent_configuration';
 
-    // Usiamo i dati di test invece di caricare dalla localStorage
-    // loadAgentConfig();
-    setIsLoading(false);
-  }, []);
+  // Load agent configuration from localStorage
+  const loadAgentConfig = () => {
+    try {
+      const savedConfig = localStorage.getItem(STORAGE_KEY);
+      
+      if (savedConfig) {
+        const config: AgentConfiguration = JSON.parse(savedConfig);
+        
+        // Get the risk level label
+        let riskLevelLabel = 'Not set';
+        const riskLevelInfo = riskLevels.find(r => r.level === config.riskLevel);
+        if (riskLevelInfo) {
+          riskLevelLabel = `${riskLevelInfo.label} (${config.riskLevel})`;
+        }
+        
+        // Get the strategy name
+        const strategyName = config.selectedStrategy ? 
+          (tradingStrategies[config.selectedStrategy as keyof typeof tradingStrategies] || 'Unknown') : 
+          'Not set';
+        
+        // Format the token allocations
+        const tokenAAllocation = config.tokenAAllocation ? 
+          parseFloat(config.tokenAAllocation).toLocaleString('en-US', { maximumFractionDigits: 2 }) : 
+          '0';
+        
+        const tokenBAllocation = config.tokenBAllocation ? 
+          parseFloat(config.tokenBAllocation).toLocaleString('en-US', { maximumFractionDigits: 2 }) : 
+          '0';
+        
+        // Get status from isAgentActive
+        const status = config.isAgentActive ? 'Active' : 'Inactive';
+        
+        setAgentStats({
+          tokenAAllocation,
+          tokenBAllocation,
+          riskLevel: riskLevelLabel,
+          strategy: strategyName,
+          status
+        });
+        
+        setIsConnected(config.isAgentActive);
+        return config.isAgentActive;
+      }
+      return false;
+    } catch (error) {
+      console.error('Error loading configuration from localStorage:', error);
+      return false;
+    }
+  };
+
+  // Fetch agent responses from backend
+  const fetchAgentResponses = async () => {
+    try {
+      const response = await fetch('http://localhost:5001/api/agent/responses');
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
+      const data = await response.json();
+      
+      if (data && data.data && Array.isArray(data.data)) {
+        // Transform backend responses to AgentActivity format
+        const transformedActivities = data.data.map((item: AgentResponse) => ({
+          id: item._id,
+          timestamp: new Date(item.createdAt),
+          type: 'info', // Default type as 'info' - could be enhanced with parsing logic if needed
+          message: item.response,
+          details: '' // No details in the backend response
+        }));
+        
+        // Sort by timestamp (newest first)
+        transformedActivities.sort((a: AgentActivity, b: AgentActivity) => b.timestamp.getTime() - a.timestamp.getTime());
+        
+        setActivities(transformedActivities);
+      }
+      
+      setIsLoading(false);
+    } catch (error) {
+      console.error('Error fetching agent responses:', error);
+      setIsLoading(false);
+    }
+  };
+
+  // Helper function to format time in a relative way (like blockchain explorers)
+  const formatTime = (date: Date) => {
+    const now = new Date();
+    const diffInSeconds = Math.floor((now.getTime() - date.getTime()) / 1000);
+    
+    if (diffInSeconds < 60) {
+      return `${diffInSeconds} sec${diffInSeconds !== 1 ? 's' : ''} ago`;
+    }
+    
+    const diffInMinutes = Math.floor(diffInSeconds / 60);
+    if (diffInMinutes < 60) {
+      return `${diffInMinutes} min${diffInMinutes !== 1 ? 's' : ''} ago`;
+    }
+    
+    const diffInHours = Math.floor(diffInMinutes / 60);
+    if (diffInHours < 24) {
+      return `${diffInHours} hour${diffInHours !== 1 ? 's' : ''} ago`;
+    }
+    
+    const diffInDays = Math.floor(diffInHours / 24);
+    return `${diffInDays} day${diffInDays !== 1 ? 's' : ''} ago`;
+  };
+
+  // Return appropriate emoji for activity type
+  const getActivityIcon = (type: string) => {
+    switch (type) {
+      case 'info':
+        return <span className="text-blue-400">ℹ️</span>;
+      case 'action':
+        return <span className="text-violet-400">⚡</span>;
+      case 'warning':
+        return <span className="text-yellow-400">⚠️</span>;
+      case 'success':
+        return <span className="text-green-400">✅</span>;
+      case 'error':
+        return <span className="text-red-400">❌</span>;
+      default:
+        return <span className="text-gray-400">🔹</span>;
+    }
+  };
+
+  // Check connection status and load activities
+  useEffect(() => {
+    // Initial load of agent config
+    const isActive = loadAgentConfig();
+    setIsConnected(isActive);
+    
+    // Load activities if agent is active
+    if (isActive) {
+      fetchAgentResponses();
+    } else {
+      setIsLoading(false);
+    }
+    
+    // Set up interval to check for agent status changes and update data
+    const checkInterval = setInterval(() => {
+      const isCurrentlyActive = loadAgentConfig();
+      
+      // If agent state changed from inactive to active, load activities
+      if (isCurrentlyActive && !isConnected) {
+        fetchAgentResponses();
+      }
+      
+      // If agent is active, refresh the activities periodically
+      if (isCurrentlyActive) {
+        fetchAgentResponses();
+      }
+      
+      setIsConnected(isCurrentlyActive);
+    }, 5000); // Check and refresh every 5 seconds
+    
+    // Clean up interval on component unmount
+    return () => clearInterval(checkInterval);
+  }, [isConnected]);
 
   return (
     <div className="p-6">
-      <div className="flex items-center justify-between mb-6">
-        <h2 className="text-2xl font-bold">AI Trading Performance</h2>
-      </div>
-
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Agent Info */}
         <div className="bg-gray-800 rounded-xl border border-violet-600/30 shadow-lg overflow-hidden">
@@ -279,12 +240,12 @@ export default function AITradingView() {
               <div className="space-y-4">
                 <div className="flex justify-between border-b border-gray-700 pb-2">
                   <span className="text-gray-400">Status</span>
-                  <div className={`bg-gray-700/50 border border-violet-500/20 rounded-lg px-3 py-1 text-sm ${agentStats.status === 'Active' ? '' : 'border-red-500/20'}`}>
-                    <span className={`mr-2 inline-block w-2 h-2 rounded-full ${agentStats.status === 'Active' ? 'bg-green-500' : 'bg-red-500'}`}></span>
-                    {agentStats.status === 'Active' ? 'Agent Online' : 'Agent Offline'}
+                  <div className={`px-3 py-1 rounded-full text-sm font-medium flex items-center ${isConnected ? 'bg-green-900/20 text-green-400' : 'bg-red-900/20 text-red-400'}`}>
+                    <span className={`w-2 h-2 rounded-full mr-2 ${isConnected ? 'bg-green-400' : 'bg-red-400'}`}></span>
+                    {isConnected ? 'Agent Connected' : 'Agent Disconnected'}
                   </div>
                 </div>
-                {agentStats.status === 'Active' && (
+                {isConnected ? (
                   <>
                     <div className="flex justify-between border-b border-gray-700 pb-2">
                       <span className="text-gray-400">Strategy</span>
@@ -303,6 +264,11 @@ export default function AITradingView() {
                       <span className="font-medium text-white">{agentStats.tokenBAllocation} TKB</span>
                     </div>
                   </>
+                ) : (
+                  <div className="text-center py-6 text-gray-500">
+                    <p>Agent is currently offline</p>
+                    <p className="text-sm mt-1">Configure and activate the agent to start trading</p>
+                  </div>
                 )}
               </div>
             )}
@@ -336,13 +302,13 @@ export default function AITradingView() {
                   </div>
                 ))}
               </div>
-            ) : activities.length > 0 ? (
+            ) : isConnected && activities.length > 0 ? (
               <div className="space-y-4">
                 {activities.map((activity) => (
                   <div key={activity.id} className="border-b border-gray-700 pb-4 last:border-b-0">
                     <div className="flex items-start">
-                      <div className={`mr-3 mt-0.5 flex-shrink-0 text-lg ${activity.iconColor}`}>
-                        {activity.icon}
+                      <div className="mr-3 flex-shrink-0 text-lg">
+                        {getActivityIcon(activity.type)}
                       </div>
                       <div className="flex-1">
                         <p className="font-medium text-white">{activity.message}</p>
@@ -350,16 +316,25 @@ export default function AITradingView() {
                           <p className="text-sm text-gray-400 mt-1">{activity.details}</p>
                         )}
                       </div>
-                      <span className="text-xs text-gray-500 ml-2">{activity.timestamp}</span>
+                      <span className="text-xs text-gray-500 ml-2">{formatTime(activity.timestamp)}</span>
                     </div>
                   </div>
                 ))}
               </div>
             ) : (
               <div className="flex flex-col items-center justify-center h-full text-gray-500 py-12">
-                <div className="text-4xl mb-3 opacity-30">🔍</div>
-                <p>No activities found</p>
-                <p className="text-sm mt-1">Activities will appear here when the agent starts working</p>
+                <div className="text-4xl mb-3 opacity-30">🔌</div>
+                {isConnected ? (
+                  <>
+                    <p>No activities found</p>
+                    <p className="text-sm mt-1">Activities will appear here when the agent starts working</p>
+                  </>
+                ) : (
+                  <>
+                    <p>Agent is not active</p>
+                    <p className="text-sm mt-1">Activate the agent to see activities</p>
+                  </>
+                )}
               </div>
             )}
           </div>
