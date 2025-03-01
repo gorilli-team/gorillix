@@ -36,3 +36,29 @@ export const saveAgentResponse = async (req, res) => {
     });
   }
 };
+
+/**
+ * Retrieves all agent responses from the database
+ * @param {Object} req - 
+ * @param {Object} res - 
+ */
+export const getAllAgentResponses = async (req, res) => {
+    try {
+      const responses = await AgentResponse.find()
+        .select('response createdAt')
+        .sort({ createdAt: -1 });
+  
+      res.status(200).json({
+        message: 'Responses retrieved successfully',
+        count: responses.length,
+        data: responses
+      });
+  
+    } catch (error) {
+      console.error('Error retrieving responses:', error);
+      res.status(500).json({ 
+        error: 'Internal server error', 
+        details: error.message 
+      });
+    }
+  };

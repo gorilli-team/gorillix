@@ -98,7 +98,7 @@ export default function AiAgentConfiguration() {
 
                 const agentConfigData = {
                     tradingStrategy: selectedStrategy,
-                    riskLevel: riskInfo.id,      // Send only the string ID as riskLevel
+                    riskLevel: riskInfo.id,
                     tkaAllocation: Number(tokenAAllocation),
                     tkbAllocation: Number(tokenBAllocation),
                     isActive: !isAgentActive,

@@ -24,6 +24,8 @@ router.get('/api/agent/trading-strategies', agentConfigController.getTradingStra
 router.post('/api/agent/config', agentConfigController.createOrUpdateAgentConfig);
 router.get('/api/agent/config/:walletAddress', agentConfigController.getAgentConfigByWallet);
 router.get('/api/agent/configs', agentConfigController.getAllAgentConfigs);
-router.post('/api/agent/response', agentResponseController.saveAgentResponse);
 
+// Agent response routes
+router.post('/api/agent/response', agentResponseController.saveAgentResponse);
+router.get('/api/agent/responses', agentResponseController.getAllAgentResponses);
 export default router;
