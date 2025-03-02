@@ -25,7 +25,6 @@ export default function AiAgentConfiguration() {
     const [tokenAAllocation, setTokenAAllocation] = useState('');
     const [tokenBAllocation, setTokenBAllocation] = useState('');
     const [isAgentActive, setIsAgentActive] = useState(false);
-    const [fundsDeposited, setFundsDeposited] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     useEffect(() => {
         loadSavedConfiguration();

@@ -1,6 +1,7 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+
 import { ConnectButton } from '@rainbow-me/rainbowkit';
 import { useAccount } from 'wagmi';
-import BalancePanel from './BalancePanel';
 
 export default function Header() {
   const { isConnected } = useAccount();

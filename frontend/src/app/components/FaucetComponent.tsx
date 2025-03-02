@@ -1,3 +1,6 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import React, { useState, useEffect, useCallback } from 'react';
 import { 
   useAccount, 
@@ -381,7 +384,7 @@ const FaucetComponent: React.FC<FaucetComponentProps> = ({ onSuccess }) => {
             To request tokens, please connect your wallet first.
           </p>
           <p className="text-sm text-gray-400 mb-4">
-            Use the "Connect Wallet" button in the header.
+            Use the &quot;Connect Wallet&quot; button in the header.
           </p>
         </div>
       ) : (
