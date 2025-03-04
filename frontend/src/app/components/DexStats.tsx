@@ -49,12 +49,12 @@ export default function DexStats() {
     const fetchData = async () => {
       try {
         // Fetch transactions
-        const txResponse = await fetch('https://explorer.abc.t.raas.gelato.cloud/api/v2/addresses/0x14a678f6F5f5F897692a9dB3dEe8E2D3c656C483/transactions');
+        const txResponse = await fetch('https://explorer.abc.t.raas.gelato.cloud/api/v2/addresses/0x80e93b9420746ac25c420c3a7cc29b46bec34d26/transactions');
         const txData = await txResponse.json();
         console.log('Transaction data received:', txData);
         
         // Fetch token data
-        const tokenResponse = await fetch('https://explorer.abc.t.raas.gelato.cloud/api/v2/addresses/0x14a678f6F5f5F897692a9dB3dEe8E2D3c656C483/tokens?type=ERC-20');
+        const tokenResponse = await fetch('https://explorer.abc.t.raas.gelato.cloud/api/v2/addresses/0x80e93b9420746ac25c420c3a7cc29b46bec34d26/tokens?type=ERC-20');
         const tokenData = await tokenResponse.json();
         console.log('Token data received:', tokenData);
         

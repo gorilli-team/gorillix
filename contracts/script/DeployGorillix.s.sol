@@ -5,7 +5,7 @@ import { Script } from "forge-std/Script.sol";
 import { Gorillix } from "../src/Gorillix.sol";
 
 contract DeployGorillix is Script {
-    address public constant TRUSTED_FORWARDER = 0xd8253782c45a12053594b9deB72d8e8aB2Fca54c;
+    address public constant TRUSTED_FORWARDER = 0x61F2976610970AFeDc1d83229e1E21bdc3D5cbE4;
 
     address public tokenA;
     address public tokenB;
