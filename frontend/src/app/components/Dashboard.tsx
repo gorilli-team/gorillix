@@ -65,7 +65,7 @@ export default function Dashboard() {
           {isAiEnabled ?<h2 className="text-2xl font-bold text-white">AI Trading Performance</h2>:<h2 className="text-2xl font-bold text-white">Manual Trading</h2>}
            <button
              onClick={handleModeSwitch}
-             className="px-4 py-2 rounded-lg text-sm transition-colors bg-violet-600 text-white hover:bg-violet-700 transition-colors focus:outline-none"
+             className="px-4 py-2 rounded-lg text-sm transition-colors bg-violet-600 text-white hover:bg-violet-700 focus:outline-none"
            >
              {isAiEnabled ? 'Switch to Manual Mode' : 'Switch to AI Mode'}
            </button>

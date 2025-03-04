@@ -7,9 +7,9 @@ export interface ContractAddresses {
   }
   
   export const CONTRACT_ADDRESSES: ContractAddresses = {
-    TOKEN_A: '0x4110db11e9fc29f645634091fef35a732ac6359a' as `0x${string}`,
-    TOKEN_B: '0xf2769f12882151cc15b78f7a0f07d4c04bc7aa31' as `0x${string}`,
-    GORILLIX: '0x14a678f6f5f5f897692a9db3dee8e2d3c656c483' as `0x${string}`,
-    FAUCET: '0x76995801f053d689f7e06e5e23e984caa31fbcf8' as `0x${string}`,
-    ESCROW: '0xdb8e20f8f51522b2053be0253bd54fab902b36bb' as `0x${string}`
+    TOKEN_A: '0x9455bd9d1dd4a7e66e34ffc2e5de83caa92092ae' as `0x${string}`,
+    TOKEN_B: '0x1d96f7338ae4edfc835bd3d19297666c1e80b170' as `0x${string}`,
+    GORILLIX: '0x80e93b9420746ac25c420c3a7cc29b46bec34d26' as `0x${string}`,
+    FAUCET: '0xce02e799a74ae683fceceaada62497e82ed7cb4a' as `0x${string}`,
+    ESCROW: '0xcd8aca3fba1192607a87fec234fd13ed439ff36c' as `0x${string}`
   };
